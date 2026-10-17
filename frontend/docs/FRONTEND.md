@@ -282,8 +282,93 @@ Domain state is partitioned into normalized slices:
 Visit `/dev/data` to:
 - Monitor live entity counts and active tracks in real time.
 - Adjust simulation clock rate (`1x`, `5x`, `20x`).
+- Toggle the **Planted Conflict Demo Layer** live without needing to restart the dev server.
 - Inject operational contingencies with single-click tactical scenario buttons.
 - Inspect, approve, or reject generated AI recommendations.
 - View live raw JSON snapshots for integration verification.
+
+---
+
+## 10. Operational Baseline & Conflict Demo Layer (Stage 5)
+
+### 10.1 Default Clean Baseline (M-01 .. M-10)
+To enable the decision-support retasking demonstration to start from a nominal state ("all green"), the default mock dataset starts with **ZERO active conflicts**:
+- **0 double-booked aircraft**: Every active and planned sortie has an exclusively assigned airframe.
+- **0 double-booked crew**: Every sortie has distinct assigned personnel.
+- **0 turnaround violations**: All sequential sorties have greater than the 45-minute mandatory turnaround buffer.
+- **0 crew duty limit breaches**: No rostered crew exceeds the legal 12.0-hour continuous duty threshold.
+- **0 airframe or qualification mismatches**: Airframes match required mission types, and aircrew possess required certifications (e.g. `CR-22` holds `SAR_RADAR` for CSAR `M-08`).
+- **0 at-risk sorties**: All initial missions are nominal (`in-progress`, `planned`, or `approved`).
+
+### 10.2 Planted Conflict Demo Layer (M-11 .. M-14)
+The planted conflict scenarios created for timeline demonstration are isolated in a separate dataset layer:
+- `M-11`: Northern Interdiction Strike (`at-risk`, assigned mismatched airframe `AC-23` [Helicopter-E instead of Strike-B], assigned `CR-08` with duty breach [11.2h + 4.0h = 15.2h > 12h]).
+- `M-12`: Border Patrol Sweep Post-Strike (`completed`, assigned `AC-21`, `CR-21`).
+- `M-13`: Reinforced Combat Air Patrol (`planned`, concurrent overlap with `M-06` double-booking airframe `AC-04` and pilot `CR-04`).
+- `M-14`: Secondary Supply Staging Sweep (`planned`, starts 15m after `M-07` on airframe `AC-09`, violating 45m turnaround buffer).
+- `REC-0001`: Proposed DSS recommendation swapping `AC-04` to `AC-05` to resolve double-booking.
+
+### 10.3 Controlling the Conflict Layer
+1. **Environment Flag**:
+   In `frontend/.env` (or `.env.example`), set:
+   ```env
+   VITE_MOCK_CONFLICTS=false  # default: clean baseline (M-01..M-10)
+   # VITE_MOCK_CONFLICTS=true # enables planted conflict demo layer (M-01..M-14)
+   ```
+2. **Runtime Dev Toggle**:
+   Navigate to `/dev/data` and click the **"Enable Conflict Demo" / "Disable Conflict Demo"** toggle. The store synchronizer instantly hot-reloads the operational snapshot.
+
+### 10.4 Canonical ID Alignment with Backend Seed
+The default dataset adheres to the following ID ranges:
+- **Air Bases (4)**: `BASE-A`, `BASE-B`, `BASE-C`, `BASE-D`
+- **Aircraft Fleet (24)**: `AC-01` .. `AC-24`
+  - `AC-01`..`AC-08`: Fighter-A (Airborne: `AC-01` on M-01, `AC-03` on M-03; Maintenance: `AC-06`; Unserviceable: `AC-02`)
+  - `AC-09`..`AC-14`: Strike-B (Airborne: `AC-07` on M-04; Serviceable: `AC-09` on M-07)
+  - `AC-15`..`AC-18`: Transport-C (Airborne/Serviceable: `AC-15` on M-05, `AC-16` on M-10)
+  - `AC-19`..`AC-21`: Recon-D (Airborne: `AC-19` on M-02; Serviceable: `AC-20` on M-09)
+  - `AC-22`..`AC-24`: Helicopter-E (Serviceable: `AC-22` on M-08)
+- **Aircrew Personnel (30)**: `CR-01` .. `CR-30`
+  - `CR-01`..`CR-10`: Lead Fighter Pilots
+  - `CR-11`..`CR-18`: Strike Weapons Officers
+  - `CR-19`..`CR-24`: Recon Systems Operators
+  - `CR-25`..`CR-30`: Heavy Transport Captains
+- **Missions (Default 10)**: `M-01` .. `M-10`
+  - `M-01`: Northern Sentinel (CAP, Fighter-A, `AC-01`, `CR-01`, in-progress)
+  - `M-02`: Eastern Border Recon Orbit (recon, Recon-D, `AC-19`, `CR-19`, in-progress)
+  - `M-03`: Southern Sea Approach Patrol (CAP, Fighter-A, `AC-03`, `CR-03`, in-progress)
+  - `M-04`: Central Precision Strike Sortie (strike, Strike-B, `AC-07`, `CR-07`, in-progress)
+    - *SAM Demo Path*: Route B intersects SAM `THR-02` (85 km); Route C is viable dogleg bypass.
+  - `M-05`: Inter-Base Munitions Airlift (airlift, Transport-C, `AC-15`, `CR-25`, in-progress)
+  - `M-06`: Quick Reaction Alert (CAP, Fighter-A, `AC-04`, `CR-04`, planned)
+  - `M-07`: Offensive Counter-Air Sweep (strike, Strike-B, `AC-09`, `CR-11`, approved)
+  - `M-08`: Forward Strip CSAR Standby (SAR, Helicopter-E, `AC-22`, `CR-22`, planned)
+  - `M-09`: Electronic Warfare Escort (escort, Recon-D, `AC-20`, `CR-20`, planned)
+  - `M-10`: Scheduled Personnel Rotation (airlift, Transport-C, `AC-16`, `CR-26`, planned)
+- **Threat Contacts (4)**: `THR-01` (SAM, 65km), `THR-02` (SAM, 85km), `THR-03` (CAP Bogey), `THR-04` (Radar Site)
+- **Airspace Zones (4)**: `AS-01` (Transit Corridor Echo), `AS-02` (Restricted Range Bravo), `AS-03` (No-Fly Northern Border), `AS-04` (Maritime Danger Area)
+- **Audit Entries (3 baseline)**: `AUD-0001`, `AUD-0002`, `AUD-0003`
+
+### 10.5 Pure Conflict Detection Engine (`src/lib/conflictDetection.ts`)
+Conflict evaluation is implemented as a **pure function**:
+```ts
+export function detectMissionConflicts(
+  missions: Mission[],
+  aircraft: Record<string, Aircraft>,
+  crew: Record<string, Crew>,
+  turnaroundMinutesOrRefTime?: number | string | Date,
+  optionalTurnaroundMinutes?: number,
+): ConflictDetectionResult;
+```
+- **Guarantees**:
+  - ZERO Zustand store access
+  - ZERO `Date.now()` or host system clock dependence
+  - ZERO React hooks or JSX rendering
+  - 100% deterministic testability in Vitest
+- **Detects 5 Critical Conflict Conditions**:
+  1. `double_booked_aircraft`: Concurrent scheduling of identical airframe across overlapping sortie windows.
+  2. `double_booked_crew`: Concurrent assignment of same aircrew personnel across overlapping sorties.
+  3. `insufficient_turnaround`: Sorties on the same airframe with departure buffers below the turnaround threshold (default 45 min).
+  4. `crew_duty_limit_breach`: Assigned aircrew projected duty hours exceeding 12.0 hours.
+  5. `resource_mismatch`: Aircraft type mismatch or aircrew missing required qualifications.
 
 
