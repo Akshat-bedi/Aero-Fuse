@@ -52,7 +52,8 @@ export class TacticalWebSocketClient {
         try {
           const parsed = JSON.parse(event.data);
           const channel = parsed.type || 'message';
-          this.emit(channel, parsed.payload ?? parsed);
+          this.emit(channel, parsed);
+          this.emit('*', parsed);
         } catch {
           this.emit('raw_message', event.data);
         }

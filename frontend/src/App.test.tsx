@@ -66,4 +66,11 @@ describe('App Shell & Navigation', () => {
     expect(serviceConfig.dataSource).toBe('mock');
     expect(serviceConfig.isMock).toBe(true);
   });
+
+  it('renders developer debug links and mounts entities store', () => {
+    render(<App />);
+
+    expect(screen.getByRole('link', { name: /Data Engine & Stores/i })).toBeInTheDocument();
+    expect(screen.getAllByRole('link', { name: /Component Gallery/i }).length).toBeGreaterThan(0);
+  });
 });

@@ -1,11 +1,17 @@
 {
   "type": "FeatureCollection",
   "name": "FictionalCommandTerritory",
+  "bounds": {
+    "minLat": 0.0,
+    "maxLat": 10.0,
+    "minLng": 0.0,
+    "maxLng": 12.0
+  },
   "features": [
     {
       "type": "Feature",
       "properties": {
-        "name": "Territory Alpha (Sovereign Airspace)",
+        "name": "Republic of Veridia (Sovereign Airspace)",
         "type": "NATIONAL_BORDER",
         "status": "FRIENDLY"
       },
@@ -13,13 +19,13 @@
         "type": "Polygon",
         "coordinates": [
           [
-            [30.0, 13.0],
-            [36.0, 13.0],
-            [36.5, 16.5],
-            [35.0, 19.5],
-            [31.0, 19.0],
-            [30.0, 16.0],
-            [30.0, 13.0]
+            [1.0, 1.0],
+            [1.0, 9.0],
+            [6.0, 9.5],
+            [11.0, 9.0],
+            [11.5, 5.0],
+            [10.0, 1.0],
+            [1.0, 1.0]
           ]
         ]
       }
@@ -27,7 +33,7 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Sector North Buffer",
+        "name": "Sector North Buffer Zone",
         "type": "BUFFER_ZONE",
         "status": "CONTESTED"
       },
@@ -35,11 +41,11 @@
         "type": "Polygon",
         "coordinates": [
           [
-            [31.0, 19.0],
-            [35.0, 19.5],
-            [35.5, 21.0],
-            [31.5, 20.8],
-            [31.0, 19.0]
+            [1.0, 9.0],
+            [11.0, 9.0],
+            [11.0, 9.8],
+            [1.0, 9.8],
+            [1.0, 9.0]
           ]
         ]
       }
@@ -47,37 +53,49 @@
     {
       "type": "Feature",
       "properties": {
-        "name": "Alpha FOB Airspace",
-        "code": "ALPH",
+        "name": "Sector Alpha Fighter Base",
+        "code": "BASE-A",
         "type": "AIRBASE"
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [32.45, 15.67]
+        "coordinates": [3.5, 8.5]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "name": "North Bastion Airbase",
-        "code": "BSTN",
+        "name": "North Bastion Strike Base",
+        "code": "BASE-B",
         "type": "AIRBASE"
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [34.12, 17.89]
+        "coordinates": [6.8, 5.2]
       }
     },
     {
       "type": "Feature",
       "properties": {
-        "name": "Highland Station Delta",
-        "code": "HLND",
+        "name": "Charlie Logistics & Transport Hub",
+        "code": "BASE-C",
         "type": "AIRBASE"
       },
       "geometry": {
         "type": "Point",
-        "coordinates": [31.88, 14.22]
+        "coordinates": [4.2, 1.8]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Delta Eastern Forward Strip",
+        "code": "BASE-D",
+        "type": "AIRBASE"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [10.5, 4.6]
       }
     }
   ]

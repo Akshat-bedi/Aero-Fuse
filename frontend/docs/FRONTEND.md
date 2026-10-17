@@ -227,3 +227,63 @@ All commands below must be executed from the `frontend/` directory (`cd frontend
 ### Component Gallery
 Visit `/dev/components` in the running application to view, interact with, and test all 15 UI primitives.
 
+---
+
+## 9. Data Contract, Shared Types & Mock Engine (Stage 2)
+
+### 9.1 Shared TypeScript Domain Types (`src/types/index.ts`)
+The entire application is strictly typed with canonical types:
+- `Base`: Airbase state (runway status `open|degraded|closed`, weather, fuel stock %, shelter capacity).
+- `Aircraft`: Airframes (`serviceable|maintenance|unserviceable|airborne|turnaround`), fuel %, flight hours to service, weapon load, live position/heading/speed, assigned mission.
+- `Crew`: Aircrew personnel, role, flight qualifications, fatigue index (0–100), duty hours in last 24h, operational status.
+- `WeaponStock`: Munition inventory per base and weapon type.
+- `Mission`: Operational tasking (`CAP`, `strike`, `recon`, `airlift`, `SAR`, `escort`), priority (P1–P4), mission window, waypoints, asset assignments.
+- `Airspace`: Dynamic vector airspace zones (`restricted`, `corridor`, `no-fly`, `danger`) with GeoJSON polygons.
+- `Threat`: Fictional threat detections (`SAM`, `fighter`, `radar`, `AAA`), engagement range, confidence, status (`active`, `suspected`, `neutralised`).
+- `WeatherState`: METAR-style surface/air conditions per base or sector, with 6h forecast horizons.
+- `OpsEvent`: Injectable operational triggers (`THREAT_DETECTED`, `AIRCRAFT_UNSERVICEABLE`, `BASE_CLOSED`, `WEATHER_DEGRADED`, `NEW_PRIORITY_MISSION`, `CREW_UNAVAILABLE`).
+- `Recommendation`: Decision-support recommendations containing suitability score (0–100), concrete entity changes, impacted missions, trade-offs, constraints satisfied/relaxed, plain-language operational rationale, and human commander decision (`pending`, `approved`, `rejected`, `modified`).
+- `Prediction`: Proactive threshold breach predictions with confidence and time horizon.
+- `AuditEntry`: Immutable operational decisions and override logs.
+
+### 9.2 Service Layer & Data Agnosticism (`src/services/`)
+Data access is isolated through `IDataService`:
+- `getSnapshot()`: Returns the complete current `OperationalSnapshot`.
+- `subscribe(callback)`: Real-time event stream subscription.
+- `injectEvent(event)`: Injects operational contingencies for optimization.
+- `decideRecommendation(id, decision, modifications)`: Processes commander decisions.
+- `runScenario(params)`: Executes what-if simulations.
+- `getAuditLog()`: Retrieves immutable event and decision logs.
+- `setSpeedMultiplier(speed)`: Controls simulation tempo (`1x`, `5x`, `20x`).
+
+**Backend-Agnostic Switch**:
+- `mockDataService.ts`: In-memory realistic fictional simulation engine with live 1000ms movement loop advancing waypoints, fuel burn, and dynamic retasking.
+- `liveDataService.ts`: Production REST + auto-reconnecting WebSocket client.
+- Configuration: Set `VITE_DATA_SOURCE=mock` or `VITE_DATA_SOURCE=live` in `frontend/.env`.
+
+### 9.3 Mock Retasking Optimisation Engine (`src/services/mockRetaskEngine.ts`)
+Deterministic decision engine that generates explainable retask plans:
+- **Aircraft Unserviceable**: Identifies compatible serviceable ground-spare at launch base, swaps airframe, logs turnaround delta.
+- **Base Closed / Weather Degraded**: Diverts airborne flights to nearest open recovery base with fuel check; warns of readiness reduction.
+- **Threat Detected**: Evaluates mission route intersections; suggests dogleg reroute around threat ceiling or CAP screen.
+- **Crew Unavailable / Fatigue Exceeded**: Reassigns qualified resting crew with lowest fatigue index.
+- **New Priority Mission**: Scrambles QRA alert aircraft or diverts low-priority routine patrols.
+
+### 9.4 Zustand State Architecture (`src/store/`)
+Domain state is partitioned into normalized slices:
+- `entitiesStore`: Normalized dictionary maps for `bases`, `aircraft`, `crew`, `missions`, `airspace`, `threats`, `weather`, `weaponStocks`, `predictions`.
+- `recommendationsStore`: Pending recommendations, status filters, active counts.
+- `eventsStore`: Chronological ops events log.
+- `auditStore`: Immutable audit trail of operational choices.
+- `uiStore`: Navigation state, night mode, modal states, alerts drawer, toast notifications.
+- `sync.ts`: Central synchronizer subscribing `dataService` directly into Zustand on app mount.
+
+### 9.5 Interactive Data & Simulation Console (`/dev/data`)
+Visit `/dev/data` to:
+- Monitor live entity counts and active tracks in real time.
+- Adjust simulation clock rate (`1x`, `5x`, `20x`).
+- Inject operational contingencies with single-click tactical scenario buttons.
+- Inspect, approve, or reject generated AI recommendations.
+- View live raw JSON snapshots for integration verification.
+
+

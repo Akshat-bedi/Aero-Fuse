@@ -51,10 +51,9 @@ export const PriorityTag: React.FC<PriorityTagProps> = ({
   size = 'md',
   className,
 }) => {
-  // Normalize priority string e.g. "P1_CRITICAL" -> "P1"
-  const normalized = priority.toUpperCase().startsWith('P')
-    ? priority.substring(0, 2)
-    : 'P3';
+  // Normalize priority string e.g. 1 -> "P1", "P1_CRITICAL" -> "P1"
+  const raw = String(priority).toUpperCase();
+  const normalized = raw.startsWith('P') ? raw.substring(0, 2) : `P${raw}`;
 
   const config = PRIORITY_CONFIG[normalized] || PRIORITY_CONFIG.P3;
   const Icon = config.icon;
