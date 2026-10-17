@@ -2,8 +2,8 @@ import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppLayout } from './AppLayout';
 import { CopPage } from '@/features/cop';
 import { ResourcesPage } from '@/features/resources';
+import { MissionsPage } from '@/features/missions';
 import {
-  MissionsPage,
   RecommendationsPage,
   ScenariosPage,
   AlertsPage,

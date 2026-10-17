@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useMemo } from 'react';
-import { useEntitiesStore } from '@/store';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
+import { useEntitiesStore, useUiStore } from '@/store';
 import { dataService } from '@/services';
 import {
   TacticalMap,
@@ -36,8 +36,35 @@ export const CopPage: React.FC = () => {
     updateMission,
   } = useEntitiesStore();
 
+  const { selectedMissionId, selectMission } = useUiStore();
+
   // Selected tactical entity
   const [selectedEntity, setSelectedEntity] = useState<SelectedEntity | null>(null);
+
+  // Sync selectedEntity with global selectedMissionId
+  useEffect(() => {
+    if (selectedMissionId) {
+      setSelectedEntity((prev) => {
+        if (prev?.type === 'mission' && prev.id === selectedMissionId) return prev;
+        return { type: 'mission', id: selectedMissionId };
+      });
+    }
+  }, [selectedMissionId]);
+
+  const handleSelectEntity = useCallback(
+    (entity: SelectedEntity | null) => {
+      setSelectedEntity(entity);
+      if (entity?.type === 'mission') {
+        selectMission(entity.id);
+      } else if (entity?.type === 'aircraft') {
+        const ac = aircraft[entity.id];
+        selectMission(ac?.assignedMissionId || null);
+      } else if (entity === null) {
+        selectMission(null);
+      }
+    },
+    [aircraft, selectMission],
+  );
 
   // Layer visibility toggles
   const [layers, setLayers] = useState<LayerVisibilityState>(DEFAULT_LAYER_VISIBILITY);
@@ -273,7 +300,7 @@ export const CopPage: React.FC = () => {
           airspace={airspace}
           weather={weather}
           selectedEntity={selectedEntity}
-          onSelectEntity={setSelectedEntity}
+          onSelectEntity={handleSelectEntity}
           layers={layers}
         />
 
@@ -298,7 +325,7 @@ export const CopPage: React.FC = () => {
         {selectedEntity && (
           <EntityDetailPanel
             selectedEntity={selectedEntity}
-            onClose={() => setSelectedEntity(null)}
+            onClose={() => handleSelectEntity(null)}
             bases={bases}
             aircraft={aircraft}
             missions={missions}
@@ -306,7 +333,7 @@ export const CopPage: React.FC = () => {
             airspace={airspace}
             weather={weather}
             crew={crew}
-            onSelectEntity={setSelectedEntity}
+            onSelectEntity={handleSelectEntity}
           />
         )}
 

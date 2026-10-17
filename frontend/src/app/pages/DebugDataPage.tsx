@@ -25,6 +25,7 @@ import {
   Copy,
   Check,
   Activity,
+  AlertTriangle,
 } from 'lucide-react';
 import { OpsEventType } from '@/types';
 
@@ -57,6 +58,20 @@ export const DebugDataPage: React.FC = () => {
   const [selectedAircraftId, setSelectedAircraftId] = useState<string>('AC-01');
   const [isInjecting, setIsInjecting] = useState(false);
   const [feedbackMsg, setFeedbackMsg] = useState<string>('Engine running and ready');
+  const [mockConflicts, setMockConflicts] = useState<boolean>(() => {
+    return dataService.getIsMockConflictsEnabled ? dataService.getIsMockConflictsEnabled() : false;
+  });
+
+  const handleToggleConflicts = () => {
+    const next = !mockConflicts;
+    if (dataService.setMockConflictsEnabled) {
+      dataService.setMockConflictsEnabled(next);
+    }
+    setMockConflicts(next);
+    setFeedbackMsg(
+      `Conflict demo layer ${next ? 'ACTIVATED (M-11..M-14 loaded)' : 'DEACTIVATED (Clean baseline M-01..M-10)'}`,
+    );
+  };
 
   const baseList = Object.values(bases);
   const aircraftList = Object.values(aircraft);
@@ -224,6 +239,48 @@ export const DebugDataPage: React.FC = () => {
         <span className="text-[10px] text-command-subdued">
           Last Snapshot Sync: {lastUpdated ? new Date(lastUpdated).toLocaleTimeString() : 'connecting...'}
         </span>
+      </div>
+
+      {/* Planted Conflict Demo Layer Toggle */}
+      <div className="p-3 rounded bg-command-panel border border-command-border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+        <div className="flex items-center gap-3">
+          <div
+            className={`p-2 rounded ${
+              mockConflicts
+                ? 'bg-amber-950/60 border border-amber-600/60 text-amber-400'
+                : 'bg-emerald-950/60 border border-emerald-600/60 text-emerald-400'
+            }`}
+          >
+            <AlertTriangle className="w-4 h-4" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-command-heading uppercase tracking-wide">
+                Planted Conflict Demo Layer
+              </span>
+              <StatusBadge
+                status={mockConflicts ? 'warning' : 'nominal'}
+                label={mockConflicts ? 'DEMO CONFLICTS ACTIVE (M-11..M-14)' : 'CLEAN BASELINE (M-01..M-10)'}
+                size="sm"
+              />
+            </div>
+            <p className="text-[11px] text-command-muted font-sans mt-0.5">
+              {mockConflicts
+                ? 'Planted conflicts loaded: AC-04/CR-04 double booking on M-06/M-13, AC-09 turnaround on M-07/M-14, CR-08 duty breach on M-11, AC-23 airframe type mismatch on M-11.'
+                : '100% conflict-free operational baseline: all sorties green, zero double-bookings, zero duty breaches, zero type mismatches.'}
+            </p>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Button
+            variant={mockConflicts ? 'danger' : 'primary'}
+            size="sm"
+            onClick={handleToggleConflicts}
+          >
+            {mockConflicts ? 'Disable Conflict Demo' : 'Enable Conflict Demo'}
+          </Button>
+        </div>
       </div>
 
       {/* State Counts Grid */}
