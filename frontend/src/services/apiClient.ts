@@ -45,7 +45,7 @@ export class TacticalApiClient {
     return this.request<T>(endpoint, { method: 'GET' });
   }
 
-  public post<T>(endpoint: string, body: unknown): Promise<T> {
+  public post<T>(endpoint: string, body: unknown = {}): Promise<T> {
     return this.request<T>(endpoint, {
       method: 'POST',
       body: JSON.stringify(body),
