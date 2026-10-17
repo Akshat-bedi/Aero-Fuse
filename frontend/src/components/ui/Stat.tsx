@@ -7,7 +7,7 @@ export interface StatProps {
   label: string;
   value: React.ReactNode;
   unit?: string;
-  trend?: {
+  trend?: string | {
     direction: 'up' | 'down' | 'neutral';
     value: string;
     isPositive?: boolean; // depending on whether 'up' is good or bad
@@ -63,7 +63,11 @@ export const Stat: React.FC<StatProps> = ({
 
       {(trend || subtitle) && (
         <div className="flex items-center justify-between text-[11px] mt-2 pt-1.5 border-t border-command-border/40 font-mono">
-          {trend ? (
+          {typeof trend === 'string' ? (
+            <span className="text-command-muted text-[10px] font-sans truncate">
+              {trend}
+            </span>
+          ) : trend ? (
             <div
               className={cn(
                 'inline-flex items-center gap-1 font-medium',
