@@ -13,6 +13,7 @@ import {
   LayerVisibilityState,
   DEFAULT_LAYER_VISIBILITY,
 } from './types';
+import { ReadinessStrip } from '@/features/resources';
 import {
   Plane,
   ShieldAlert,
@@ -249,6 +250,15 @@ export const CopPage: React.FC = () => {
               </div>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* Tactical Readiness Strip at the top of COP screen */}
+      <div className="relative z-10 px-3 py-1 bg-command-panel/90 border-b border-command-border/60 flex items-center justify-between overflow-x-auto">
+        <ReadinessStrip isCompact className="border-0 bg-transparent p-0 shadow-none" />
+        <div className="hidden md:flex items-center gap-2 font-mono text-[10px] text-command-subdued">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+          <span>THEATRE READINESS: NOMINAL</span>
         </div>
       </div>
 
