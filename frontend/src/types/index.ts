@@ -6,7 +6,15 @@
 
 export type DataSourceMode = 'mock' | 'live';
 
-export type OperationalStatus = 'nominal' | 'warning' | 'critical' | 'info' | 'unknown';
+export type OperationalStatus =
+  | 'nominal'    // Serviceable / Nominal (Green)
+  | 'warning'    // Caution / Degraded (Amber)
+  | 'critical'   // Critical / Unserviceable / Threat (Red)
+  | 'info'       // Pending / Info (Blue)
+  | 'inactive'   // Inactive (Grey)
+  | 'unknown';   // Unknown / Unconfirmed
+
+export type PriorityLevel = 'P1' | 'P2' | 'P3' | 'P4';
 
 export type AircraftType =
   | 'Fighter-A'
@@ -65,4 +73,23 @@ export interface RetaskingRecommendation {
   decisionTimestamp?: string;
   commanderNotes?: string;
   createdAt: string;
+}
+
+export interface ToastItem {
+  id: string;
+  type: 'nominal' | 'warning' | 'critical' | 'info';
+  title: string;
+  message?: string;
+  durationMs?: number;
+}
+
+export interface OperationalAlert {
+  id: string;
+  title: string;
+  severity: 'critical' | 'warning' | 'info';
+  timestamp: string; // Zulu or ISO
+  category: 'AIRSPACE' | 'WEATHER' | 'MAINTENANCE' | 'THREAT' | 'FUEL';
+  location?: string;
+  acknowledged: boolean;
+  details: string;
 }
