@@ -73,5 +73,7 @@ export interface IDataService {
     action: 'pause' | 'resume' | 'speed' | 'reset',
     speed?: 1 | 5 | 20,
   ): Promise<{ simTime: string; speed: number; paused: boolean }>;
+  setMockConflictsEnabled?(enabled: boolean): void;
+  getIsMockConflictsEnabled?(): boolean;
 }
 

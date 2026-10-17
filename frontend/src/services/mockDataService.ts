@@ -23,6 +23,7 @@ import {
   MapBounds,
 } from '@/types';
 import { mockRetaskEngine } from './mockRetaskEngine';
+import { serviceConfig } from './config';
 
 /* =========================================================================
    FICTIONAL INITIAL SEED DATA ("Republic of Veridia")
@@ -154,13 +155,13 @@ const SEED_WEAPON_STOCKS: WeaponStock[] = [
   { baseId: 'BASE-D', weaponType: 'GENERIC-RECON-POD', quantity: 12 },
 ];
 
-function generateSeedAircraft(): Record<string, Aircraft> {
+export function generateSeedAircraft(): Record<string, Aircraft> {
   const aircraft: Record<string, Aircraft> = {};
 
   // 8 x Fighter-A (AC-01 .. AC-08)
   for (let i = 1; i <= 8; i++) {
     const id = `AC-${i.toString().padStart(2, '0')}`;
-    const baseId = i <= 4 ? 'BASE-A' : i <= 6 ? 'BASE-B' : 'BASE-D';
+    const baseId = i <= 5 ? 'BASE-A' : i <= 7 ? 'BASE-B' : 'BASE-D';
     const isAirborne = i === 1 || i === 3;
     aircraft[id] = {
       id,
@@ -292,7 +293,7 @@ function generateSeedAircraft(): Record<string, Aircraft> {
   return aircraft;
 }
 
-function generateSeedCrew(): Record<string, Crew> {
+export function generateSeedCrew(): Record<string, Crew> {
   const crew: Record<string, Crew> = {};
   const CALLSIGNS = [
     'VIPER', 'HAWK', 'RAVEN', 'MAVERICK', 'COBRA', 'EAGLE', 'SPECTRE', 'VALKYRIE',
@@ -308,9 +309,10 @@ function generateSeedCrew(): Record<string, Crew> {
     const isCritical = i === 8;
     const isWarning1 = i === 14;
     const isWarning2 = i === 21;
+    const isCR22 = i === 22;
 
-    const fatigue = isCritical ? 86 : isWarning1 ? 78 : isWarning2 ? 72 : isOnMission ? 52 : ((i * 7 + 11) % 35) + 12;
-    const dutyHours = isCritical ? 11.2 : isWarning1 ? 10.5 : isWarning2 ? 9.8 : isOnMission ? 6.4 : +(((i * 3 + 5) % 8) + 1.5).toFixed(1);
+    const fatigue = isCritical ? 86 : isWarning1 ? 78 : isWarning2 ? 72 : isCR22 ? 28 : isOnMission ? 52 : ((i * 7 + 11) % 35) + 12;
+    const dutyHours = isCritical ? 11.2 : isWarning1 ? 10.5 : isWarning2 ? 9.8 : isCR22 ? 4.2 : isOnMission ? 6.4 : +(((i * 3 + 5) % 8) + 1.5).toFixed(1);
 
     const qualifications =
       i <= 10
@@ -336,13 +338,18 @@ function generateSeedCrew(): Record<string, Crew> {
   return crew;
 }
 
-function generateSeedMissions(): Record<string, Mission> {
-  const now = new Date();
+export function generateSeedMissions(includeConflicts = false, baseTime?: Date): Record<string, Mission> {
+  const now = baseTime || new Date();
   const isoNow = now.toISOString();
+  const isoMinus4h = new Date(now.getTime() - 4 * 3600000).toISOString();
   const isoPlus4h = new Date(now.getTime() + 4 * 3600000).toISOString();
+  const isoPlus5h = new Date(now.getTime() + 5 * 3600000).toISOString();
+  const isoPlus7h = new Date(now.getTime() + 7 * 3600000).toISOString();
   const isoPlus8h = new Date(now.getTime() + 8 * 3600000).toISOString();
+  const isoPlus8h15m = new Date(now.getTime() + (8 * 3600000 + 15 * 60000)).toISOString();
+  const isoPlus11h = new Date(now.getTime() + 11 * 3600000).toISOString();
 
-  return {
+  const missions: Record<string, Mission> = {
     'M-01': {
       id: 'M-01',
       name: 'Northern Sentinel (CAP)',
@@ -594,7 +601,7 @@ function generateSeedMissions(): Record<string, Mission> {
       windowStart: isoPlus4h,
       windowEnd: isoPlus8h,
       requiredAircraftType: 'Helicopter-E',
-      requiredCrewQuals: ['NIGHT_OPS'],
+      requiredCrewQuals: ['SAR_RADAR'],
       requiredWeapons: [],
       assigned: { aircraftIds: ['AC-22'], crewIds: ['CR-22'] },
     },
@@ -639,6 +646,121 @@ function generateSeedMissions(): Record<string, Mission> {
       assigned: { aircraftIds: ['AC-16'], crewIds: ['CR-26'] },
     },
   };
+
+  if (includeConflicts) {
+    missions['M-11'] = {
+      id: 'M-11',
+      name: 'Northern Interdiction Strike',
+      type: 'strike',
+      priority: 1,
+      status: 'at-risk',
+      launchBaseId: 'BASE-B',
+      target: { lat: 4.5, lng: 8.5, name: 'Contested Radar Site Victor' },
+      route: [
+        { lat: 5.2, lng: 6.8 },
+        { lat: 4.8, lng: 7.5 },
+        { lat: 4.5, lng: 8.5 },
+        { lat: 5.2, lng: 6.8 },
+      ],
+      routeOptions: [
+        {
+          id: 'Route A',
+          name: 'Route A (Direct SAM Penetration)',
+          waypoints: [
+            { lat: 5.2, lng: 6.8 },
+            { lat: 4.8, lng: 7.5 },
+            { lat: 4.5, lng: 8.5 },
+            { lat: 5.2, lng: 6.8 },
+          ],
+          distanceKm: 310,
+          riskScore: 85,
+        },
+        {
+          id: 'Route B',
+          name: 'Route B (Low-Altitude Valley Ingress)',
+          waypoints: [
+            { lat: 5.2, lng: 6.8 },
+            { lat: 4.2, lng: 7.0 },
+            { lat: 4.5, lng: 8.5 },
+            { lat: 5.2, lng: 6.8 },
+          ],
+          distanceKm: 360,
+          riskScore: 35,
+        },
+      ],
+      windowStart: isoNow,
+      windowEnd: isoPlus4h,
+      requiredAircraftType: 'Strike-B',
+      requiredCrewQuals: ['SEAD_STRIKE', 'TACTICAL_DATALINK'],
+      requiredWeapons: [{ weaponType: 'PGM-Mk2', quantity: 4 }],
+      assigned: { aircraftIds: ['AC-23'], crewIds: ['CR-08'] },
+    };
+
+    missions['M-12'] = {
+      id: 'M-12',
+      name: 'Border Patrol Sweep Post-Strike',
+      type: 'recon',
+      priority: 3,
+      status: 'completed',
+      launchBaseId: 'BASE-D',
+      target: { lat: 5.5, lng: 10.2, name: 'Recon Sector Bravo' },
+      route: [
+        { lat: 4.6, lng: 10.5 },
+        { lat: 5.5, lng: 10.2 },
+        { lat: 4.6, lng: 10.5 },
+      ],
+      windowStart: isoMinus4h,
+      windowEnd: isoNow,
+      requiredAircraftType: 'Recon-D',
+      requiredCrewQuals: ['INSTRUMENT_RATING'],
+      requiredWeapons: [{ weaponType: 'GENERIC-RECON-POD', quantity: 1 }],
+      assigned: { aircraftIds: ['AC-21'], crewIds: ['CR-21'] },
+    };
+
+    missions['M-13'] = {
+      id: 'M-13',
+      name: 'Reinforced Combat Air Patrol',
+      type: 'CAP',
+      priority: 2,
+      status: 'planned',
+      launchBaseId: 'BASE-A',
+      target: { lat: 8.2, lng: 4.8, name: 'CAP Gate Victor' },
+      route: [
+        { lat: 8.5, lng: 3.5 },
+        { lat: 8.2, lng: 4.8 },
+        { lat: 8.5, lng: 3.5 },
+      ],
+      windowStart: isoPlus5h,
+      windowEnd: isoPlus7h,
+      requiredAircraftType: 'Fighter-A',
+      requiredCrewQuals: ['AAM_COMBAT'],
+      requiredWeapons: [{ weaponType: 'GENERIC-AAM-M', quantity: 2 }],
+      assigned: { aircraftIds: ['AC-04'], crewIds: ['CR-04'] },
+    };
+
+    missions['M-14'] = {
+      id: 'M-14',
+      name: 'Secondary Supply Staging Sweep',
+      type: 'strike',
+      priority: 3,
+      status: 'planned',
+      launchBaseId: 'BASE-B',
+      target: { lat: 4.2, lng: 7.2, name: 'Forward Staging Yard' },
+      route: [
+        { lat: 5.2, lng: 6.8 },
+        { lat: 4.2, lng: 7.2 },
+        { lat: 5.2, lng: 6.8 },
+      ],
+      windowStart: isoPlus8h15m,
+      windowEnd: isoPlus11h,
+      requiredAircraftType: 'Strike-B',
+      requiredCrewQuals: ['TACTICAL_DATALINK'],
+      requiredWeapons: [{ weaponType: 'PGM-Mk2', quantity: 4 }],
+      assigned: { aircraftIds: ['AC-09'], crewIds: ['CR-12'] },
+    };
+  }
+
+  return missions;
 }
 
 function generateSeedAirspace(): Record<string, Airspace> {
@@ -892,6 +1014,57 @@ function generateSeedAuditLog(): AuditEntry[] {
   ];
 }
 
+export function generateSeedRecommendations(includeConflicts = false, baseTime?: Date): Record<string, Recommendation> {
+  if (!includeConflicts) {
+    return {};
+  }
+  const now = baseTime || new Date();
+  return {
+    'REC-0001': {
+      id: 'REC-0001',
+      triggerEventId: 'EV-0001',
+      summary: 'Substitute AC-05 for AC-04 on Quick Reaction Alert (QRA) to resolve scheduling conflict.',
+      score: 94,
+      changes: [
+        {
+          missionId: 'M-06',
+          kind: 'aircraft_swap',
+          before: 'AC-04',
+          after: 'AC-05',
+          note: 'Retask AC-05 (Fighter-A) from Sector Alpha Fighter Base to resolve aircraft double-booking.',
+          type: 'REPLACE_AIRCRAFT',
+          entityId: 'M-06',
+          fromValue: 'AC-04',
+          toValue: 'AC-05',
+          description: 'Retask AC-05 (Fighter-A) from Sector Alpha Fighter Base to resolve aircraft double-booking.',
+        },
+      ],
+      impactedMissionIds: ['M-06'],
+      tradeoffs: [
+        { label: 'Conflict Resolution', delta: 1, unit: 'conflict', direction: 'good' },
+        { label: 'Sortie Preparation Buffer', delta: 45, unit: 'min', direction: 'good' },
+      ],
+      explanation: [
+        'Airframe AC-04 is double-booked between M-06 and M-13.',
+        'Substitute airframe AC-05 (Fighter-A) is available at Sector Alpha Fighter Base with 95% fuel reserve and zero scheduled sortie conflicts.',
+        'Reassignment preserves mission readiness with zero flight path or station time impact.',
+      ],
+      constraintsSatisfied: [
+        'Aircraft type match: Fighter-A hardpoints verified',
+        'Launch base alignment: Sector Alpha Fighter Base (BASE-A)',
+        'Maintenance reserve threshold satisfied',
+      ],
+      constraintsRelaxed: [],
+      status: 'pending',
+      createdAt: now.toISOString(),
+      stateVersion: 1,
+      confidence: 0.94,
+      dataFreshnessSec: 2,
+      alternatives: [],
+    },
+  };
+}
+
 /* =========================================================================
    MOCK DATA SERVICE IMPLEMENTATION
    ========================================================================= */
@@ -901,11 +1074,12 @@ export class MockDataService implements IDataService {
   private simTime: Date = new Date();
   private speedMultiplier: 1 | 5 | 20 = 1;
   private isPaused = false;
+  private mockConflictsEnabled = serviceConfig.mockConflicts;
 
   private bases: Record<string, Base> = { ...SEED_BASES };
   private aircraft: Record<string, Aircraft> = generateSeedAircraft();
   private crew: Record<string, Crew> = generateSeedCrew();
-  private missions: Record<string, Mission> = generateSeedMissions();
+  private missions: Record<string, Mission> = generateSeedMissions(serviceConfig.mockConflicts);
   private airspace: Record<string, Airspace> = generateSeedAirspace();
   private threats: Record<string, Threat> = generateSeedThreats();
   private weaponStocks: WeaponStock[] = [...SEED_WEAPON_STOCKS];
@@ -915,7 +1089,7 @@ export class MockDataService implements IDataService {
     'BASE-C': SEED_BASES['BASE-C'].weather,
     'BASE-D': SEED_BASES['BASE-D'].weather,
   };
-  private recommendations: Record<string, Recommendation> = {};
+  private recommendations: Record<string, Recommendation> = generateSeedRecommendations(serviceConfig.mockConflicts);
   private activeEvents: OpsEvent[] = [];
   private predictions: Prediction[] = generateSeedPredictions();
   private auditLog: AuditEntry[] = generateSeedAuditLog();
@@ -1304,8 +1478,8 @@ export class MockDataService implements IDataService {
       this.bases = { ...SEED_BASES };
       this.aircraft = generateSeedAircraft();
       this.crew = generateSeedCrew();
-      this.missions = generateSeedMissions();
-      this.recommendations = {};
+      this.missions = generateSeedMissions(this.mockConflictsEnabled, this.simTime);
+      this.recommendations = generateSeedRecommendations(this.mockConflictsEnabled, this.simTime);
       this.activeEvents = [];
       this.isPaused = false;
       this.speedMultiplier = 1;
@@ -1317,6 +1491,18 @@ export class MockDataService implements IDataService {
       speed: this.speedMultiplier,
       paused: this.isPaused,
     };
+  }
+
+  public setMockConflictsEnabled(enabled: boolean): void {
+    this.mockConflictsEnabled = enabled;
+    this.missions = generateSeedMissions(enabled, this.simTime);
+    this.recommendations = generateSeedRecommendations(enabled, this.simTime);
+    this.stateVersion++;
+    this.notifySubscribers();
+  }
+
+  public getIsMockConflictsEnabled(): boolean {
+    return this.mockConflictsEnabled;
   }
 
   private appendAuditEntry(entry: Omit<AuditEntry, 'id' | 'timestamp' | 'prevHash' | 'hash'>): void {
