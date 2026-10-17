@@ -10,6 +10,7 @@ import {
   AuditLogPage,
 } from './pages/RoutesPages';
 import { ComponentGalleryPage } from './pages/ComponentGalleryPage';
+import { DebugDataPage } from './pages/DebugDataPage';
 
 export const router = createBrowserRouter([
   {
@@ -47,6 +48,10 @@ export const router = createBrowserRouter([
       {
         path: 'dev/components',
         element: <ComponentGalleryPage />,
+      },
+      {
+        path: 'dev/data',
+        element: <DebugDataPage />,
       },
       {
         path: '*',

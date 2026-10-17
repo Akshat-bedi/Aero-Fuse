@@ -9,6 +9,7 @@ import {
   AlertTriangle,
   ClipboardList,
   Component,
+  Database,
   ChevronLeft,
   ChevronRight,
 } from 'lucide-react';
@@ -152,7 +153,7 @@ export const NavRail: React.FC = () => {
           to="/dev/components"
           className={({ isActive }) =>
             cn(
-              'flex items-center gap-2.5 px-2.5 py-2 rounded text-xs uppercase font-medium tracking-wide transition-all duration-150 group border border-dashed',
+              'flex items-center gap-2.5 px-2.5 py-1.5 rounded text-xs uppercase font-medium tracking-wide transition-all duration-150 group border border-dashed',
               isActive
                 ? 'bg-command-raised border-command-primary text-command-primary font-semibold shadow-tactical'
                 : 'border-command-border/80 text-command-muted hover:text-command-text hover:bg-command-raised/50',
@@ -164,14 +165,14 @@ export const NavRail: React.FC = () => {
               <>
                 <Component
                   className={cn(
-                    'w-4 h-4 flex-shrink-0',
+                    'w-3.5 h-3.5 flex-shrink-0',
                     isActive ? 'text-command-primary' : 'text-command-muted group-hover:text-command-text',
                   )}
                 />
                 {isExpanded && (
                   <div className="flex flex-col min-w-0 leading-tight">
-                    <span className="truncate">Component Gallery</span>
-                    <span className="text-[9px] font-mono text-command-subdued">/dev/components</span>
+                    <span className="truncate text-[11px]">Component Gallery</span>
+                    <span className="text-[8px] font-mono text-command-subdued">/dev/components</span>
                   </div>
                 )}
               </>
@@ -180,6 +181,47 @@ export const NavRail: React.FC = () => {
             if (!isExpanded) {
               return (
                 <Tooltip content="Component Gallery (/dev/components)" position="right">
+                  <div className="flex items-center justify-center w-full">{linkContent}</div>
+                </Tooltip>
+              );
+            }
+
+            return linkContent;
+          }}
+        </NavLink>
+
+        <NavLink
+          to="/dev/data"
+          className={({ isActive }) =>
+            cn(
+              'flex items-center gap-2.5 px-2.5 py-1.5 rounded text-xs uppercase font-medium tracking-wide transition-all duration-150 group border border-dashed',
+              isActive
+                ? 'bg-command-raised border-command-primary text-command-primary font-semibold shadow-tactical'
+                : 'border-command-border/80 text-command-muted hover:text-command-text hover:bg-command-raised/50',
+            )
+          }
+        >
+          {({ isActive }) => {
+            const linkContent = (
+              <>
+                <Database
+                  className={cn(
+                    'w-3.5 h-3.5 flex-shrink-0',
+                    isActive ? 'text-command-primary' : 'text-command-muted group-hover:text-command-text',
+                  )}
+                />
+                {isExpanded && (
+                  <div className="flex flex-col min-w-0 leading-tight">
+                    <span className="truncate text-[11px]">Data Engine & Stores</span>
+                    <span className="text-[8px] font-mono text-command-subdued">/dev/data</span>
+                  </div>
+                )}
+              </>
+            );
+
+            if (!isExpanded) {
+              return (
+                <Tooltip content="Data Engine & Stores (/dev/data)" position="right">
                   <div className="flex items-center justify-center w-full">{linkContent}</div>
                 </Tooltip>
               );
