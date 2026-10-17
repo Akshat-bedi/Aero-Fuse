@@ -1,0 +1,71 @@
+{
+  "type": "FeatureCollection",
+  "name": "VeridiaTerrain",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Northern Highland Ridge",
+        "elevationFt": 7500,
+        "type": "HIGHLAND"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [2.2, 7.8],
+            [3.2, 8.8],
+            [4.8, 9.1],
+            [5.5, 8.6],
+            [4.6, 7.6],
+            [3.0, 7.4],
+            [2.2, 7.8]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Central Plateau",
+        "elevationFt": 3800,
+        "type": "PLATEAU"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [5.0, 4.5],
+            [7.2, 4.8],
+            [7.8, 6.0],
+            [6.4, 6.5],
+            [5.2, 5.8],
+            [5.0, 4.5]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "Eastern Escarpment",
+        "elevationFt": 5200,
+        "type": "RIDGE"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [9.2, 3.8],
+            [10.2, 4.2],
+            [10.8, 5.5],
+            [10.4, 6.4],
+            [9.4, 5.8],
+            [9.0, 4.6],
+            [9.2, 3.8]
+          ]
+        ]
+      }
+    }
+  ]
+}

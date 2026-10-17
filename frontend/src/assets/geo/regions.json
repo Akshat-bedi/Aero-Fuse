@@ -1,0 +1,96 @@
+{
+  "type": "FeatureCollection",
+  "name": "VeridiaRegions",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "SEC-NORTH",
+        "name": "Sector Alpha (Northern Command)",
+        "code": "NORTH-A",
+        "commandHQ": "BASE-A"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [1.2, 7.0],
+            [1.8, 9.0],
+            [3.5, 9.4],
+            [5.8, 9.6],
+            [7.0, 9.5],
+            [6.8, 7.0],
+            [1.2, 7.0]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "SEC-CENTRAL",
+        "name": "Sector Bravo (Central Strike Command)",
+        "code": "CENTRAL-B",
+        "commandHQ": "BASE-B"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [1.0, 4.0],
+            [1.2, 7.0],
+            [6.8, 7.0],
+            [8.5, 7.0],
+            [8.5, 4.0],
+            [1.0, 4.0]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "SEC-SOUTH",
+        "name": "Sector Charlie (Southern Logistics Command)",
+        "code": "SOUTH-C",
+        "commandHQ": "BASE-C"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [1.2, 1.0],
+            [1.0, 4.0],
+            [8.5, 4.0],
+            [8.5, 1.0],
+            [5.5, 1.2],
+            [1.2, 1.0]
+          ]
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "id": "SEC-EAST",
+        "name": "Sector Delta (Eastern Border Command)",
+        "code": "EAST-D",
+        "commandHQ": "BASE-D"
+      },
+      "geometry": {
+        "type": "Polygon",
+        "coordinates": [
+          [
+            [8.5, 1.0],
+            [8.5, 9.2],
+            [11.2, 8.2],
+            [11.5, 6.5],
+            [11.4, 3.2],
+            [10.8, 1.8],
+            [8.5, 1.0]
+          ]
+        ]
+      }
+    }
+  ]
+}
