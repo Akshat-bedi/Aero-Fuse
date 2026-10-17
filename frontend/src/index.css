@@ -7,16 +7,16 @@
 
 :root,
 .dark {
-  /* Command Centre Base Palette */
-  --color-bg-base: #07090e;
-  --color-bg-surface: #0d121d;
-  --color-bg-panel: #131b2a;
-  --color-bg-card: #182235;
+  /* Near-black layered surfaces: base, panel, raised */
+  --color-bg-base: #080b11;
+  --color-bg-panel: #0e1422;
+  --color-bg-raised: #151e32;
+  --color-bg-raised-hover: #1c2842;
 
-  /* Borders */
-  --color-border: #1e2c45;
-  --color-border-subtle: #162032;
-  --color-border-strong: #2a3d60;
+  /* Borders & Grid dividers */
+  --color-border: #1d2a44;
+  --color-border-subtle: #131c2e;
+  --color-border-strong: #2c3e64;
 
   /* Typography */
   --color-text-base: #e2e8f0;
@@ -24,17 +24,86 @@
   --color-text-muted: #94a3b8;
   --color-text-subdued: #64748b;
 
-  /* Tactical Primary (Cyan HUD accent) */
-  --color-primary: #00e5ff;
-  --color-primary-hover: #33ebff;
-  --color-primary-dim: rgba(0, 229, 255, 0.12);
+  /* Primary accent: muted cyan/teal */
+  --color-primary: #06b6d4;
+  --color-primary-hover: #22d3ee;
+  --color-primary-dim: rgba(6, 182, 212, 0.14);
 
-  /* Safety-critical Operational Status Tokens */
-  --color-status-nominal: #10b981;    /* Ready / Nominal / Safe */
-  --color-status-warning: #f59e0b;    /* Caution / Degraded / Weather alert */
-  --color-status-critical: #ef4444;   /* Unserviceable / High Threat / Fuel Emergency */
-  --color-status-info: #0284c7;       /* Planned / In-Progress */
-  --color-status-unknown: #a855f7;    /* Unconfirmed / Pending confirmation */
+  /* Secondary accent: amber for caution */
+  --color-secondary: #f59e0b;
+  --color-secondary-hover: #fbbf24;
+  --color-secondary-dim: rgba(245, 158, 11, 0.14);
+
+  /* Semantic status colours (with matching backgrounds and borders) */
+  /* Serviceable / Nominal = green */
+  --color-status-nominal: #10b981;
+  --color-status-nominal-bg: rgba(16, 185, 129, 0.15);
+  --color-status-nominal-border: rgba(16, 185, 129, 0.35);
+
+  /* Caution / Degraded = amber */
+  --color-status-warning: #f59e0b;
+  --color-status-warning-bg: rgba(245, 158, 11, 0.15);
+  --color-status-warning-border: rgba(245, 158, 11, 0.35);
+
+  /* Critical / Unserviceable / Threat = red */
+  --color-status-critical: #ef4444;
+  --color-status-critical-bg: rgba(239, 68, 68, 0.15);
+  --color-status-critical-border: rgba(239, 68, 68, 0.35);
+
+  /* Pending / Info = blue */
+  --color-status-info: #3b82f6;
+  --color-status-info-bg: rgba(59, 130, 246, 0.15);
+  --color-status-info-border: rgba(59, 130, 246, 0.35);
+
+  /* Inactive = grey */
+  --color-status-inactive: #64748b;
+  --color-status-inactive-bg: rgba(100, 116, 139, 0.15);
+  --color-status-inactive-border: rgba(100, 116, 139, 0.35);
+}
+
+/* Red-shifted, low-lumen military tactical ops lighting ("Night Mode") */
+.night-mode {
+  --color-bg-base: #060203;
+  --color-bg-panel: #110507;
+  --color-bg-raised: #1c080b;
+  --color-bg-raised-hover: #290c10;
+
+  --color-border: #3b1116;
+  --color-border-subtle: #240a0e;
+  --color-border-strong: #5c1820;
+
+  --color-text-base: #fca5a5;
+  --color-text-heading: #fee2e2;
+  --color-text-muted: #e05d68;
+  --color-text-subdued: #992934;
+
+  --color-primary: #ff4d61;
+  --color-primary-hover: #ff7081;
+  --color-primary-dim: rgba(255, 77, 97, 0.15);
+
+  --color-secondary: #f87171;
+  --color-secondary-hover: #fca5a5;
+  --color-secondary-dim: rgba(248, 113, 113, 0.15);
+
+  --color-status-nominal: #ff9988;
+  --color-status-nominal-bg: rgba(255, 153, 136, 0.15);
+  --color-status-nominal-border: rgba(255, 153, 136, 0.4);
+
+  --color-status-warning: #ffaa55;
+  --color-status-warning-bg: rgba(255, 170, 85, 0.15);
+  --color-status-warning-border: rgba(255, 170, 85, 0.4);
+
+  --color-status-critical: #ff2233;
+  --color-status-critical-bg: rgba(255, 34, 51, 0.2);
+  --color-status-critical-border: rgba(255, 34, 51, 0.5);
+
+  --color-status-info: #dd6677;
+  --color-status-info-bg: rgba(221, 102, 119, 0.15);
+  --color-status-info-border: rgba(221, 102, 119, 0.4);
+
+  --color-status-inactive: #6b262f;
+  --color-status-inactive-bg: rgba(107, 38, 47, 0.15);
+  --color-status-inactive-border: rgba(107, 38, 47, 0.4);
 }
 
 body {
@@ -43,27 +112,35 @@ body {
   background-color: var(--color-bg-base);
   color: var(--color-text-base);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
-  min-height: 100vh;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-code, kbd, samp, pre {
+code, kbd, samp, pre, .font-mono {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Custom Tactical Scrollbars */
+/* Custom Tactical Scrollbars for individual panels */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 ::-webkit-scrollbar-track {
-  background: var(--color-bg-surface);
+  background: var(--color-bg-base);
 }
 ::-webkit-scrollbar-thumb {
   background: var(--color-border);
-  border-radius: 3px;
+  border-radius: 2px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-border-strong);
+}
+
+/* Focus styles for accessible keyboard navigation */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 1px;
 }

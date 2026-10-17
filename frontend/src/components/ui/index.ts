@@ -1,3 +1,15 @@
-// UI components module barrel export
-// (Buttons, cards, badges, modals, tabs, tooltips will be added in subsequent stages)
-export {};
+export * from './Button';
+export * from './Panel';
+export * from './StatusBadge';
+export * from './PriorityTag';
+export * from './Modal';
+export * from './ConfirmDialog';
+export * from './Tabs';
+export * from './Tooltip';
+export * from './DataTable';
+export * from './ProgressBar';
+export * from './Toast';
+export * from './Skeleton';
+export * from './EmptyState';
+export * from './KeyValue';
+export * from './Stat';

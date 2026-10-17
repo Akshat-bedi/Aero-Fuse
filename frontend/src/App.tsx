@@ -1,8 +1,6 @@
+import { RouterProvider } from 'react-router-dom';
+import { router } from '@/app/router';
+
 export default function App() {
-  return (
-    <main className="min-h-screen bg-command-bg text-command-text" role="main">
-      {/* Stage 0 scaffold placeholder - UI will be built in subsequent stages */}
-      <h1 className="sr-only">AirOps DSS</h1>
-    </main>
-  );
+  return <RouterProvider router={router} />;
 }
