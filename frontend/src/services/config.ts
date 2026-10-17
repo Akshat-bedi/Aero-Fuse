@@ -5,6 +5,7 @@ export interface ServiceConfig {
   apiBaseUrl: string;
   wsUrl: string;
   isMock: boolean;
+  mockConflicts: boolean;
 }
 
 export const serviceConfig: ServiceConfig = {
@@ -12,4 +13,5 @@ export const serviceConfig: ServiceConfig = {
   apiBaseUrl: import.meta.env.VITE_API_BASE_URL || 'http://localhost:8000/api',
   wsUrl: import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws',
   isMock: (import.meta.env.VITE_DATA_SOURCE || 'mock') === 'mock',
+  mockConflicts: import.meta.env.VITE_MOCK_CONFLICTS === 'true',
 };
