@@ -1,4 +1,5 @@
 import '@testing-library/jest-dom';
+import React from 'react';
 import { vi } from 'vitest';
 
 // Mock maplibre-gl for headless jsdom test environment
@@ -49,5 +50,17 @@ vi.mock('maplibre-gl', () => {
     ScaleControl: MockScaleControl,
     Popup: MockPopup,
     supported: vi.fn(() => true),
+  };
+});
+
+// Mock echarts-for-react for headless test environment
+vi.mock('echarts-for-react', () => {
+  return {
+    default: ({ option, style, className }: { option?: { title?: { text?: string } }; style?: React.CSSProperties; className?: string }) =>
+      React.createElement(
+        'div',
+        { 'data-testid': 'echarts-for-react', className, style },
+        option?.title?.text || 'ECharts Component',
+      ),
   };
 });

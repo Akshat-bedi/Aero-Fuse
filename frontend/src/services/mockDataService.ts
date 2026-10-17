@@ -121,16 +121,37 @@ const SEED_BASES: Record<string, Base> = {
 };
 
 const SEED_WEAPON_STOCKS: WeaponStock[] = [
+  // BASE-A (Fighter Intercept Focus)
   { baseId: 'BASE-A', weaponType: 'GENERIC-AAM-M', quantity: 64 },
   { baseId: 'BASE-A', weaponType: 'GENERIC-AAM-S', quantity: 96 },
   { baseId: 'BASE-A', weaponType: 'PGM-Mk2', quantity: 24 },
-  { baseId: 'BASE-B', weaponType: 'PGM-Mk2', quantity: 48 },
+  { baseId: 'BASE-A', weaponType: 'GENERIC-ANTIRADAR', quantity: 6 }, // LOW STOCK
+  { baseId: 'BASE-A', weaponType: 'GENERIC-CARGO-PALLET', quantity: 18 },
+  { baseId: 'BASE-A', weaponType: 'GENERIC-RECON-POD', quantity: 8 },
+
+  // BASE-B (Strike Bastion)
   { baseId: 'BASE-B', weaponType: 'GENERIC-AAM-M', quantity: 48 },
+  { baseId: 'BASE-B', weaponType: 'GENERIC-AAM-S', quantity: 52 },
+  { baseId: 'BASE-B', weaponType: 'PGM-Mk2', quantity: 48 },
   { baseId: 'BASE-B', weaponType: 'GENERIC-ANTIRADAR', quantity: 18 },
-  { baseId: 'BASE-C', weaponType: 'GENERIC-CARGO-PALLET', quantity: 120 },
+  { baseId: 'BASE-B', weaponType: 'GENERIC-CARGO-PALLET', quantity: 22 },
+  { baseId: 'BASE-B', weaponType: 'GENERIC-RECON-POD', quantity: 4 }, // LOW STOCK
+
+  // BASE-C (Transport & Logistics Hub)
+  { baseId: 'BASE-C', weaponType: 'GENERIC-AAM-M', quantity: 14 }, // LOW STOCK
   { baseId: 'BASE-C', weaponType: 'GENERIC-AAM-S', quantity: 32 },
-  { baseId: 'BASE-D', weaponType: 'GENERIC-RECON-POD', quantity: 12 },
+  { baseId: 'BASE-C', weaponType: 'PGM-Mk2', quantity: 12 }, // LOW STOCK
+  { baseId: 'BASE-C', weaponType: 'GENERIC-ANTIRADAR', quantity: 0 }, // OUT OF STOCK
+  { baseId: 'BASE-C', weaponType: 'GENERIC-CARGO-PALLET', quantity: 120 },
+  { baseId: 'BASE-C', weaponType: 'GENERIC-RECON-POD', quantity: 2 }, // LOW STOCK
+
+  // BASE-D (Eastern Forward Recon Strip)
+  { baseId: 'BASE-D', weaponType: 'GENERIC-AAM-M', quantity: 16 }, // LOW STOCK
   { baseId: 'BASE-D', weaponType: 'GENERIC-AAM-S', quantity: 24 },
+  { baseId: 'BASE-D', weaponType: 'PGM-Mk2', quantity: 8 }, // LOW STOCK
+  { baseId: 'BASE-D', weaponType: 'GENERIC-ANTIRADAR', quantity: 4 }, // LOW STOCK
+  { baseId: 'BASE-D', weaponType: 'GENERIC-CARGO-PALLET', quantity: 14 },
+  { baseId: 'BASE-D', weaponType: 'GENERIC-RECON-POD', quantity: 12 },
 ];
 
 function generateSeedAircraft(): Record<string, Aircraft> {
@@ -284,16 +305,31 @@ function generateSeedCrew(): Record<string, Crew> {
     const id = `CR-${i.toString().padStart(2, '0')}`;
     const baseId = i <= 10 ? 'BASE-A' : i <= 18 ? 'BASE-B' : i <= 24 ? 'BASE-D' : 'BASE-C';
     const isOnMission = i === 1 || i === 3 || i === 4 || i === 7 || i === 15 || i === 19;
+    const isCritical = i === 8;
+    const isWarning1 = i === 14;
+    const isWarning2 = i === 21;
+
+    const fatigue = isCritical ? 86 : isWarning1 ? 78 : isWarning2 ? 72 : isOnMission ? 52 : ((i * 7 + 11) % 35) + 12;
+    const dutyHours = isCritical ? 11.2 : isWarning1 ? 10.5 : isWarning2 ? 9.8 : isOnMission ? 6.4 : +(((i * 3 + 5) % 8) + 1.5).toFixed(1);
+
+    const qualifications =
+      i <= 10
+        ? ['AAM_COMBAT', 'NIGHT_OPS', 'TACTICAL_DATALINK', 'HIGH_G_QUAL']
+        : i <= 18
+        ? ['PGM_DELIVERY', 'SEAD_STRIKE', 'TACTICAL_DATALINK', 'LOW_LEVEL_INGRESS']
+        : i <= 24
+        ? ['OPTICAL_RECON', 'SAR_RADAR', 'INSTRUMENT_RATING', 'EW_ANALYSIS']
+        : ['HEAVY_AIRLIFT', 'INSTRUMENT_RATING', 'AERIAL_REFUEL', 'MEDEVAC'];
 
     crew[id] = {
       id,
       callsign: CALLSIGNS[i - 1] || `PILOT-${i}`,
       role: i <= 10 ? 'Lead Fighter Pilot' : i <= 18 ? 'Strike Weapons Officer' : i <= 24 ? 'Recon Systems Operator' : 'Heavy Transport Captain',
-      qualifications: ['NIGHT_OPS', 'AAM_COMBAT', 'TACTICAL_DATALINK', 'INSTRUMENT_RATING'],
+      qualifications,
       baseId,
-      fatigueIndex: isOnMission ? 52 : i === 8 ? 86 : Math.floor(Math.random() * 30) + 10,
-      dutyHoursLast24h: isOnMission ? 6.4 : i === 8 ? 11.2 : Math.floor(Math.random() * 4) + 1,
-      status: isOnMission ? 'on-mission' : i === 8 ? 'unavailable' : i % 5 === 0 ? 'resting' : 'available',
+      fatigueIndex: fatigue,
+      dutyHoursLast24h: dutyHours,
+      status: isOnMission ? 'on-mission' : isCritical ? 'unavailable' : i % 5 === 0 ? 'resting' : 'available',
     };
   }
 
@@ -743,10 +779,10 @@ function generateSeedPredictions(): Prediction[] {
       entityId: 'AC-14',
       metric: 'serviceability_risk',
       value: 0.72,
-      confidence: 0.82,
+      confidence: 0.72,
       horizonMinutes: 360,
       createdAt: now,
-      message: 'AC-14 likely unserviceable within 6 h (72%)',
+      message: 'Aircraft AC-14 likely unserviceable within 6h (confidence 72%)',
     },
     {
       entityType: 'crew',
@@ -756,7 +792,7 @@ function generateSeedPredictions(): Prediction[] {
       confidence: 0.90,
       horizonMinutes: 180,
       createdAt: now,
-      message: 'CR-09 fatigue critical after next sortie',
+      message: 'Crew CR-09 fatigue critical after next sortie',
     },
     {
       entityType: 'base',
@@ -766,7 +802,7 @@ function generateSeedPredictions(): Prediction[] {
       confidence: 0.85,
       horizonMinutes: 540,
       createdAt: now,
-      message: 'BASE-C fuel below reserve threshold in 9 h',
+      message: 'Base BASE-C fuel below threshold in 9h',
     },
     {
       entityType: 'weather',
@@ -776,7 +812,47 @@ function generateSeedPredictions(): Prediction[] {
       confidence: 0.78,
       horizonMinutes: 240,
       createdAt: now,
-      message: 'BASE-A below flight minima 14:00-17:00Z',
+      message: 'Base BASE-A cloud ceiling breach below landing minima in 4h',
+    },
+    {
+      entityType: 'aircraft',
+      entityId: 'AC-06',
+      metric: 'radar_degradation',
+      value: 0.81,
+      confidence: 0.88,
+      horizonMinutes: 120,
+      createdAt: now,
+      message: 'Aircraft AC-06 APG radar transmitter power drop predicted in 2h',
+    },
+    {
+      entityType: 'crew',
+      entityId: 'CR-14',
+      metric: 'duty_hour_breach',
+      value: 0.84,
+      confidence: 0.84,
+      horizonMinutes: 150,
+      createdAt: now,
+      message: 'Crew CR-14 continuous duty window will exceed 12h threshold in 2.5h',
+    },
+    {
+      entityType: 'base',
+      entityId: 'BASE-B',
+      metric: 'crosswind_hazard',
+      value: 0.74,
+      confidence: 0.76,
+      horizonMinutes: 300,
+      createdAt: now,
+      message: 'Base BASE-B crosswinds forecast >32kts in 5h: runway ops degraded',
+    },
+    {
+      entityType: 'aircraft',
+      entityId: 'AC-22',
+      metric: 'rotor_vibration',
+      value: 0.62,
+      confidence: 0.68,
+      horizonMinutes: 480,
+      createdAt: now,
+      message: 'Helicopter AC-22 rotor mast harmonic vibration exceedance predicted in 8h',
     },
   ];
 }
