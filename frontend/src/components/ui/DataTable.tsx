@@ -24,7 +24,7 @@ export interface DataTableProps<T> {
   isCompact?: boolean;
 }
 
-export function DataTable<T extends Record<string, unknown>>({
+export function DataTable<T>({
   columns,
   data,
   keyExtractor,
@@ -55,8 +55,8 @@ export function DataTable<T extends Record<string, unknown>>({
     if (!sortKey) return data;
 
     return [...data].sort((a, b) => {
-      const aVal = a[sortKey];
-      const bVal = b[sortKey];
+      const aVal = (a as Record<string, unknown>)[sortKey];
+      const bVal = (b as Record<string, unknown>)[sortKey];
 
       if (aVal === bVal) return 0;
       if (aVal === undefined || aVal === null) return 1;
@@ -156,7 +156,7 @@ export function DataTable<T extends Record<string, unknown>>({
                       col.render(row, index)
                     ) : (
                       <span className="font-mono text-xs">
-                        {String(row[col.key] ?? '—')}
+                        {String((row as Record<string, unknown>)[col.key] ?? '—')}
                       </span>
                     )}
                   </td>
