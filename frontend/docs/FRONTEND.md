@@ -184,3 +184,46 @@ All commands below must be executed from the `frontend/` directory (`cd frontend
 | `npm run lint` | Runs ESLint over all TypeScript and React files |
 | `npm run format` | Formats code with Prettier |
 | `npm run preview` | Previews production build locally |
+
+---
+
+## 8. Design System & Application Shell (Stage 1)
+
+### Tactical Command Centre Theme
+- **Layered Surfaces**:
+  - `command-bg` (`--color-bg-base`): `#080b11` deep tactical backdrop
+  - `command-panel` (`--color-bg-panel`): `#0e1422` operational console panel
+  - `command-raised` (`--color-bg-raised`): `#151e32` elevated cards and active selection
+  - `command-border`: `#1d2a44` crisp dividers
+- **Accents**:
+  - Primary: Muted cyan/teal (`#06b6d4`, hover `#22d3ee`)
+  - Secondary: Caution amber (`#f59e0b`, hover `#fbbf24`)
+- **Semantic Status Colours (Always paired with icons and text labels)**:
+  - `nominal`: Serviceable/Nominal (Green `#10b981`)
+  - `warning`: Caution/Degraded (Amber `#f59e0b`)
+  - `critical`: Critical/Unserviceable/Threat (Red `#ef4444`)
+  - `info`: Pending/Info (Blue `#3b82f6`)
+  - `inactive`: Inactive (Grey `#64748b`)
+- **Military Night Vision Mode (`.night-mode`)**:
+  - Full red-shifted, low-lumen palette for dimmed operations rooms preserving dark adaptation.
+
+### Reusable UI Primitives (`src/components/ui/`)
+- `Button`: Primary, secondary, danger, ghost, loading, and 2-click safety `requireConfirm` variant.
+- `Panel` / `Card`: Header with title, subtitle, badges, action slot, and collapsible state.
+- `StatusBadge`: High contrast status badges paired with Lucide status icons.
+- `PriorityTag`: P1 (Critical), P2 (High), P3 (Routine), P4 (Low) mission urgency tags.
+- `Modal`: Accessible dialog with Escape key dismiss, backdrop click, and focus handling.
+- `ConfirmDialog`: Safety-critical confirmation modal with explicit risk warning and action verification.
+- `Tabs`: Underline and segmented tab bars with counters and active indicator.
+- `Tooltip`: Micro-tooltips with keyboard focus support and shortcut hotkey badges.
+- `DataTable`: Generic sortable table with column alignments, empty state, and row selection.
+- `ProgressBar`: Safety threshold progress bars (fuel endurance, operational readiness).
+- `Toast` & `ToastContainer`: Global operational notifications system.
+- `Skeleton`: Shimmer placeholder loaders for text, cards, and data views.
+- `EmptyState`: Clean tactical empty states for cleared views or empty filters.
+- `KeyValue` & `KeyValueList`: Dense telemetry key-value displays with copyable values.
+- `Stat`: High-visibility metric tiles with directional trend indicator and context subtitle.
+
+### Component Gallery
+Visit `/dev/components` in the running application to view, interact with, and test all 15 UI primitives.
+
