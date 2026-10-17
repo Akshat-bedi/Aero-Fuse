@@ -1,0 +1,69 @@
+@import '@fontsource/inter/index.css';
+@import '@fontsource/jetbrains-mono/index.css';
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root,
+.dark {
+  /* Command Centre Base Palette */
+  --color-bg-base: #07090e;
+  --color-bg-surface: #0d121d;
+  --color-bg-panel: #131b2a;
+  --color-bg-card: #182235;
+
+  /* Borders */
+  --color-border: #1e2c45;
+  --color-border-subtle: #162032;
+  --color-border-strong: #2a3d60;
+
+  /* Typography */
+  --color-text-base: #e2e8f0;
+  --color-text-heading: #f8fafc;
+  --color-text-muted: #94a3b8;
+  --color-text-subdued: #64748b;
+
+  /* Tactical Primary (Cyan HUD accent) */
+  --color-primary: #00e5ff;
+  --color-primary-hover: #33ebff;
+  --color-primary-dim: rgba(0, 229, 255, 0.12);
+
+  /* Safety-critical Operational Status Tokens */
+  --color-status-nominal: #10b981;    /* Ready / Nominal / Safe */
+  --color-status-warning: #f59e0b;    /* Caution / Degraded / Weather alert */
+  --color-status-critical: #ef4444;   /* Unserviceable / High Threat / Fuel Emergency */
+  --color-status-info: #0284c7;       /* Planned / In-Progress */
+  --color-status-unknown: #a855f7;    /* Unconfirmed / Pending confirmation */
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--color-bg-base);
+  color: var(--color-text-base);
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  min-height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code, kbd, samp, pre {
+  font-family: 'JetBrains Mono', monospace;
+}
+
+/* Custom Tactical Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-bg-surface);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-border);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-border-strong);
+}
