@@ -1,5 +1,6 @@
 @import '@fontsource/inter/index.css';
 @import '@fontsource/jetbrains-mono/index.css';
+@import 'maplibre-gl/dist/maplibre-gl.css';
 
 @tailwind base;
 @tailwind components;
@@ -143,4 +144,64 @@ code, kbd, samp, pre, .font-mono {
 :focus-visible {
   outline: 2px solid var(--color-primary);
   outline-offset: 1px;
+}
+
+/* MapLibre Tactical Dark Theme Customizations */
+.maplibregl-popup-content {
+  background-color: var(--color-bg-panel) !important;
+  color: var(--color-text-base) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 4px !important;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7), 0 8px 10px -6px rgba(0, 0, 0, 0.7) !important;
+  padding: 0 !important;
+}
+
+.maplibregl-popup-anchor-top .maplibregl-popup-tip {
+  border-bottom-color: var(--color-border) !important;
+}
+.maplibregl-popup-anchor-bottom .maplibregl-popup-tip {
+  border-top-color: var(--color-border) !important;
+}
+.maplibregl-popup-anchor-left .maplibregl-popup-tip {
+  border-right-color: var(--color-border) !important;
+}
+.maplibregl-popup-anchor-right .maplibregl-popup-tip {
+  border-left-color: var(--color-border) !important;
+}
+
+.maplibregl-popup-close-button {
+  color: var(--color-text-muted) !important;
+  padding: 4px 8px !important;
+  font-size: 16px !important;
+}
+.maplibregl-popup-close-button:hover {
+  color: var(--color-primary) !important;
+  background-color: transparent !important;
+}
+
+.maplibregl-ctrl-group {
+  background-color: var(--color-bg-panel) !important;
+  border: 1px solid var(--color-border) !important;
+  border-radius: 4px !important;
+}
+.maplibregl-ctrl-group button {
+  border-bottom: 1px solid var(--color-border) !important;
+}
+.maplibregl-ctrl-group button:last-child {
+  border-bottom: none !important;
+}
+.maplibregl-ctrl-group button:hover {
+  background-color: var(--color-bg-raised) !important;
+}
+.maplibregl-ctrl-icon {
+  filter: invert(0.8) hue-rotate(160deg);
+}
+
+.maplibregl-ctrl-scale {
+  background-color: rgba(14, 20, 34, 0.85) !important;
+  border: 1px solid var(--color-border) !important;
+  color: var(--color-primary) !important;
+  font-family: 'JetBrains Mono', monospace !important;
+  font-size: 10px !important;
+  padding: 2px 5px !important;
 }
