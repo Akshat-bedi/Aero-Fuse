@@ -1,0 +1,76 @@
+{
+  "type": "FeatureCollection",
+  "name": "VeridiaGraticule",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": { "label": "01°N", "axis": "lat", "deg": 1 },
+      "geometry": { "type": "LineString", "coordinates": [[0.0, 1.0], [12.0, 1.0]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "label": "02°N", "axis": "lat", "deg": 2 },
+      "geometry": { "type": "LineString", "coordinates": [[0.0, 2.0], [12.0, 2.0]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "label": "03°N", "axis": "lat", "deg": 3 },
+      "geometry": { "type": "LineString", "coordinates": [[0.0, 3.0], [12.0, 3.0]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "label": "04°N", "axis": "lat", "deg": 4 },
+      "geometry": { "type": "LineString", "coordinates": [[0.0, 4.0], [12.0, 4.0]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "label": "05°N", "axis": "lat", "deg": 5 },
+      "geometry": { "type": "LineString", "coordinates": [[0.0, 5.0], [12.0, 5.0]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "label": "06°N", "axis": "lat", "deg": 6 },
+      "geometry": { "type": "LineString", "coordinates": [[0.0, 6.0], [12.0, 6.0]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "label": "07°N", "axis": "lat", "deg": 7 },
+      "geometry": { "type": "LineString", "coordinates": [[0.0, 7.0], [12.0, 7.0]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "label": "08°N", "axis": "lat", "deg": 8 },
+      "geometry": { "type": "LineString", "coordinates": [[0.0, 8.0], [12.0, 8.0]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "label": "09°N", "axis": "lat", "deg": 9 },
+      "geometry": { "type": "LineString", "coordinates": [[0.0, 9.0], [12.0, 9.0]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "label": "02°E", "axis": "lng", "deg": 2 },
+      "geometry": { "type": "LineString", "coordinates": [[2.0, 0.0], [2.0, 10.0]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "label": "04°E", "axis": "lng", "deg": 4 },
+      "geometry": { "type": "LineString", "coordinates": [[4.0, 0.0], [4.0, 10.0]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "label": "06°E", "axis": "lng", "deg": 6 },
+      "geometry": { "type": "LineString", "coordinates": [[6.0, 0.0], [6.0, 10.0]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "label": "08°E", "axis": "lng", "deg": 8 },
+      "geometry": { "type": "LineString", "coordinates": [[8.0, 0.0], [8.0, 10.0]] }
+    },
+    {
+      "type": "Feature",
+      "properties": { "label": "10°E", "axis": "lng", "deg": 10 },
+      "geometry": { "type": "LineString", "coordinates": [[10.0, 0.0], [10.0, 10.0]] }
+    }
+  ]
+}

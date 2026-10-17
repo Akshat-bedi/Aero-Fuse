@@ -1,7 +1,7 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom';
 import { AppLayout } from './AppLayout';
+import { CopPage } from '@/features/cop';
 import {
-  CommonPicturePage,
   MissionsPage,
   ResourcesPage,
   RecommendationsPage,
@@ -19,7 +19,7 @@ export const router = createBrowserRouter([
     children: [
       {
         index: true,
-        element: <CommonPicturePage />,
+        element: <CopPage />,
       },
       {
         path: 'missions',
