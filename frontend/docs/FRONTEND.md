@@ -371,4 +371,48 @@ export function detectMissionConflicts(
   4. `crew_duty_limit_breach`: Assigned aircrew projected duty hours exceeding 12.0 hours.
   5. `resource_mismatch`: Aircraft type mismatch or aircrew missing required qualifications.
 
+---
+
+## 11. Visual Language & Command-and-Control (C2) Design System
+
+### 11.1 Philosophy & Operational Tone
+AirOps DSS adheres strictly to the aesthetics and functional discipline of a genuine military command-and-control (C2) operations room rather than a commercial startup dashboard. The visual interface is:
+- **Sober & Utilitarian**: Zero glowing cyan accents, zero pill-shaped rounded chips, zero drop shadows, zero soft gradients, and zero backdrop blur filters.
+- **High-Density & Dense**: Information-dense rectangular layouts optimized for low-glare, 24/7 command center displays.
+- **NATO APP-6 Symbology Inspired**: Standardized military tracks, square base markers with status ticks, and thin threat envelopes.
+
+### 11.2 Geometry & Elevation
+- **Corner Radii**: Strictly square or near-square (maximum `2px` radius; `rounded-[1px]` or `rounded-[2px]`). All rounded-full elements (except native checkbox circles/radio inputs where required) are eliminated.
+- **Borders & Rules**: Crisp `1px` solid borders (`#2a3630`) defining surfaces and cells.
+- **Elevation**: Flat surfaces without drop shadows (`box-shadow: none`). Panels are defined by subtle surface contrast between base (`#0c0f0e`), panel (`#141917`), and raised (`#1c2320`).
+
+### 11.3 Color Palette & Semantic Tokens
+- **Background Surfaces**: Near-black charcoal/graphite (`#0c0f0e` base, `#141917` panel, `#1c2320` raised).
+- **Text & Readouts**: Off-white primary text (`#d7dcd4`), subdued olive-grey labels (`#7e998a`), muted secondary (`#52665a`).
+- **Accent**: Muted tactical amber (`#d9a521`) used sparingly as a single accent for focus, active state, and selection indicators.
+- **Semantic Status (Never Color Alone)**:
+  - *Nominal / Serviceable*: Desaturated green (`#48a972`), label `SVC` / `NOM`.
+  - *Caution / Degraded*: Amber (`#d9a521`), label `CAUT` / `DEGR`.
+  - *Critical / Threat*: Muted red (`#c93b3b`), label `CRIT` / `AOG`.
+  - *Pending / Info*: Steel blue (`#4a7bb0`), label `INFO` / `PEND`.
+  - *Inactive*: Slate-grey (`#54635a`), label `INAC`.
+
+### 11.4 Typography
+- **UI & Telemetry**: Monospace-led (`JetBrains Mono`) for all callsigns, coordinates, flight hours, fuel percentages, mission IDs, and telemetry readouts. Tabular figures (`tabular-nums`) ensure jitter-free real-time simulation updates.
+- **Labels & Headers**: Uppercase, tracked monospace (`tracking-wider`).
+
+### 11.5 Motion Discipline
+- **Zero Decorative Motion**: Pulsing, bouncing, floating animations, and glow halos are strictly removed.
+- **Alert Blinking**: Critical status breaches use a slow, functional border blink (`@keyframes slow-blink` at 2s cycle).
+- **Accessibility**: All animations are suppressed when `prefers-reduced-motion` is active.
+
+### 11.6 Cartography & Map Symbology
+- **Landmass & Sea**: Near-black sea (`#080b0a`) and dark olive-grey land (`#151b18`) with subtle olive coastline rules (`#2a3630`).
+- **Graticule**: Faint coordinate lines (`#1c2621`) with haloed degree labels.
+- **Air Tracks**: Blue rectangular framing for friendly airframes (`#5b8ec2`), callsign label with dark halo.
+- **Threat Zones**: Red diamond center marker, thin red range ring (`#c93b3b`, line-width 1.2), and low-opacity hatch fill (0.05–0.08, zero solid red blobs). Suspected threats rendered with amber dashed rings (`#d9a521`, dasharray `[4, 4]`).
+- **Air Bases**: Square marker with status-colored perimeter tick (`#48a972` open, `#d9a521` degraded, `#c93b3b` closed).
+- **Mission Routes**: Line weights mapped strictly to sortie priority (P1 = 2.5px, P2 = 2.0px, P3 = 1.5px, P4 = 1.0px); solid when active airborne, dashed `[3, 3]` when planned.
+
+
 
