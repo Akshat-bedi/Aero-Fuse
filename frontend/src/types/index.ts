@@ -455,8 +455,32 @@ export interface WebSocketEnvelope<T = unknown> {
 }
 
 /* =========================================================================
-   4. UI NOTIFICATIONS & TOASTS
+   4. UI NOTIFICATIONS, ALERTS & TELEMETRY CONNECTION
    ========================================================================= */
+
+export type AlertSeverity = 'critical' | 'warning' | 'info';
+
+export type AlertType =
+  | 'threat'
+  | 'readiness'
+  | 'weather'
+  | 'crew'
+  | 'conflict'
+  | 'prediction'
+  | 'data-quality';
+
+export type ConnectionStatus =
+  | 'LIVE'
+  | 'MOCK'
+  | 'RECONNECTING'
+  | 'STALE'
+  | 'OFFLINE'
+  | 'live'
+  | 'mock'
+  | 'reconnecting'
+  | 'stale'
+  | 'offline'
+  | 'disconnected';
 
 export interface ToastItem {
   id: string;
@@ -469,12 +493,15 @@ export interface ToastItem {
 export interface OperationalAlert {
   id: string;
   title: string;
-  severity: 'critical' | 'warning' | 'info';
+  message: string;
+  severity: AlertSeverity;
+  type: AlertType;
   timestamp: string;
-  category: 'AIRSPACE' | 'WEATHER' | 'MAINTENANCE' | 'THREAT' | 'FUEL';
-  location?: string;
   acknowledged: boolean;
-  details: string;
+  entityId?: string;
+  location?: string;
+  details?: string;
+  category?: string;
 }
 
 /* =========================================================================

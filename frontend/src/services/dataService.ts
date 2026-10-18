@@ -11,6 +11,8 @@ import {
   Tradeoff,
   RetaskProgressState,
   ImpactAnalysisPayload,
+  OperationalAlert,
+  ConnectionStatus,
 } from '@/types';
 
 export interface DecisionPayload {
@@ -77,8 +79,18 @@ export interface IDataService {
     action: 'pause' | 'resume' | 'speed' | 'reset',
     speed?: 1 | 5 | 20,
   ): Promise<{ simTime: string; speed: number; paused: boolean }>;
+  // Stage 6: Retask Progress & Impact Telemetry
   subscribeRetaskProgress?(callback: (progress: RetaskProgressState) => void): () => void;
   subscribeImpact?(callback: (impact: ImpactAnalysisPayload) => void): () => void;
+
+  // Stage 9: Live Backend, Alerts & Health Checks
+  getHealth?(): Promise<{ status: string; version: string; simTime: string; solverReady: boolean }>;
+  getRecommendations?(status?: string): Promise<Recommendation[]>;
+  getRecommendation?(id: string): Promise<Recommendation>;
+  subscribeAlerts?(callback: (alert: OperationalAlert) => void): () => void;
+  subscribeConnectionStatus?(
+    callback: (status: ConnectionStatus, staleAgeSec?: number) => void,
+  ): () => void;
   setMockConflictsEnabled?(enabled: boolean): void;
   getIsMockConflictsEnabled?(): boolean;
 }

@@ -6,6 +6,7 @@ export interface ServiceConfig {
   wsUrl: string;
   isMock: boolean;
   mockConflicts: boolean;
+  staleAfterSec: number;
 }
 
 export const serviceConfig: ServiceConfig = {
@@ -14,4 +15,5 @@ export const serviceConfig: ServiceConfig = {
   wsUrl: import.meta.env.VITE_WS_URL || 'ws://localhost:8000/ws',
   isMock: (import.meta.env.VITE_DATA_SOURCE || 'mock') === 'mock',
   mockConflicts: import.meta.env.VITE_MOCK_CONFLICTS === 'true',
+  staleAfterSec: Number(import.meta.env.VITE_STALE_AFTER_SEC) || 15,
 };
