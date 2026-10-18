@@ -43,13 +43,13 @@ export const LayerControlPanel: React.FC<LayerControlPanelProps> = ({
     {
       key: 'aircraft',
       label: 'Aircraft Tracks',
-      icon: <Plane className="w-3.5 h-3.5 text-cyan-400" />,
+      icon: <Plane className="w-3.5 h-3.5 text-command-primary" />,
       desc: 'Airframe positions, callsigns & headings',
     },
     {
       key: 'flightTrails',
       label: 'Flight Breadcrumbs',
-      icon: <Route className="w-3.5 h-3.5 text-cyan-300" />,
+      icon: <Route className="w-3.5 h-3.5 text-command-secondary" />,
       desc: 'Recent position trail for airborne sorties',
     },
     {

@@ -245,10 +245,10 @@ export const DebugDataPage: React.FC = () => {
       <div className="p-3 rounded bg-command-panel border border-command-border flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
         <div className="flex items-center gap-3">
           <div
-            className={`p-2 rounded ${
+            className={`p-2 rounded-[1px] ${
               mockConflicts
-                ? 'bg-amber-950/60 border border-amber-600/60 text-amber-400'
-                : 'bg-emerald-950/60 border border-emerald-600/60 text-emerald-400'
+                ? 'bg-command-warning-bg border border-command-warning-border text-command-warning'
+                : 'bg-command-nominal-bg border border-command-nominal-border text-command-nominal'
             }`}
           >
             <AlertTriangle className="w-4 h-4" />

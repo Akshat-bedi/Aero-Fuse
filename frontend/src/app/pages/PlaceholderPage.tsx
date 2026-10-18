@@ -121,7 +121,7 @@ export const PlaceholderPage: React.FC<PlaceholderPageProps> = ({
             <KeyValue label="Order of Battle" value="FICTIONAL ASSETS ONLY" statusColor="default" />
           </KeyValueList>
 
-          <div className="mt-4 p-2.5 rounded bg-command-primary-dim border border-command-primary/30 text-[11px] text-cyan-200">
+          <div className="mt-4 p-2.5 rounded-[1px] bg-command-raised border border-command-border text-[11px] text-command-primary">
             <div className="flex items-center gap-1.5 font-bold uppercase mb-1">
               <Database className="w-3.5 h-3.5" />
               <span>Safety Rule Reminder</span>

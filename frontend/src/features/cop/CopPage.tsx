@@ -304,7 +304,7 @@ export const CopPage: React.FC = () => {
         <div className="flex items-center gap-3 shrink-0">
           <PlanCompareToggle />
           <div className="hidden md:flex items-center gap-2 font-mono text-[10px] text-command-subdued">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span className="w-1.5 h-1.5 rounded-[1px] bg-command-nominal" />
             <span>THEATRE: NOMINAL</span>
           </div>
         </div>

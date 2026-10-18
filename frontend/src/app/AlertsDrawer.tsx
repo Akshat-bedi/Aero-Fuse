@@ -26,9 +26,9 @@ export const AlertsDrawer: React.FC = () => {
   };
 
   const severityStyles = {
-    critical: 'border-l-command-critical bg-red-950/20',
-    warning: 'border-l-command-warning bg-amber-950/20',
-    info: 'border-l-command-primary bg-cyan-950/20',
+    critical: 'border-l-command-critical bg-command-critical-bg',
+    warning: 'border-l-command-warning bg-command-warning-bg',
+    info: 'border-l-command-primary bg-command-raised',
   };
 
   const handleAcknowledgeAll = () => {
@@ -39,17 +39,17 @@ export const AlertsDrawer: React.FC = () => {
 
   return (
     <aside
-      className="w-80 sm:w-96 bg-command-panel border-l border-command-border flex flex-col h-full z-20 flex-shrink-0 animate-in slide-in-from-right duration-200 select-none shadow-2xl"
+      className="w-80 sm:w-96 bg-command-panel border-l border-command-border flex flex-col h-full z-20 flex-shrink-0 animate-in slide-in-from-right duration-150 select-none"
       aria-label="Operational Alerts Drawer"
     >
       {/* Drawer Header */}
-      <div className="p-3 border-b border-command-border/80 bg-command-raised flex items-center justify-between">
+      <div className="p-3 border-b border-command-border bg-command-raised flex items-center justify-between">
         <div className="flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-command-warning" />
           <h3 className="text-xs font-bold uppercase tracking-wider text-command-heading">
             Live Tactical Alerts
           </h3>
-          <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded bg-command-border text-command-text">
+          <span className="text-[10px] font-mono font-bold px-1.5 py-0.2 rounded-[1px] bg-command-border text-command-text">
             {alerts.length}
           </span>
         </div>
@@ -68,7 +68,7 @@ export const AlertsDrawer: React.FC = () => {
           <button
             type="button"
             onClick={() => toggleAlertsDrawer(false)}
-            className="p-1 text-command-muted hover:text-command-heading rounded hover:bg-command-raised transition-colors"
+            className="p-1 text-command-muted hover:text-command-heading rounded-[1px] hover:bg-command-raised transition-colors"
             aria-label="Close alerts drawer"
           >
             <X className="w-4 h-4" />
@@ -77,7 +77,7 @@ export const AlertsDrawer: React.FC = () => {
       </div>
 
       {/* Alerts Feed */}
-      <div className="flex-1 overflow-y-auto p-3 space-y-2.5">
+      <div className="flex-1 overflow-y-auto p-3 space-y-2 text-xs">
         {alerts.length === 0 ? (
           <div className="flex flex-col items-center justify-center text-center p-8 text-command-muted space-y-2">
             <CheckCircle className="w-8 h-8 text-command-nominal/70 mb-1" />
@@ -93,7 +93,7 @@ export const AlertsDrawer: React.FC = () => {
             <div
               key={alert.id}
               className={cn(
-                'p-3 rounded border border-command-border border-l-4 transition-all duration-150 flex flex-col gap-2',
+                'p-2.5 rounded-[1px] border border-command-border border-l-[3px] transition-all duration-150 flex flex-col gap-2',
                 severityStyles[alert.severity],
                 alert.acknowledged && 'opacity-65 bg-command-panel/50',
               )}
@@ -101,7 +101,7 @@ export const AlertsDrawer: React.FC = () => {
               <div className="flex items-start justify-between gap-2">
                 <div className="flex items-center gap-1.5">
                   {severityIcons[alert.severity]}
-                  <span className="text-[10px] font-mono font-bold uppercase px-1.5 py-0.2 bg-command-bg rounded border border-command-border text-command-text">
+                  <span className="text-[10px] font-mono font-bold uppercase px-1.5 py-0.2 bg-command-bg rounded-[1px] border border-command-border text-command-text">
                     {alert.category}
                   </span>
                 </div>
@@ -138,7 +138,7 @@ export const AlertsDrawer: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => acknowledgeAlert(alert.id)}
-                      className="px-2 py-0.5 rounded text-[10px] font-mono uppercase font-semibold bg-command-raised text-command-primary hover:bg-command-raised-hover border border-command-border transition-colors"
+                      className="px-2 py-0.5 rounded-[1px] text-[10px] font-mono uppercase font-semibold bg-command-raised text-command-primary hover:bg-command-raised-hover border border-command-border transition-colors"
                     >
                       Acknowledge
                     </button>
@@ -146,7 +146,7 @@ export const AlertsDrawer: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => dismissAlert(alert.id)}
-                      className="p-1 rounded text-command-muted hover:text-command-critical hover:bg-command-raised transition-colors"
+                      className="p-1 rounded-[1px] text-command-muted hover:text-command-critical hover:bg-command-raised transition-colors"
                       title="Dismiss alert"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
