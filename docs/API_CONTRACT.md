@@ -518,3 +518,70 @@ Emitted over `GET /api/snapshot` and WebSocket `SNAPSHOT`:
 }
 ```
 *Note: The frontend Zustand store normalizes all arrays into dictionary lookups indexed by entity `id`.*
+
+### 6.14 Scenario Simulation Models (`ScenarioParams`, `ScenarioResult`)
+
+#### Scenario Request (`ScenarioParams`):
+```json
+{
+  "name": "Northern Flank SAM Pop-up + BASE-B Degraded",
+  "aircraftLoss": [
+    { "type": "Strike-B", "baseId": "BASE-B", "count": 1 }
+  ],
+  "baseOutage": {
+    "baseId": "BASE-B",
+    "hours": 8
+  },
+  "crewAvailabilityReductionPct": 20,
+  "weatherSeverity": "caution",
+  "surgeMissions": 2,
+  "threatLevel": "high",
+  "horizonHours": 24
+}
+```
+
+#### Scenario Response (`ScenarioResult`):
+```json
+{
+  "id": "SCEN-0001",
+  "name": "Northern Flank SAM Pop-up + BASE-B Degraded",
+  "createdAt": "2026-03-14T06:35:00Z",
+  "baselineKpis": {
+    "missionsFulfilledPct": 100.0,
+    "p1CoveragePct": 100.0,
+    "avgDelayMin": 4.2,
+    "aircraftUtilisationPct": 58.0,
+    "crewFatigueMean": 34.0,
+    "crewFatigueMax": 68.0,
+    "fuelConsumptionPct": 48.0,
+    "weaponsConsumptionPct": 36.0
+  },
+  "scenarioKpis": {
+    "missionsFulfilledPct": 85.0,
+    "p1CoveragePct": 90.0,
+    "avgDelayMin": 18.5,
+    "aircraftUtilisationPct": 76.0,
+    "crewFatigueMean": 46.0,
+    "crewFatigueMax": 82.0,
+    "fuelConsumptionPct": 64.0,
+    "weaponsConsumptionPct": 49.0
+  },
+  "series": {
+    "time": ["T+00h", "T+04h", "T+08h", "T+12h", "T+16h", "T+20h", "T+24h"],
+    "baseline": [55, 58, 62, 59, 56, 54, 52],
+    "scenario": [55, 68, 82, 88, 79, 74, 71]
+  },
+  "firstFailure": {
+    "time": "T+08h",
+    "cause": "Airframe Deficit",
+    "description": "Strike aircraft exhaustion at BASE-B drops mission fulfillment below 90%"
+  },
+  "unmetMissions": [
+    {
+      "missionId": "M-04",
+      "reason": "Runway outage at BASE-B exceeds launch window by 45 minutes"
+    }
+  ],
+  "capped": false
+}
+```

@@ -4,11 +4,11 @@ import { CopPage } from '@/features/cop';
 import { ResourcesPage } from '@/features/resources';
 import { MissionsPage } from '@/features/missions';
 import {
-  ScenariosPage,
   AlertsPage,
 } from './pages/RoutesPages';
 import { RecommendationsPage } from '@/features/recommendations';
 import { AuditLogPage } from '@/features/audit';
+import { ScenariosPage } from '@/features/scenarios';
 import { ComponentGalleryPage } from './pages/ComponentGalleryPage';
 import { DebugDataPage } from './pages/DebugDataPage';
 

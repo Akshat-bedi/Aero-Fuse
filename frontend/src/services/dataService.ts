@@ -65,6 +65,8 @@ export interface IDataService {
   getSpeedMultiplier(): number;
 
   // Supplementary client methods from backend contract
+  getScenarios?(): Promise<ScenarioResult[]>;
+  getScenario?(id: string): Promise<ScenarioResult>;
   validateModification?(id: string, modifications: unknown): Promise<ModificationValidationResult>;
   getEligibleResources?(missionId: string): Promise<EligibleResourcesResult>;
   getPredictions?(): Promise<Prediction[]>;
