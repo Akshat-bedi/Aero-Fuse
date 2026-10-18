@@ -431,6 +431,27 @@ export interface OperationalAlert {
   details: string;
 }
 
+/* =========================================================================
+   5. STAGE 6: EVENT INJECTION & RETASKING TELEMETRY
+   ========================================================================= */
+
+export type RetaskStage = 'fusing' | 'constraints' | 'optimising' | 'ranking';
+
+export interface RetaskProgressState {
+  isReplanActive: boolean;
+  stage: RetaskStage | 'ready' | null;
+  elapsedMs: number;
+  message: string;
+}
+
+export interface ImpactAnalysisPayload {
+  eventId: string;
+  eventType: OpsEventType;
+  impactedMissionIds: string[];
+  reasons: string[];
+  timeToDecisionMin: number;
+}
+
 // Backward compatibility aliases
 export type Airbase = Base;
 export type RetaskingRecommendation = Recommendation;
