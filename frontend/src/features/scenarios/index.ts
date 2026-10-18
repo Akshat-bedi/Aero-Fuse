@@ -1,3 +1,1 @@
-// Feature: scenarios
-export {};
-
+export * from './ScenarioControlPanel';
