@@ -178,11 +178,38 @@ All commands below must be executed from the `frontend/` directory (`cd frontend
 | Command | Action |
 | :--- | :--- |
 | `npm run dev` | Starts Vite local development server |
+| `npm run fake-backend` | Runs local Node.js test server serving REST (`/api/health`, `/api/snapshot`) and WebSocket (`/ws`) streaming telemetry |
 | `npm run build` | Runs TypeScript compilation (`tsc -b`) and Vite production bundle |
 | `npm run test` | Runs Vitest unit tests |
 | `npm run test:watch` | Runs Vitest in interactive watch mode |
 | `npm run lint` | Runs ESLint over all TypeScript and React files |
 | `npm run format` | Formats code with Prettier |
+
+### Testing with the Fake Backend (Live Integration)
+
+You can verify full live-backend telemetry handling without running the Python server:
+
+1. **Start the Fake Backend** (Terminal 1):
+   ```bash
+   npm run fake-backend
+   ```
+   *Listens on `http://localhost:8000/api` and `ws://localhost:8000/ws`.*
+
+2. **Launch Frontend in Live Mode** (Terminal 2):
+   ```bash
+   # On Windows PowerShell:
+   $env:VITE_DATA_SOURCE="live"; npm run dev
+
+   # Or configure frontend/.env:
+   # VITE_DATA_SOURCE=live
+   ```
+
+3. **Verify Operational Indicators**:
+   - TopBar displays green `LIVE FEED` connection tag.
+   - Dual clocks and 1 Hz aircraft position ticks update smoothly.
+   - Server heartbeat (`HEARTBEAT`) pings are answered with `PING` frames.
+   - At T+3s, a live `ALERT` message appears in the Alerts drawer and increments the unacknowledged count badge.
+   - Stop the fake backend (`Ctrl+C`) to verify the top bar changes to `RECONNECTING`, then `OFFLINE`, and reconnects cleanly with fresh snapshot resynchronization when restarted.
 | `npm run preview` | Previews production build locally |
 
 ---
@@ -413,6 +440,67 @@ AirOps DSS adheres strictly to the aesthetics and functional discipline of a gen
 - **Threat Zones**: Red diamond center marker, thin red range ring (`#c93b3b`, line-width 1.2), and low-opacity hatch fill (0.05–0.08, zero solid red blobs). Suspected threats rendered with amber dashed rings (`#d9a521`, dasharray `[4, 4]`).
 - **Air Bases**: Square marker with status-colored perimeter tick (`#48a972` open, `#d9a521` degraded, `#c93b3b` closed).
 - **Mission Routes**: Line weights mapped strictly to sortie priority (P1 = 2.5px, P2 = 2.0px, P3 = 1.5px, P4 = 1.0px); solid when active airborne, dashed `[3, 3]` when planned.
+
+---
+
+## 12. Stage 9 Guided Demo Mode & Air-Gapped Verification Protocol
+
+### 12.1 Guided Demo Mode Walkthrough (3-Minute Scripted Story)
+The application includes a built-in interactive walkthrough that guides the operator through a complete contingency-to-resolution lifecycle starting from the clean baseline:
+
+1. **Trigger Demo Mode**:
+   - Click the `DEMO` button in the top bar, **or**
+   - Press the key `d` on the keyboard.
+2. **Step Progression**:
+   - **Step 1: Baseline Operations (All Green)**: Nominal operational baseline across Republic of Veridia; sorties M-01 to M-10 planned with zero conflicts.
+   - **Step 2: Threat Detected (SAM Pop-Up)**: Pop-up SA-11 SAM battery (`THR-02`) detected directly intersecting Strike sortie M-04's planned Route B ingress.
+   - **Step 3: Conflict Detected (Sortie M-04 At-Risk)**: Collision detection tags M-04 at-risk with cross-module highlighting across map, board, and timeline.
+   - **Step 4: AI Retasking Engine (4-Stage Progress)**: Retask engine computes contingency: Sensor Fusion → Constraints Validation → Route Optimisation → Multi-Criteria Ranking.
+   - **Step 5: Recommendation (Before vs After View)**: DSS proposes `REC-0001` with Route B vs Route C ghost overlay and airframe swap `AC-07` → `AC-11`.
+   - **Step 6: Commander Approval (Atomic Plan Commit)**: Commander approves recommendation `REC-0001`, atomically resolving the conflict and updating the live plan.
+   - **Step 7: Audit Ledger (Cryptographic Link)**: Inspect the immutable SHA-256 block hash appended to the audit ledger (`AUD-0004`) with verified chain integrity.
+   - **Step 8: What-If Simulation (Sandbox Safety)**: Sandboxed contingency run modeling BASE-B cratering runway outage and 20% crew fatigue without mutating the live COP.
+   - **Step 9: Operations Debrief (Walkthrough Complete)**: Summary of operational cycle and return to COP.
+3. **Controls**:
+   - `Next` (`→`) / `Prev` (`←`): Step manually or allow auto-advance timer.
+   - `Pause` / `Play` (`Space`): Toggle auto-advance countdown.
+   - `Reset Initial State`: Clears recommendations, events, alerts, and scenario runs, restoring the clean baseline.
+   - `Exit` (`Esc`): Exit demo mode.
+
+### 12.2 Offline-First Compliance & Verification Protocol
+AirOps DSS is engineered strictly for air-gapped mission operations with zero external network dependencies:
+
+1. **Automated Scanner Script**:
+   ```bash
+   npm run check:offline
+   ```
+   Scans `src/`, `dist/`, `public/`, and `index.html` for unauthorized external URLs (`http://`, `https://`, `ws://`, `wss://`, `//cdn`, Google Fonts, unpkg, etc.). Fails with exit code `1` if any unauthorized external endpoints are found.
+
+2. **Browser Network Tab Verification Protocol**:
+   To verify that no external requests are dispatched at runtime:
+   1. Open browser developer tools (`F12` or `Ctrl + Shift + I`).
+   2. Select the **Network** tab.
+   3. Check the **Disable cache** option.
+   4. Reload the application (`Ctrl + R`).
+   5. Filter by domain or sort by `Domain` column.
+   6. Confirm that **100% of requests** are addressed to `localhost:5173` (static web bundle) or `localhost:8000` (local backend telemetry).
+   7. Verify that zero requests are sent to public CDNs, Google Fonts, or telemetry domains.
+
+### 12.3 Tactical Keyboard Shortcuts
+Press `?` on any screen to open the hotkeys reference overlay:
+- `g` then `c`: Navigate to Common Operating Picture (COP)
+- `g` then `m`: Navigate to Missions Management
+- `g` then `r`: Navigate to Fleet Readiness & Logistics
+- `g` then `s`: Navigate to What-If Scenario Simulator
+- `g` then `a`: Navigate to Cryptographic Audit Log
+- `g` then `l`: Navigate to Tactical Alerts Feed
+- `/`: Focus search input
+- `A`: Approve focused pending recommendation (with confirmation modal)
+- `R`: Reject focused pending recommendation (with confirmation modal)
+- `d`: Toggle Guided Demo Mode
+- `N`: Toggle Night Vision Mode
+- `Esc`: Close dialogs, drawer, or exit demo mode
+*(Shortcuts are automatically suppressed when typing inside input or textarea elements).*
 
 
 
