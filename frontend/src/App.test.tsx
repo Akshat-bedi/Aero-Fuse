@@ -33,16 +33,16 @@ describe('App Shell & Navigation', () => {
     render(<App />);
 
     const alertToggleBtn = screen.getByRole('button', { name: /Toggle Alerts Drawer/i });
-    expect(screen.queryByText(/Live Tactical Alerts/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Tactical Alerts/i)).not.toBeInTheDocument();
 
     // Click to open
     fireEvent.click(alertToggleBtn);
-    expect(screen.getByText(/Live Tactical Alerts/i)).toBeInTheDocument();
+    expect(screen.getByText(/Tactical Alerts/i)).toBeInTheDocument();
 
     // Click to close
     const closeBtn = screen.getByRole('button', { name: /Close alerts drawer/i });
     fireEvent.click(closeBtn);
-    expect(screen.queryByText(/Live Tactical Alerts/i)).not.toBeInTheDocument();
+    expect(screen.queryByText(/Tactical Alerts/i)).not.toBeInTheDocument();
   });
 
   it('toggles night mode class on document element', () => {
