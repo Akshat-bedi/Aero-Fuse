@@ -53,7 +53,7 @@ const OFFLINE_BASE_STYLE: StyleSpecification = {
   ],
 };
 
-export const TacticalMap: React.FC<TacticalMapProps> = ({
+const TacticalMapComponent: React.FC<TacticalMapProps> = ({
   bases,
   aircraft,
   missions,
@@ -71,9 +71,15 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
   const mapRef = useRef<MapLibreMap | null>(null);
   const isLoadedRef = useRef(false);
   const trailsRef = useRef<Record<string, LatLng[]>>({});
+  const animationFrameRef = useRef<number | null>(null);
 
   const [cursorCoords, setCursorCoords] = useState<LatLng | null>(null);
   const [mapBearing, setMapBearing] = useState(0);
+
+  const onSelectEntityRef = useRef(onSelectEntity);
+  useEffect(() => {
+    onSelectEntityRef.current = onSelectEntity;
+  });
 
   const updateAllDynamicSourcesRef = useRef<(map: MapLibreMap) => void>(() => {});
 
@@ -91,15 +97,17 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
+    const savedViewport = useUiStore.getState().mapViewport;
+
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
       style: OFFLINE_BASE_STYLE,
-      center: [6.0, 5.0], // Center on Republic of Veridia [lng, lat]
-      zoom: 6.2,
+      center: savedViewport.center, // Center on Republic of Veridia or saved pan [lng, lat]
+      zoom: savedViewport.zoom,
       minZoom: 4.8,
       maxZoom: 13,
-      bearing: 0,
-      pitch: 0,
+      bearing: savedViewport.bearing,
+      pitch: savedViewport.pitch,
       maxBounds: [
         [-2.5, -2.0], // Southwest [lng, lat]
         [14.5, 12.0], // Northeast [lng, lat]
@@ -111,6 +119,7 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
     map.addControl(new maplibregl.ScaleControl({ maxWidth: 120, unit: 'metric' }), 'bottom-left');
 
     map.on('load', () => {
+      if (!mapRef.current || mapRef.current !== map) return;
       isLoadedRef.current = true;
       setupStaticVectorSources(map);
       setupDynamicSources(map);
@@ -129,7 +138,22 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
     });
 
     map.on('rotate', () => {
-      setMapBearing(Math.round(map.getBearing()));
+      const b = Math.round(map.getBearing ? map.getBearing() : 0);
+      setMapBearing(b);
+    });
+
+    // Persist viewport camera updates on user pan/zoom/rotate
+    map.on('moveend', () => {
+      const center = map.getCenter();
+      const zoom = map.getZoom();
+      const bearing = map.getBearing ? map.getBearing() : 0;
+      const pitch = map.getPitch ? map.getPitch() : 0;
+      useUiStore.getState().setMapViewport({
+        center: [center.lng, center.lat],
+        zoom,
+        bearing,
+        pitch,
+      });
     });
 
     // Interactive clicking on vector entities
@@ -153,7 +177,7 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
 
         if (entityType && entityId) {
           e.originalEvent.stopPropagation();
-          onSelectEntity({ type: entityType, id: entityId });
+          onSelectEntityRef.current?.({ type: entityType, id: entityId });
         }
       });
 
@@ -184,18 +208,24 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
       // If clicked on empty space, deselect
       const features = map.queryRenderedFeatures(e.point, { layers: interactiveLayers });
       if (features.length === 0) {
-        onSelectEntity(null);
+        onSelectEntityRef.current?.(null);
       }
     });
 
     mapRef.current = map;
 
     return () => {
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
       isLoadedRef.current = false;
-      map.remove();
-      mapRef.current = null;
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
     };
-  }, [onSelectEntity]);
+  }, []);
 
   // Setup static fictional geography vectors
   const setupStaticVectorSources = (map: MapLibreMap) => {
@@ -997,11 +1027,28 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
 
   updateAllDynamicSourcesRef.current = updateAllDynamicSources;
 
-  // Synchronize on data updates
+  // Synchronize on data updates (batched via requestAnimationFrame)
   useEffect(() => {
-    if (mapRef.current && isLoadedRef.current) {
-      updateAllDynamicSources(mapRef.current);
+    if (!mapRef.current || !isLoadedRef.current) return;
+    const map = mapRef.current;
+
+    if (animationFrameRef.current !== null) {
+      cancelAnimationFrame(animationFrameRef.current);
     }
+
+    animationFrameRef.current = requestAnimationFrame(() => {
+      animationFrameRef.current = null;
+      if (mapRef.current && isLoadedRef.current) {
+        updateAllDynamicSources(map);
+      }
+    });
+
+    return () => {
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+    };
   }, [updateAllDynamicSources]);
 
   // Synchronize layer visibility toggles
@@ -1057,6 +1104,12 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
 
   // Pan / Fit theater bounds
   const handleResetView = () => {
+    useUiStore.getState().setMapViewport({
+      center: [6.0, 5.0],
+      zoom: 6.2,
+      bearing: 0,
+      pitch: 0,
+    });
     mapRef.current?.flyTo({
       center: [6.0, 5.0],
       zoom: 6.2,
@@ -1151,3 +1204,6 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
     </div>
   );
 };
+
+export const TacticalMap = React.memo(TacticalMapComponent);
+TacticalMap.displayName = 'TacticalMap';

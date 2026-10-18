@@ -54,6 +54,17 @@ export interface UIState {
   setMapPlacementMode: (mode: 'threat' | null) => void;
   pendingThreatCoords: LatLng | null;
   setPendingThreatCoords: (coords: LatLng | null) => void;
+
+  // COP: Map Viewport Camera Persistence
+  mapViewport: MapViewport;
+  setMapViewport: (viewport: Partial<MapViewport>) => void;
+}
+
+export interface MapViewport {
+  center: [number, number];
+  zoom: number;
+  bearing: number;
+  pitch: number;
 }
 
 const INITIAL_ALERTS: OperationalAlert[] = [
@@ -204,6 +215,18 @@ export const useUiStore = create<UIState>((set) => ({
   setMapPlacementMode: (mode) => set({ mapPlacementMode: mode }),
   pendingThreatCoords: null,
   setPendingThreatCoords: (coords) => set({ pendingThreatCoords: coords }),
+
+  // COP: Map Viewport Camera Persistence
+  mapViewport: {
+    center: [6.0, 5.0],
+    zoom: 6.2,
+    bearing: 0,
+    pitch: 0,
+  },
+  setMapViewport: (viewport) =>
+    set((state) => ({
+      mapViewport: { ...state.mapViewport, ...viewport },
+    })),
 }));
 
 // Backward compatibility alias for Stage 1 code

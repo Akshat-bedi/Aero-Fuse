@@ -27,21 +27,21 @@ import {
 } from 'lucide-react';
 
 export const CopPage: React.FC = () => {
-  // Global domain state from Zustand store
-  const {
-    bases,
-    aircraft,
-    missions,
-    threats,
-    airspace,
-    weather,
-    crew,
-    simTime,
-    speedMultiplier,
-    updateMission,
-  } = useEntitiesStore();
+  // Global domain state from Zustand store using narrow selectors
+  const bases = useEntitiesStore((s) => s.bases);
+  const aircraft = useEntitiesStore((s) => s.aircraft);
+  const missions = useEntitiesStore((s) => s.missions);
+  const threats = useEntitiesStore((s) => s.threats);
+  const airspace = useEntitiesStore((s) => s.airspace);
+  const weather = useEntitiesStore((s) => s.weather);
+  const crew = useEntitiesStore((s) => s.crew);
+  const simTime = useEntitiesStore((s) => s.simTime);
+  const speedMultiplier = useEntitiesStore((s) => s.speedMultiplier);
+  const updateMission = useEntitiesStore((s) => s.updateMission);
 
-  const { selectedMissionId, selectMission, toggleScenarioControl } = useUiStore();
+  const selectedMissionId = useUiStore((s) => s.selectedMissionId);
+  const selectMission = useUiStore((s) => s.selectMission);
+  const toggleScenarioControl = useUiStore((s) => s.toggleScenarioControl);
 
   // Selected tactical entity
   const [selectedEntity, setSelectedEntity] = useState<SelectedEntity | null>(null);
@@ -62,13 +62,13 @@ export const CopPage: React.FC = () => {
       if (entity?.type === 'mission') {
         selectMission(entity.id);
       } else if (entity?.type === 'aircraft') {
-        const ac = aircraft[entity.id];
+        const ac = useEntitiesStore.getState().aircraft[entity.id];
         selectMission(ac?.assignedMissionId || null);
       } else if (entity === null) {
         selectMission(null);
       }
     },
-    [aircraft, selectMission],
+    [selectMission],
   );
 
   // Layer visibility toggles
