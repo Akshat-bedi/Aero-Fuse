@@ -359,26 +359,72 @@ export interface OperationalSnapshot {
   auditLog?: AuditEntry[];
 }
 
+export interface ScenarioAircraftLoss {
+  type?: AircraftType;
+  baseId?: string;
+  count: number;
+}
+
+export interface ScenarioBaseOutage {
+  baseId: string;
+  hours: number;
+}
+
 export interface ScenarioParams {
   name?: string;
   description?: string;
-  aircraftLoss?: { type?: AircraftType; baseId?: string; count: number }[];
-  baseOutage?: { baseId: string; hours: number };
+  aircraftLoss?: ScenarioAircraftLoss[];
+  baseOutage?: ScenarioBaseOutage;
   crewAvailabilityReductionPct?: number;
   weatherSeverity?: WeatherSeverity;
   surgeMissions?: number;
-  threatLevel?: number;
+  threatLevel?: 'low' | 'medium' | 'high' | 'critical' | number;
   horizonHours?: number;
   injectedEvents?: Omit<OpsEvent, 'id' | 'timestamp'>[];
   durationMinutes?: number;
 }
 
+export interface ScenarioKpis {
+  missionsFulfilledPct: number;
+  p1CoveragePct: number;
+  avgDelayMin: number;
+  aircraftUtilisationPct: number;
+  crewFatigueMean: number;
+  crewFatigueMax: number;
+  fuelConsumptionPct: number;
+  weaponsConsumptionPct: number;
+  [key: string]: unknown;
+}
+
+export interface ScenarioUnmetMission {
+  missionId: string;
+  reason: string;
+}
+
+export interface ScenarioFailurePoint {
+  time: string;
+  cause: string;
+  description: string;
+}
+
+export interface ScenarioUtilisationSeries {
+  time: string[];
+  baseline: number[];
+  scenario: number[];
+}
+
 export interface ScenarioResult {
-  scenarioId?: string;
-  baselineKpis?: Record<string, unknown>;
-  scenarioKpis?: Record<string, unknown>;
-  firstFailure?: { time: string; cause: string } | null;
-  unmetMissions?: string[];
+  id: string;
+  scenarioId?: string; // backward-compatibility alias
+  name: string;
+  createdAt: string; // ISO 8601 UTC
+  baselineKpis: ScenarioKpis;
+  scenarioKpis: ScenarioKpis;
+  series: ScenarioUtilisationSeries;
+  firstFailure?: ScenarioFailurePoint | null;
+  unmetMissions: ScenarioUnmetMission[];
+  capped?: boolean;
+  params?: ScenarioParams;
   generatedRecommendations?: Recommendation[];
   impactedMissionIds?: string[];
   successProbability?: number;

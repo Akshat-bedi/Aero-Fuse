@@ -11,6 +11,9 @@ import {
   Recommendation,
   ScenarioParams,
   ScenarioResult,
+  ScenarioKpis,
+  ScenarioUnmetMission,
+  ScenarioFailurePoint,
   AuditEntry,
   Base,
   Aircraft,
@@ -1070,6 +1073,111 @@ export function generateSeedRecommendations(includeConflicts = false, baseTime?:
   };
 }
 
+export const DEFAULT_SAVED_SCENARIOS: ScenarioResult[] = [
+  {
+    id: 'SCEN-0001',
+    scenarioId: 'SCEN-0001',
+    name: 'Northern Threat Escalation + High SAM Density',
+    createdAt: new Date(Date.now() - 3600000).toISOString(),
+    baselineKpis: {
+      missionsFulfilledPct: 100.0,
+      p1CoveragePct: 100.0,
+      avgDelayMin: 3.5,
+      aircraftUtilisationPct: 56.0,
+      crewFatigueMean: 32.0,
+      crewFatigueMax: 68.0,
+      fuelConsumptionPct: 45.0,
+      weaponsConsumptionPct: 35.0,
+    },
+    scenarioKpis: {
+      missionsFulfilledPct: 91.5,
+      p1CoveragePct: 94.0,
+      avgDelayMin: 14.5,
+      aircraftUtilisationPct: 68.0,
+      crewFatigueMean: 38.0,
+      crewFatigueMax: 74.0,
+      fuelConsumptionPct: 56.0,
+      weaponsConsumptionPct: 48.0,
+    },
+    series: {
+      time: ['T+00h', 'T+04h', 'T+08h', 'T+12h', 'T+16h', 'T+20h', 'T+24h'],
+      baseline: [52, 58, 62, 59, 56, 54, 50],
+      scenario: [58, 67, 76, 73, 69, 66, 62],
+    },
+    firstFailure: {
+      time: 'T+12h',
+      cause: 'Threat Corridor Egress Saturation',
+      description: 'Southern dogleg bypass adds 25 min transit, pushing M-04 into crew rest window.',
+    },
+    unmetMissions: [
+      {
+        missionId: 'M-04',
+        reason: 'Dogleg corridor bypass adds delay exceeding time-on-target limit',
+      },
+    ],
+    params: {
+      name: 'Northern Threat Escalation + High SAM Density',
+      threatLevel: 'high',
+      weatherSeverity: 'caution',
+    },
+    successProbability: 0.915,
+    impactedMissionIds: ['M-04'],
+  },
+  {
+    id: 'SCEN-0002',
+    scenarioId: 'SCEN-0002',
+    name: 'BASE-B Runway Closure (6 Hours) + 1 Hull AOG',
+    createdAt: new Date(Date.now() - 1800000).toISOString(),
+    baselineKpis: {
+      missionsFulfilledPct: 100.0,
+      p1CoveragePct: 100.0,
+      avgDelayMin: 3.5,
+      aircraftUtilisationPct: 56.0,
+      crewFatigueMean: 32.0,
+      crewFatigueMax: 68.0,
+      fuelConsumptionPct: 45.0,
+      weaponsConsumptionPct: 35.0,
+    },
+    scenarioKpis: {
+      missionsFulfilledPct: 78.0,
+      p1CoveragePct: 85.0,
+      avgDelayMin: 28.0,
+      aircraftUtilisationPct: 82.0,
+      crewFatigueMean: 46.0,
+      crewFatigueMax: 84.0,
+      fuelConsumptionPct: 69.0,
+      weaponsConsumptionPct: 42.0,
+    },
+    series: {
+      time: ['T+00h', 'T+04h', 'T+08h', 'T+12h', 'T+16h', 'T+20h', 'T+24h'],
+      baseline: [52, 58, 62, 59, 56, 54, 50],
+      scenario: [68, 84, 91, 88, 83, 79, 74],
+    },
+    firstFailure: {
+      time: 'T+06h',
+      cause: 'Runway Outage Divert Cascade',
+      description: 'BASE-B closure forces diversion of scheduled recoveries, exhausting alternate FOB fuel reserves.',
+    },
+    unmetMissions: [
+      {
+        missionId: 'M-04',
+        reason: 'Launch base BASE-B unavailable during planned take-off window',
+      },
+      {
+        missionId: 'M-07',
+        reason: 'Airframe VR-S07 AOG; substitute airframe in turnaround at BASE-C',
+      },
+    ],
+    params: {
+      name: 'BASE-B Runway Closure (6 Hours) + 1 Hull AOG',
+      baseOutage: { baseId: 'BASE-B', hours: 6 },
+      aircraftLoss: [{ type: 'Strike-B', baseId: 'BASE-B', count: 1 }],
+    },
+    successProbability: 0.78,
+    impactedMissionIds: ['M-04', 'M-07'],
+  },
+];
+
 /* =========================================================================
    MOCK DATA SERVICE IMPLEMENTATION
    ========================================================================= */
@@ -1080,6 +1188,11 @@ export class MockDataService implements IDataService {
   private speedMultiplier: 1 | 5 | 20 = 1;
   private isPaused = false;
   private mockConflictsEnabled = serviceConfig.mockConflicts;
+
+  private scenarioCounter = 3;
+  private savedScenarios: Record<string, ScenarioResult> = Object.fromEntries(
+    DEFAULT_SAVED_SCENARIOS.map((scen) => [scen.id, { ...scen }]),
+  );
 
   private bases: Record<string, Base> = { ...SEED_BASES };
   private aircraft: Record<string, Aircraft> = generateSeedAircraft();
@@ -1585,30 +1698,280 @@ export class MockDataService implements IDataService {
     return rec;
   }
 
-  public async runScenario(_params: ScenarioParams): Promise<ScenarioResult> {
-    return {
-      scenarioId: `SCEN-${Date.now()}`,
-      baselineKpis: {
-        coveragePct: 94.2,
-        avgDelayMin: 8,
-        unmetCount: 0,
-        fuelUsedKg: 28400,
-      },
-      scenarioKpis: {
-        coveragePct: 82.5,
-        avgDelayMin: 22,
-        unmetCount: 1,
-        fuelUsedKg: 34100,
-      },
-      firstFailure: {
-        time: 'T+14h',
-        cause: 'BASE-B runway outage forces diversion of strike assets beyond allowable duty hours',
-      },
-      unmetMissions: ['M-10'],
-      generatedRecommendations: [],
-      impactedMissionIds: ['M-04', 'M-07', 'M-10'],
-      successProbability: 0.85,
+  public async runScenario(params: ScenarioParams): Promise<ScenarioResult> {
+    // CRITICAL SIMULATION SAFETY:
+    // Pure calculation against cloned state. Zero mutation of live entities,
+    // zero change to this.stateVersion, zero change to this.recommendations, zero audit dispatch.
+
+    const id = `SCEN-${String(this.scenarioCounter++).padStart(4, '0')}`;
+    const name = params.name || `What-If Analysis ${id}`;
+
+    // 1. Establish pristine baseline
+    const baselineKpis: ScenarioKpis = {
+      missionsFulfilledPct: 100.0,
+      p1CoveragePct: 100.0,
+      avgDelayMin: 3.5,
+      aircraftUtilisationPct: 56.0,
+      crewFatigueMean: 32.0,
+      crewFatigueMax: 68.0,
+      fuelConsumptionPct: 45.0,
+      weaponsConsumptionPct: 35.0,
     };
+
+    // 2. Evaluate parameter perturbations
+    const aircraftLost = (params.aircraftLoss || []).reduce((acc, l) => acc + (l.count || 0), 0);
+    const outageHours = params.baseOutage?.hours || 0;
+    const outageBase = params.baseOutage?.baseId;
+    const crewRedPct = Math.max(0, Math.min(100, params.crewAvailabilityReductionPct || 0));
+    const weather = params.weatherSeverity || 'nominal';
+    const surge = Math.max(0, params.surgeMissions || 0);
+
+    let threatLevelNum = 1;
+    if (typeof params.threatLevel === 'number') {
+      threatLevelNum = params.threatLevel;
+    } else if (params.threatLevel === 'critical') {
+      threatLevelNum = 4;
+    } else if (params.threatLevel === 'high') {
+      threatLevelNum = 3;
+    } else if (params.threatLevel === 'medium') {
+      threatLevelNum = 2;
+    }
+
+    // Check if zero changes
+    const isZeroChanges =
+      aircraftLost === 0 &&
+      outageHours === 0 &&
+      crewRedPct === 0 &&
+      weather === 'nominal' &&
+      surge === 0 &&
+      threatLevelNum <= 1;
+
+    let scenarioKpis: ScenarioKpis;
+    const unmetMissions: ScenarioUnmetMission[] = [];
+    let firstFailure: ScenarioFailurePoint | null = null;
+
+    if (isZeroChanges) {
+      scenarioKpis = { ...baselineKpis };
+    } else {
+      // Deterministic degradation additions & penalties
+      let fulfillmentLoss = 0;
+      let p1Loss = 0;
+      let delayAdd = 0;
+      let utilAdd = 0;
+      let fatigueMeanAdd = 0;
+      let fatigueMaxAdd = 0;
+      let fuelAdd = 0;
+      let weaponsAdd = 0;
+
+      // Aircraft loss impact
+      if (aircraftLost > 0) {
+        fulfillmentLoss += Math.min(aircraftLost * 8.5, 45);
+        p1Loss += Math.min(aircraftLost * 6.0, 35);
+        delayAdd += aircraftLost * 12.0;
+        utilAdd += aircraftLost * 7.5;
+        fuelAdd += aircraftLost * 3.0;
+      }
+
+      // Base outage impact
+      if (outageHours > 0) {
+        fulfillmentLoss += Math.min(outageHours * 2.2, 35);
+        p1Loss += Math.min(outageHours * 1.5, 25);
+        delayAdd += outageHours * 3.5;
+        fuelAdd += Math.min(outageHours * 2.5, 30);
+        utilAdd += Math.min(outageHours * 1.2, 18);
+      }
+
+      // Crew reduction impact
+      if (crewRedPct > 0) {
+        fatigueMeanAdd += crewRedPct * 0.45;
+        fatigueMaxAdd += Math.min(crewRedPct * 0.4, 30);
+        delayAdd += crewRedPct * 0.25;
+        if (crewRedPct > 20) {
+          fulfillmentLoss += (crewRedPct - 20) * 0.7;
+          p1Loss += (crewRedPct - 20) * 0.4;
+        }
+      }
+
+      // Weather severity impact
+      if (weather === 'caution') {
+        delayAdd += 8.0;
+        fuelAdd += 5.0;
+        fulfillmentLoss += 3.0;
+      } else if (weather === 'severe') {
+        delayAdd += 24.0;
+        fuelAdd += 18.0;
+        fulfillmentLoss += 16.0;
+        p1Loss += 12.0;
+      }
+
+      // Surge missions impact
+      if (surge > 0) {
+        utilAdd += surge * 8.0;
+        fuelAdd += surge * 7.5;
+        weaponsAdd += surge * 11.0;
+        fatigueMeanAdd += surge * 3.0;
+        delayAdd += surge * 4.5;
+        if (surge > 4) {
+          fulfillmentLoss += (surge - 4) * 5.0;
+        }
+      }
+
+      // Threat level impact
+      if (threatLevelNum === 2) {
+        delayAdd += 4.0;
+        fuelAdd += 3.0;
+      } else if (threatLevelNum === 3) {
+        delayAdd += 11.0;
+        fuelAdd += 8.0;
+        p1Loss += 4.0;
+      } else if (threatLevelNum >= 4) {
+        delayAdd += 20.0;
+        fuelAdd += 14.0;
+        fulfillmentLoss += 8.0;
+        p1Loss += 10.0;
+      }
+
+      // Invariant: losses NEVER improve coverage or reduce delay/utilization
+      scenarioKpis = {
+        missionsFulfilledPct: Math.max(
+          10,
+          Math.min(100, Math.round((baselineKpis.missionsFulfilledPct - fulfillmentLoss) * 10) / 10),
+        ),
+        p1CoveragePct: Math.max(
+          15,
+          Math.min(100, Math.round((baselineKpis.p1CoveragePct - p1Loss) * 10) / 10),
+        ),
+        avgDelayMin: Math.round((baselineKpis.avgDelayMin + delayAdd) * 10) / 10,
+        aircraftUtilisationPct: Math.min(
+          100,
+          Math.round((baselineKpis.aircraftUtilisationPct + utilAdd) * 10) / 10,
+        ),
+        crewFatigueMean: Math.min(
+          95,
+          Math.round((baselineKpis.crewFatigueMean + fatigueMeanAdd) * 10) / 10,
+        ),
+        crewFatigueMax: Math.min(
+          99,
+          Math.round((baselineKpis.crewFatigueMax + fatigueMaxAdd) * 10) / 10,
+        ),
+        fuelConsumptionPct: Math.min(
+          100,
+          Math.round((baselineKpis.fuelConsumptionPct + fuelAdd) * 10) / 10,
+        ),
+        weaponsConsumptionPct: Math.min(
+          100,
+          Math.round((baselineKpis.weaponsConsumptionPct + weaponsAdd) * 10) / 10,
+        ),
+      };
+
+      // Unmet missions mapping
+      if (scenarioKpis.missionsFulfilledPct < 100) {
+        if (aircraftLost > 0) {
+          unmetMissions.push({
+            missionId: 'M-07',
+            reason: `Airframe deficit: required Strike-B hull unavailable due to simulated asset attrition (${aircraftLost} lost)`,
+          });
+        }
+        if (outageHours > 0) {
+          unmetMissions.push({
+            missionId: 'M-04',
+            reason: `Runway closure at ${outageBase || 'BASE-B'} exceeds max holding loiter window (+${outageHours}h outage)`,
+          });
+        }
+        if (crewRedPct > 30) {
+          unmetMissions.push({
+            missionId: 'M-05',
+            reason: `Qualified aircrew exhausted: duty window hard limit breached (${crewRedPct}% reduction)`,
+          });
+        }
+        if (weather === 'severe') {
+          unmetMissions.push({
+            missionId: 'M-08',
+            reason: 'Terminal aerodrome weather below minimum recovery visibility standards',
+          });
+        }
+        if (unmetMissions.length === 0) {
+          unmetMissions.push({
+            missionId: 'M-10',
+            reason: 'Compound operational delay pushes sortie window outside acceptable ATO margin',
+          });
+        }
+      }
+
+      // First point of failure calculation
+      if (
+        scenarioKpis.missionsFulfilledPct < 90 ||
+        scenarioKpis.avgDelayMin >= 20 ||
+        scenarioKpis.aircraftUtilisationPct >= 85
+      ) {
+        const failureHours = Math.max(
+          4,
+          Math.min(20, Math.round(24 - (100 - scenarioKpis.missionsFulfilledPct) * 0.4)),
+        );
+        let cause = 'Resource Saturation';
+        let description = `Fleet utilisation reaches ${Math.round(scenarioKpis.aircraftUtilisationPct)}%; reserves depleted.`;
+
+        if (aircraftLost > 1) {
+          cause = 'Airframe Exhaustion';
+          description = `Available Strike and Fighter hulls exhausted at T+${failureHours}h; coverage drops to ${scenarioKpis.missionsFulfilledPct}%.`;
+        } else if (outageHours >= 6) {
+          cause = 'Runway Outage Divert Cascade';
+          description = `${outageBase || 'BASE-B'} closure forces diversion of scheduled recoveries, saturating alternate FOB parking.`;
+        } else if (crewRedPct >= 35) {
+          cause = 'Crew Duty Window Limit';
+          description = `Mandatory rest rules stand down 40% of rostered pilots at T+${failureHours}h.`;
+        }
+
+        firstFailure = {
+          time: `T+${failureHours}h`,
+          cause,
+          description,
+        };
+      }
+    }
+
+    // 3. Generate 24h utilisation time series
+    const seriesTime = ['T+00h', 'T+04h', 'T+08h', 'T+12h', 'T+16h', 'T+20h', 'T+24h'];
+    const seriesBaseline = [52, 58, 62, 59, 56, 54, 50];
+    const utilDelta = scenarioKpis.aircraftUtilisationPct - baselineKpis.aircraftUtilisationPct;
+    const seriesScenario = seriesBaseline.map((bVal) =>
+      Math.min(100, Math.max(10, Math.round(bVal + utilDelta))),
+    );
+
+    const result: ScenarioResult = {
+      id,
+      scenarioId: id,
+      name,
+      createdAt: new Date().toISOString(),
+      baselineKpis,
+      scenarioKpis,
+      series: {
+        time: seriesTime,
+        baseline: seriesBaseline,
+        scenario: seriesScenario,
+      },
+      firstFailure,
+      unmetMissions,
+      capped: scenarioKpis.aircraftUtilisationPct >= 95,
+      params,
+      successProbability: scenarioKpis.missionsFulfilledPct / 100,
+      impactedMissionIds: unmetMissions.map((m) => m.missionId),
+    };
+
+    this.savedScenarios[id] = result;
+    return result;
+  }
+
+  public async getScenarios(): Promise<ScenarioResult[]> {
+    return Object.values(this.savedScenarios);
+  }
+
+  public async getScenario(id: string): Promise<ScenarioResult> {
+    const scen = this.savedScenarios[id];
+    if (!scen) {
+      throw new Error(`Scenario ${id} not found.`);
+    }
+    return scen;
   }
 
   public async getAuditLog(): Promise<AuditEntry[]> {

@@ -402,6 +402,14 @@ export class LiveDataService implements IDataService {
     return apiClient.post<ScenarioResult>('/scenarios/run', params);
   }
 
+  public async getScenarios(): Promise<ScenarioResult[]> {
+    return apiClient.get<ScenarioResult[]>('/scenarios');
+  }
+
+  public async getScenario(id: string): Promise<ScenarioResult> {
+    return apiClient.get<ScenarioResult>(`/scenarios/${id}`);
+  }
+
   public async getAuditLog(): Promise<AuditEntry[]> {
     return apiClient.get<AuditEntry[]>('/audit');
   }
