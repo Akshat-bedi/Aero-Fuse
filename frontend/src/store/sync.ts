@@ -31,6 +31,11 @@ export function initStoreSubscriptions(): () => void {
     if (snapshot.activeEvents) {
       useEventsStore.getState().setEvents(snapshot.activeEvents);
     }
+
+    // 4. Sync Audit Log Store
+    if (snapshot.auditLog) {
+      useAuditStore.getState().setAuditLog(snapshot.auditLog);
+    }
   });
 
   // Stage 6: Subscribe to Retask Progress Telemetry

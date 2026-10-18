@@ -47,21 +47,29 @@ export class MockRetaskEngine {
    * Evaluates an operational event and produces a recommendation conforming to context.md
    */
   public evaluateEvent(event: OpsEvent, context: RetaskContext): Recommendation {
+    let rec: Recommendation;
     switch (event.type) {
       case 'AIRCRAFT_UNSERVICEABLE':
-        return this.handleAircraftUnserviceable(event, context);
+        rec = this.handleAircraftUnserviceable(event, context);
+        break;
       case 'BASE_CLOSED':
       case 'WEATHER_DEGRADED':
-        return this.handleBaseDisruption(event, context);
+        rec = this.handleBaseDisruption(event, context);
+        break;
       case 'THREAT_DETECTED':
-        return this.handleThreatDetected(event, context);
+        rec = this.handleThreatDetected(event, context);
+        break;
       case 'CREW_UNAVAILABLE':
-        return this.handleCrewUnavailable(event, context);
+        rec = this.handleCrewUnavailable(event, context);
+        break;
       case 'NEW_PRIORITY_MISSION':
-        return this.handleNewPriorityMission(event, context);
+        rec = this.handleNewPriorityMission(event, context);
+        break;
       default:
-        return this.handleGenericEvent(event, context);
+        rec = this.handleGenericEvent(event, context);
+        break;
     }
+    return this.attachAlternatives(rec, event, context);
   }
 
   private handleAircraftUnserviceable(event: OpsEvent, context: RetaskContext): Recommendation {
@@ -500,6 +508,188 @@ export class MockRetaskEngine {
       dataFreshnessSec: 1,
       alternatives: [],
     };
+  }
+
+  private attachAlternatives(rec: Recommendation, event: OpsEvent, _context: RetaskContext): Recommendation {
+    const alt1Id = `${rec.id}-ALT1`;
+    const alt2Id = `${rec.id}-ALT2`;
+
+    if (event.type === 'THREAT_DETECTED') {
+      rec.alternatives = [
+        {
+          id: alt1Id,
+          triggerEventId: event.id,
+          summary: 'Option B: Hold at Egress Orbit until SEAD suppression package clears corridor.',
+          score: Math.max(50, rec.score - 14),
+          changes: rec.changes.map((c) => ({
+            ...c,
+            after: 'Hold Orbit Bravo',
+            note: 'Orbit holding pattern 40 km north of threat envelope',
+          })),
+          impactedMissionIds: rec.impactedMissionIds,
+          tradeoffs: [
+            { label: 'Time-on-Station Reduction', delta: -25, unit: 'min', direction: 'bad' },
+            { label: 'Fuel Margin Drawdown', delta: -18, unit: '%', direction: 'bad' },
+            { label: 'Threat Exposure Risk', delta: -70, unit: '%', direction: 'good' },
+          ],
+          explanation: [
+            'Holding orbit keeps strike package out of SAM engagement envelope.',
+            'Consumes 18% additional loiter fuel while awaiting suppression assets.',
+          ],
+          constraintsSatisfied: ['Threat engagement buffer maintained'],
+          constraintsRelaxed: ['Time on station relaxed by 25 min'],
+          status: 'pending',
+          createdAt: rec.createdAt,
+          stateVersion: rec.stateVersion,
+          confidence: 0.82,
+          dataFreshnessSec: rec.dataFreshnessSec,
+        },
+        {
+          id: alt2Id,
+          triggerEventId: event.id,
+          summary: 'Option C: Low-level terrain masking ingress via northern ridge contour.',
+          score: Math.max(50, rec.score - 21),
+          changes: rec.changes.map((c) => ({
+            ...c,
+            after: 'Route D (Low Altitude)',
+            note: 'Ingress at 500 ft AGL under radar horizon',
+          })),
+          impactedMissionIds: rec.impactedMissionIds,
+          tradeoffs: [
+            { label: 'Fuel Consumption Rate', delta: 28, unit: '%', direction: 'bad' },
+            { label: 'Terrain Collision Risk', delta: 15, unit: '%', direction: 'bad' },
+            { label: 'Threat Exposure Risk', delta: -60, unit: '%', direction: 'good' },
+          ],
+          explanation: [
+            'Low-level terrain masking undercuts SAM tracking radar line-of-sight.',
+            'Significantly elevates fuel burn rate due to dense low-altitude air.',
+          ],
+          constraintsSatisfied: ['Direct line of flight partially preserved'],
+          constraintsRelaxed: ['Minimum altitude corridor safety floors relaxed to 500 ft'],
+          status: 'pending',
+          createdAt: rec.createdAt,
+          stateVersion: rec.stateVersion,
+          confidence: 0.74,
+          dataFreshnessSec: rec.dataFreshnessSec,
+        },
+      ];
+    } else if (event.type === 'AIRCRAFT_UNSERVICEABLE') {
+      rec.alternatives = [
+        {
+          id: alt1Id,
+          triggerEventId: event.id,
+          summary: 'Option B: Delay mission start window by 90 minutes for expedited repairs.',
+          score: Math.max(45, rec.score - 16),
+          changes: rec.changes.map((c) => ({
+            ...c,
+            kind: 'delay',
+            after: 'T+90m Departure',
+            note: 'Emergency maintenance crew dispatched for on-ramp component swap',
+          })),
+          impactedMissionIds: rec.impactedMissionIds,
+          tradeoffs: [
+            { label: 'Sortie Departure Delay', delta: 90, unit: 'min', direction: 'bad' },
+            { label: 'Airframe Fleet Margin', delta: 0, unit: 'airframe', direction: 'neutral' },
+            { label: 'Fuel Consumption', delta: 0, unit: 'kg', direction: 'neutral' },
+          ],
+          explanation: [
+            'Retains original airframe and weapons loadout.',
+            'Forces 90-minute delay, risking target visibility window closure.',
+          ],
+          constraintsSatisfied: ['Original payload and airframe retained'],
+          constraintsRelaxed: ['ATO flight window tolerance exceeded by 30 min'],
+          status: 'pending',
+          createdAt: rec.createdAt,
+          stateVersion: rec.stateVersion,
+          confidence: 0.79,
+          dataFreshnessSec: rec.dataFreshnessSec,
+        },
+        {
+          id: alt2Id,
+          triggerEventId: event.id,
+          summary: 'Option C: Divert secondary Fighter-A CAP airframe to fulfill strike escort.',
+          score: Math.max(40, rec.score - 24),
+          changes: rec.changes.map((c) => ({
+            ...c,
+            after: 'AC-01 (Fighter-A)',
+            note: 'Repurpose alert fighter hull with secondary air-to-ground load',
+          })),
+          impactedMissionIds: rec.impactedMissionIds,
+          tradeoffs: [
+            { label: 'Sortie Departure Delay', delta: 10, unit: 'min', direction: 'bad' },
+            { label: 'CAP Sector Defense Margin', delta: -50, unit: '%', direction: 'bad' },
+            { label: 'Target Effect On Target', delta: -40, unit: '%', direction: 'bad' },
+          ],
+          explanation: [
+            'Preempts defensive fighter from Sector North to support target strike.',
+            'Draws down defensive CAP coverage, increasing vulnerability to adversary incursions.',
+          ],
+          constraintsSatisfied: ['Immediate launch posture achieved within 10 min'],
+          constraintsRelaxed: ['Sector North defensive CAP posture compromised'],
+          status: 'pending',
+          createdAt: rec.createdAt,
+          stateVersion: rec.stateVersion,
+          confidence: 0.71,
+          dataFreshnessSec: rec.dataFreshnessSec,
+        },
+      ];
+    } else {
+      rec.alternatives = [
+        {
+          id: alt1Id,
+          triggerEventId: event.id,
+          summary: 'Option B: Stand down sortie package and preserve theatre reserve margin.',
+          score: Math.max(40, rec.score - 18),
+          changes: rec.changes.map((c) => ({
+            ...c,
+            kind: 'cancel',
+            after: 'STAND_DOWN',
+            note: 'Abort tasking order to prevent secondary resource cascade',
+          })),
+          impactedMissionIds: rec.impactedMissionIds,
+          tradeoffs: [
+            { label: 'Mission Objective Completion', delta: -100, unit: '%', direction: 'bad' },
+            { label: 'Resource Preservation', delta: 100, unit: '%', direction: 'good' },
+          ],
+          explanation: [
+            'Eliminates all operational risk by standing down the sortie package.',
+            'Fails to achieve tactical objectives assigned in current master ATO.',
+          ],
+          constraintsSatisfied: ['Zero wear or fuel expenditure'],
+          constraintsRelaxed: ['ATO operational mandate unsatisfied'],
+          status: 'pending',
+          createdAt: rec.createdAt,
+          stateVersion: rec.stateVersion,
+          confidence: 0.88,
+          dataFreshnessSec: rec.dataFreshnessSec,
+        },
+        {
+          id: alt2Id,
+          triggerEventId: event.id,
+          summary: 'Option C: Execute partial mission profile with minimum available assets.',
+          score: Math.max(40, rec.score - 12),
+          changes: rec.changes,
+          impactedMissionIds: rec.impactedMissionIds,
+          tradeoffs: [
+            { label: 'Mission Coverage', delta: -35, unit: '%', direction: 'bad' },
+            { label: 'Readiness Margin Conserved', delta: 1, unit: 'airframe', direction: 'good' },
+          ],
+          explanation: [
+            'Dispatches lead airframe while holding secondary asset in reserve.',
+            'Reduces strike effectiveness on primary target infrastructure.',
+          ],
+          constraintsSatisfied: ['Partial objective fulfillment'],
+          constraintsRelaxed: ['Two-ship mutual defense tactics waived to single-ship profile'],
+          status: 'pending',
+          createdAt: rec.createdAt,
+          stateVersion: rec.stateVersion,
+          confidence: 0.78,
+          dataFreshnessSec: rec.dataFreshnessSec,
+        },
+      ];
+    }
+
+    return rec;
   }
 }
 
