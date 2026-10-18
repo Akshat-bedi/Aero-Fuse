@@ -4,4 +4,6 @@ export * from './LayerControlPanel';
 export * from './EntityDetailPanel';
 export * from './TimeControls';
 export * from './RouteRiskIndicator';
+export * from './ImpactBanner';
+export * from './PlanCompareToggle';
 export * from './CopPage';

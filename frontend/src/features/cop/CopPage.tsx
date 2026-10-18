@@ -7,6 +7,8 @@ import {
   EntityDetailPanel,
   TimeControls,
   RouteRiskIndicator,
+  ImpactBanner,
+  PlanCompareToggle,
 } from '@/features/cop';
 import {
   SelectedEntity,
@@ -14,11 +16,14 @@ import {
   DEFAULT_LAYER_VISIBILITY,
 } from './types';
 import { ReadinessStrip } from '@/features/resources';
+import { ReplanProgressIndicator, RecommendationPreviewCard } from '@/features/recommendations';
+import { ScenarioControlPanel } from '@/features/scenarios';
 import {
   Plane,
   ShieldAlert,
   Route,
   Search,
+  Sliders,
 } from 'lucide-react';
 
 export const CopPage: React.FC = () => {
@@ -36,7 +41,7 @@ export const CopPage: React.FC = () => {
     updateMission,
   } = useEntitiesStore();
 
-  const { selectedMissionId, selectMission } = useUiStore();
+  const { selectedMissionId, selectMission, toggleScenarioControl } = useUiStore();
 
   // Selected tactical entity
   const [selectedEntity, setSelectedEntity] = useState<SelectedEntity | null>(null);
@@ -211,8 +216,18 @@ export const CopPage: React.FC = () => {
           onReset={handleResetSim}
         />
 
-        {/* Right: Quick Entity Navigation Jump */}
+        {/* Right: Simulation Controls & Quick Entity Navigation Jump */}
         <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => toggleScenarioControl()}
+            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-cyan-950/60 hover:bg-cyan-900/80 text-cyan-300 border border-cyan-500/50 text-xs font-mono transition-colors shadow-sm"
+            title="Open Simulation Controls (Event Injection & Demo Scripts)"
+          >
+            <Sliders className="w-3.5 h-3.5 text-cyan-400" />
+            <span className="hidden sm:inline">Simulation Controls</span>
+          </button>
+
           <div className="relative">
             <button
               type="button"
@@ -281,11 +296,14 @@ export const CopPage: React.FC = () => {
       </div>
 
       {/* Tactical Readiness Strip at the top of COP screen */}
-      <div className="relative z-10 px-3 py-1 bg-command-panel/90 border-b border-command-border/60 flex items-center justify-between overflow-x-auto">
+      <div className="relative z-10 px-3 py-1 bg-command-panel/90 border-b border-command-border/60 flex items-center justify-between overflow-x-auto gap-3">
         <ReadinessStrip isCompact className="border-0 bg-transparent p-0 shadow-none" />
-        <div className="hidden md:flex items-center gap-2 font-mono text-[10px] text-command-subdued">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-          <span>THEATRE READINESS: NOMINAL</span>
+        <div className="flex items-center gap-3 shrink-0">
+          <PlanCompareToggle />
+          <div className="hidden md:flex items-center gap-2 font-mono text-[10px] text-command-subdued">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+            <span>THEATRE: NOMINAL</span>
+          </div>
         </div>
       </div>
 
@@ -336,6 +354,18 @@ export const CopPage: React.FC = () => {
             onSelectEntity={handleSelectEntity}
           />
         )}
+
+        {/* Stage 6: Operational Impact Advisory Banner */}
+        <ImpactBanner />
+
+        {/* Stage 6: AI Retasking Progression Bar */}
+        <ReplanProgressIndicator />
+
+        {/* Stage 6: Recommendation Decision Preview Card */}
+        <RecommendationPreviewCard />
+
+        {/* Stage 6: Scenario Control Panel (Slide-over drawer) */}
+        <ScenarioControlPanel />
 
         {/* Bottom Status Bar */}
         <div className="absolute bottom-1 right-2 z-10 pointer-events-none">
