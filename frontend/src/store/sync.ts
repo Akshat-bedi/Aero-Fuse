@@ -4,6 +4,7 @@ import { useRecommendationsStore } from './recommendationsStore';
 import { useEventsStore } from './eventsStore';
 import { useAuditStore } from './auditStore';
 import { useUiStore } from './uiStore';
+import { useAlertsStore } from './alertsStore';
 import { OperationalSnapshot } from '@/types';
 
 let isInitialized = false;
@@ -55,6 +56,17 @@ export function initStoreSubscriptions(): () => void {
     });
   });
 
+  // Stage 9: Subscribe to Live / Mock Operational Alerts
+  const unsubscribeAlerts = dataService.subscribeAlerts?.((alert) => {
+    useAlertsStore.getState().addAlert(alert);
+  });
+
+  // Stage 9: Subscribe to Telemetry Connection Status & Stale Detection
+  const unsubscribeConnection = dataService.subscribeConnectionStatus?.((status, staleAgeSec) => {
+    useUiStore.getState().setConnectionStatus(status);
+    useUiStore.getState().setStaleAgeSec(staleAgeSec || 0);
+  });
+
   // Initial audit log fetch
   dataService.getAuditLog().then((entries) => {
     useAuditStore.getState().setAuditLog(entries);
@@ -64,6 +76,8 @@ export function initStoreSubscriptions(): () => void {
     unsubscribeSnapshot();
     unsubscribeProgress?.();
     unsubscribeImpact?.();
+    unsubscribeAlerts?.();
+    unsubscribeConnection?.();
     isInitialized = false;
   };
 }

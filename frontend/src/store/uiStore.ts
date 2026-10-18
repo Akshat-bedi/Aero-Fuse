@@ -1,5 +1,12 @@
 import { create } from 'zustand';
-import { OperationalAlert, ToastItem, ImpactAnalysisPayload, RetaskProgressState, LatLng } from '@/types';
+import {
+  OperationalAlert,
+  ToastItem,
+  ImpactAnalysisPayload,
+  RetaskProgressState,
+  LatLng,
+  ConnectionStatus,
+} from '@/types';
 import { serviceConfig } from '@/services/config';
 
 export interface UIState {
@@ -10,8 +17,10 @@ export interface UIState {
   isAlertsDrawerOpen: boolean;
   toggleAlertsDrawer: (open?: boolean) => void;
 
-  connectionStatus: 'mock' | 'live' | 'disconnected';
-  setConnectionStatus: (status: 'mock' | 'live' | 'disconnected') => void;
+  connectionStatus: ConnectionStatus;
+  setConnectionStatus: (status: ConnectionStatus) => void;
+  staleAgeSec: number;
+  setStaleAgeSec: (age: number) => void;
 
   selectedAirbaseId: string | null;
   selectedAircraftId: string | null;
@@ -71,7 +80,9 @@ const INITIAL_ALERTS: OperationalAlert[] = [
   {
     id: 'alt-01',
     title: 'Aircraft Unserviceable: Hydraulic Advisory',
+    message: 'Fighter-A airframe VAPOR-12 flagged return for hydraulic pressure anomaly on Hardpoint 2.',
     severity: 'critical',
+    type: 'readiness',
     timestamp: '1422Z',
     category: 'MAINTENANCE',
     location: 'Sector Alpha FOB (ALPH)',
@@ -81,7 +92,9 @@ const INITIAL_ALERTS: OperationalAlert[] = [
   {
     id: 'alt-02',
     title: 'Weather Minima Exceeded',
+    message: 'Crosswind 28G36kts exceeding safe landing envelope for Transport-C airframes.',
     severity: 'warning',
+    type: 'weather',
     timestamp: '1410Z',
     category: 'WEATHER',
     location: 'North Bastion Airbase (BSTN)',
@@ -91,7 +104,9 @@ const INITIAL_ALERTS: OperationalAlert[] = [
   {
     id: 'alt-03',
     title: 'Sector Buffer Track Detections',
+    message: 'Uncorrelated radar contact detected at FL240 heading 180 degrees at 420 knots.',
     severity: 'warning',
+    type: 'threat',
     timestamp: '1355Z',
     category: 'THREAT',
     location: 'Sector North Buffer',
@@ -101,7 +116,9 @@ const INITIAL_ALERTS: OperationalAlert[] = [
   {
     id: 'alt-04',
     title: 'ATO Retasking Opportunity Available',
+    message: 'AI DSS generated retasking recommendation REC-901 for CAP reinforcement.',
     severity: 'info',
+    type: 'conflict',
     timestamp: '1340Z',
     category: 'AIRSPACE',
     location: 'Sector Alpha FOB',
@@ -141,8 +158,10 @@ export const useUiStore = create<UIState>((set) => ({
       isAlertsDrawerOpen: typeof open === 'boolean' ? open : !state.isAlertsDrawerOpen,
     })),
 
-  connectionStatus: serviceConfig.isMock ? 'mock' : 'live',
+  connectionStatus: serviceConfig.isMock ? 'MOCK' : 'LIVE',
   setConnectionStatus: (status) => set({ connectionStatus: status }),
+  staleAgeSec: 0,
+  setStaleAgeSec: (age) => set({ staleAgeSec: age }),
 
   selectedAirbaseId: null,
   selectedAircraftId: null,
