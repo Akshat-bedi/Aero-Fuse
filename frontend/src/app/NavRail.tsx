@@ -4,7 +4,7 @@ import {
   Compass,
   PlaneTakeoff,
   Boxes,
-  Sparkles,
+  Target,
   Sliders,
   AlertTriangle,
   ClipboardList,
@@ -50,9 +50,7 @@ export const NavRail: React.FC = () => {
     {
       to: '/recommendations',
       label: 'Recommendations',
-      icon: Sparkles,
-      badge: 'AI',
-      badgeVariant: 'primary',
+      icon: Target,
     },
     {
       to: '/scenarios',
@@ -77,14 +75,14 @@ export const NavRail: React.FC = () => {
     <nav
       className={cn(
         'bg-command-panel border-r border-command-border flex flex-col justify-between select-none z-20 flex-shrink-0 transition-all duration-200',
-        isExpanded ? 'w-56' : 'w-14',
+        isExpanded ? 'w-56' : 'w-12',
       )}
       aria-label="Tactical Navigation Rail"
     >
       {/* Navigation Links */}
-      <div className="flex flex-col py-2 px-1.5 gap-1">
-        <div className="px-2 py-1 text-[10px] font-mono uppercase tracking-wider text-command-subdued">
-          {isExpanded ? 'COMMAND NAVIGATION' : 'NAV'}
+      <div className="flex flex-col py-1.5 gap-0.5">
+        <div className="px-3 py-1 text-[9px] font-mono uppercase tracking-[0.15em] text-command-subdued">
+          {isExpanded ? 'MODULE NAVIGATION' : 'NAV'}
         </div>
 
         {NAV_ITEMS.map((item) => {
@@ -97,10 +95,10 @@ export const NavRail: React.FC = () => {
               end={item.to === '/'}
               className={({ isActive }) =>
                 cn(
-                  'flex items-center gap-2.5 px-2.5 py-2 rounded text-xs uppercase font-medium tracking-wide transition-all duration-150 relative group',
+                  'flex items-center gap-2.5 px-3 py-2 text-xs font-mono uppercase tracking-wider transition-colors relative group',
                   isActive
-                    ? 'bg-command-raised text-command-primary font-semibold border-l-2 border-command-primary shadow-tactical'
-                    : 'text-command-muted hover:text-command-text hover:bg-command-raised/50',
+                    ? 'border-l-[3px] border-l-command-primary bg-command-raised text-command-heading font-semibold'
+                    : 'border-l-[3px] border-l-transparent text-command-muted hover:text-command-heading hover:bg-command-raised/50',
                 )
               }
             >
@@ -109,7 +107,7 @@ export const NavRail: React.FC = () => {
                   <Icon
                     className={cn(
                       'w-4 h-4 flex-shrink-0 transition-colors',
-                      isActive ? 'text-command-primary' : 'text-command-muted group-hover:text-command-text',
+                      isActive ? 'text-command-primary' : 'text-command-muted group-hover:text-command-heading',
                     )}
                   />
                   {isExpanded && <span className="truncate">{item.label}</span>}
@@ -117,14 +115,14 @@ export const NavRail: React.FC = () => {
                   {item.badge !== undefined && (
                     <span
                       className={cn(
-                        'ml-auto font-mono text-[10px] font-bold px-1.5 py-0.2 rounded',
+                        'ml-auto font-mono text-[9px] font-bold px-1.5 py-0.2 rounded-[1px] border',
                         !isExpanded && 'absolute top-1 right-1 px-1 py-0 text-[8px]',
                         item.badgeVariant === 'primary' &&
-                          'bg-command-primary/20 text-command-primary border border-command-primary/40',
+                          'bg-command-bg text-command-primary border-command-border',
                         item.badgeVariant === 'warning' &&
-                          'bg-command-warning/20 text-command-warning border border-command-warning/40',
+                          'bg-command-bg text-command-warning border-command-warning-border',
                         item.badgeVariant === 'critical' &&
-                          'bg-command-critical/20 text-command-critical border border-command-critical/40',
+                          'bg-command-bg text-command-critical border-command-critical-border',
                       )}
                     >
                       {item.badge}
@@ -148,15 +146,15 @@ export const NavRail: React.FC = () => {
       </div>
 
       {/* Bottom Section: Component Gallery & Collapse Toggle */}
-      <div className="p-1.5 border-t border-command-border/60 flex flex-col gap-1 bg-command-bg/40">
+      <div className="p-1 border-t border-command-border flex flex-col gap-1 bg-command-bg">
         <NavLink
           to="/dev/components"
           className={({ isActive }) =>
             cn(
-              'flex items-center gap-2.5 px-2.5 py-1.5 rounded text-xs uppercase font-medium tracking-wide transition-all duration-150 group border border-dashed',
+              'flex items-center gap-2 px-2 py-1 text-xs uppercase font-mono tracking-wider transition-none border',
               isActive
-                ? 'bg-command-raised border-command-primary text-command-primary font-semibold shadow-tactical'
-                : 'border-command-border/80 text-command-muted hover:text-command-text hover:bg-command-raised/50',
+                ? 'bg-command-raised border-command-primary text-command-primary font-semibold'
+                : 'border-command-border/60 text-command-muted hover:text-command-text hover:bg-command-raised/50',
             )
           }
         >
@@ -166,12 +164,12 @@ export const NavRail: React.FC = () => {
                 <Component
                   className={cn(
                     'w-3.5 h-3.5 flex-shrink-0',
-                    isActive ? 'text-command-primary' : 'text-command-muted group-hover:text-command-text',
+                    isActive ? 'text-command-primary' : 'text-command-muted',
                   )}
                 />
                 {isExpanded && (
                   <div className="flex flex-col min-w-0 leading-tight">
-                    <span className="truncate text-[11px]">Component Gallery</span>
+                    <span className="truncate text-[10px]">Component Gallery</span>
                     <span className="text-[8px] font-mono text-command-subdued">/dev/components</span>
                   </div>
                 )}
@@ -194,10 +192,10 @@ export const NavRail: React.FC = () => {
           to="/dev/data"
           className={({ isActive }) =>
             cn(
-              'flex items-center gap-2.5 px-2.5 py-1.5 rounded text-xs uppercase font-medium tracking-wide transition-all duration-150 group border border-dashed',
+              'flex items-center gap-2 px-2 py-1 text-xs uppercase font-mono tracking-wider transition-none border',
               isActive
-                ? 'bg-command-raised border-command-primary text-command-primary font-semibold shadow-tactical'
-                : 'border-command-border/80 text-command-muted hover:text-command-text hover:bg-command-raised/50',
+                ? 'bg-command-raised border-command-primary text-command-primary font-semibold'
+                : 'border-command-border/60 text-command-muted hover:text-command-text hover:bg-command-raised/50',
             )
           }
         >
@@ -207,12 +205,12 @@ export const NavRail: React.FC = () => {
                 <Database
                   className={cn(
                     'w-3.5 h-3.5 flex-shrink-0',
-                    isActive ? 'text-command-primary' : 'text-command-muted group-hover:text-command-text',
+                    isActive ? 'text-command-primary' : 'text-command-muted',
                   )}
                 />
                 {isExpanded && (
                   <div className="flex flex-col min-w-0 leading-tight">
-                    <span className="truncate text-[11px]">Data Engine & Stores</span>
+                    <span className="truncate text-[10px]">Data Engine & Stores</span>
                     <span className="text-[8px] font-mono text-command-subdued">/dev/data</span>
                   </div>
                 )}
@@ -235,7 +233,7 @@ export const NavRail: React.FC = () => {
         <button
           type="button"
           onClick={() => setIsExpanded(!isExpanded)}
-          className="flex items-center justify-center py-1.5 px-2 rounded text-[11px] font-mono text-command-muted hover:text-command-heading hover:bg-command-raised transition-colors uppercase gap-1.5"
+          className="flex items-center justify-center py-1 px-2 border border-command-border/60 text-[10px] font-mono text-command-muted hover:text-command-heading hover:bg-command-raised transition-none uppercase gap-1.5"
           aria-label={isExpanded ? 'Collapse Navigation Rail' : 'Expand Navigation Rail'}
         >
           {isExpanded ? (
