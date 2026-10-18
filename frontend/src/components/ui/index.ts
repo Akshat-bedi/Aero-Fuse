@@ -13,3 +13,4 @@ export * from './Skeleton';
 export * from './EmptyState';
 export * from './KeyValue';
 export * from './Stat';
+export * from './ErrorBoundary';
