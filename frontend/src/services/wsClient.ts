@@ -44,8 +44,9 @@ export class TacticalWebSocketClient {
       this.ws = new WebSocket(this.url);
 
       this.ws.onopen = () => {
+        const wasReconnecting = this.reconnectAttempts > 0;
         this.reconnectAttempts = 0;
-        this.emit('connection_status', { status: 'connected' });
+        this.emit('connection_status', { status: 'connected', reconnected: wasReconnecting });
       };
 
       this.ws.onmessage = (event: MessageEvent) => {
@@ -75,16 +76,23 @@ export class TacticalWebSocketClient {
     }
   }
 
+  public isConnected(): boolean {
+    return this.ws !== null && this.ws.readyState === WebSocket.OPEN;
+  }
+
   private scheduleReconnect(): void {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
       this.emit('connection_status', { status: 'reconnect_failed' });
       return;
     }
 
-    const delay = Math.min(
+    const baseDelay = Math.min(
       this.reconnectIntervalMs * Math.pow(this.reconnectDecay, this.reconnectAttempts),
       this.maxReconnectIntervalMs,
     );
+    // Randomized jitter (0-25% of base delay) to avoid thundering herd on server restart
+    const jitter = Math.random() * 0.25 * baseDelay;
+    const delay = Math.min(baseDelay + jitter, this.maxReconnectIntervalMs);
 
     this.reconnectAttempts++;
     this.emit('connection_status', {

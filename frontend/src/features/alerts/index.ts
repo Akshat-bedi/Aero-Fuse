@@ -1,3 +1,1 @@
-// Feature: alerts
-export {};
-
+export * from './AlertsPage';

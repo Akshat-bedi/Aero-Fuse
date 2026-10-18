@@ -29,6 +29,10 @@ import {
   RetaskStage,
   AircraftType,
   Tradeoff,
+  OperationalAlert,
+  ConnectionStatus,
+  AlertType,
+  AlertSeverity,
 } from '@/types';
 import { mockRetaskEngine } from './mockRetaskEngine';
 import { serviceConfig } from './config';
@@ -1313,6 +1317,10 @@ export class MockDataService implements IDataService {
     return this.buildSnapshot();
   }
 
+  private alertSubscribers: Set<(alert: OperationalAlert) => void> = new Set();
+  private connectionSubscribers: Set<(status: ConnectionStatus, staleAgeSec?: number) => void> =
+    new Set();
+
   public subscribe(callback: (snapshot: OperationalSnapshot) => void): () => void {
     this.subscribers.add(callback);
     callback(this.buildSnapshot());
@@ -1335,12 +1343,33 @@ export class MockDataService implements IDataService {
     };
   }
 
+  public subscribeAlerts(callback: (alert: OperationalAlert) => void): () => void {
+    this.alertSubscribers.add(callback);
+    return () => {
+      this.alertSubscribers.delete(callback);
+    };
+  }
+
+  public subscribeConnectionStatus(
+    callback: (status: ConnectionStatus, staleAgeSec?: number) => void,
+  ): () => void {
+    this.connectionSubscribers.add(callback);
+    callback('MOCK');
+    return () => {
+      this.connectionSubscribers.delete(callback);
+    };
+  }
+
   private notifyRetaskProgress(progress: RetaskProgressState): void {
     this.retaskProgressSubscribers.forEach((cb) => cb(progress));
   }
 
   private notifyImpact(impact: ImpactAnalysisPayload): void {
     this.impactSubscribers.forEach((cb) => cb(impact));
+  }
+
+  private notifyAlert(alert: OperationalAlert): void {
+    this.alertSubscribers.forEach((cb) => cb(alert));
   }
 
   public async injectEvent(
@@ -1511,6 +1540,65 @@ export class MockDataService implements IDataService {
       timeToDecisionMin: 5,
     };
     this.notifyImpact(impactPayload);
+
+    // Derive operational alert locally from event and impact
+    const alertId = `ALT-${String(this.eventCounter).padStart(4, '0')}`;
+    let alertType: AlertType = 'readiness';
+    let alertSeverity: AlertSeverity = 'warning';
+    let alertTitle = `Event: ${fullEvent.type}`;
+    let alertMessage = `Tactical event ${fullEvent.id} registered in operations log.`;
+
+    if (fullEvent.type === 'THREAT_DETECTED') {
+      alertType = 'threat';
+      alertSeverity = 'critical';
+      alertTitle = 'Threat Contact: Active SAM Battery';
+      alertMessage = 'SAM radar engagement zone detected. Intersects active flight corridors.';
+    } else if (fullEvent.type === 'BASE_CLOSED') {
+      alertType = 'readiness';
+      alertSeverity = 'critical';
+      alertTitle = `Base Outage: ${fullEvent.payload.baseId}`;
+      alertMessage = `Base ${fullEvent.payload.baseId} runway closed for operational contingencies.`;
+    } else if (fullEvent.type === 'AIRCRAFT_UNSERVICEABLE') {
+      alertType = 'readiness';
+      alertSeverity = 'warning';
+      alertTitle = `Airframe AOG: ${fullEvent.payload.aircraftId}`;
+      alertMessage = `Aircraft ${fullEvent.payload.aircraftId} flagged unserviceable.`;
+    } else if (fullEvent.type === 'WEATHER_DEGRADED') {
+      alertType = 'weather';
+      alertSeverity = 'warning';
+      alertTitle = `Weather Minima Warning: ${fullEvent.payload.baseId || 'Sector'}`;
+      alertMessage = 'Severe meteorological front degrading visibility and recovery minimums.';
+    } else if (fullEvent.type === 'CREW_UNAVAILABLE') {
+      alertType = 'crew';
+      alertSeverity = 'warning';
+      alertTitle = `Aircrew Grounded: ${fullEvent.payload.crewId}`;
+      alertMessage = `Crew member ${fullEvent.payload.crewId} reached mandatory rest threshold.`;
+    }
+
+    this.notifyAlert({
+      id: alertId,
+      title: alertTitle,
+      message: alertMessage,
+      details: alertMessage,
+      severity: alertSeverity,
+      type: alertType,
+      timestamp,
+      acknowledged: false,
+    });
+
+    if (impactedMissionIds.length > 0) {
+      this.notifyAlert({
+        id: `ALT-CF-${alertId}`,
+        title: 'ATO Sortie Corridor Conflict',
+        message: `${impactedMissionIds.length} sortie(s) flagged at-risk (${impactedMissionIds.join(', ')}). Retasking engaged.`,
+        details: impactReasons.join('; '),
+        severity: 'critical',
+        type: 'conflict',
+        timestamp,
+        acknowledged: false,
+      });
+    }
+
     this.notifySubscribers();
 
     // Stage progression
@@ -2202,15 +2290,42 @@ export class MockDataService implements IDataService {
     return this.mockConflictsEnabled;
   }
 
+  public async getHealth(): Promise<{
+    status: string;
+    version: string;
+    simTime: string;
+    solverReady: boolean;
+  }> {
+    return {
+      status: 'ok',
+      version: '0.1.0',
+      simTime: this.simTime.toISOString(),
+      solverReady: true,
+    };
+  }
+
+  public async getRecommendations(status?: string): Promise<Recommendation[]> {
+    const list = Object.values(this.recommendations);
+    if (!status) return list;
+    return list.filter((r) => r.status === status);
+  }
+
+  public async getRecommendation(id: string): Promise<Recommendation> {
+    const reco = this.recommendations[id];
+    if (!reco) throw new Error(`Recommendation ${id} not found`);
+    return reco;
+  }
+
   private appendAuditEntry(entry: Omit<AuditEntry, 'id' | 'timestamp' | 'prevHash' | 'hash'>): void {
     const prev = this.auditLog[this.auditLog.length - 1];
     const prevHash = prev ? prev.hash : '0000000000000000000000000000000000000000000000000000000000000000';
     const id = `AUD-${String(this.auditCounter++).padStart(4, '0')}`;
     const timestamp = this.simTime.toISOString();
     // Deterministic mock hash string (hex length 64)
-    const hash = `${Math.abs(
+    const rawHash = `${Math.abs(
       (id + timestamp + entry.action).split('').reduce((acc, char) => (acc << 5) - acc + char.charCodeAt(0), 0),
-    ).toString(16)}abcdef0123456789abcdef0123456789abcdef0123456789`.slice(0, 64);
+    ).toString(16)}abcdef0123456789abcdef0123456789abcdef01234567890123456789abcdef`;
+    const hash = rawHash.slice(0, 64).padEnd(64, '0');
 
     this.auditLog.push({
       id,

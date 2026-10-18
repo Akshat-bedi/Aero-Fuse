@@ -21,6 +21,8 @@ import {
   Prediction,
   RetaskProgressState,
   ImpactAnalysisPayload,
+  OperationalAlert,
+  ConnectionStatus,
 } from '@/types';
 import { apiClient } from './apiClient';
 import { TacticalWebSocketClient } from './wsClient';
@@ -100,8 +102,12 @@ export function normalizeWireSnapshot(
     recommendations[r.id] = r;
   });
 
-  const simTime = wire.sim?.time || (wire as unknown as { simTime?: string }).simTime || new Date().toISOString();
-  const speed = wire.sim?.speed ?? (wire as unknown as { speedMultiplier?: number }).speedMultiplier ?? 1;
+  const simTime =
+    wire.sim?.time ||
+    (wire as unknown as { simTime?: string }).simTime ||
+    new Date().toISOString();
+  const speed =
+    wire.sim?.speed ?? (wire as unknown as { speedMultiplier?: number }).speedMultiplier ?? 1;
   const paused = wire.sim?.paused ?? false;
 
   return {
@@ -124,6 +130,22 @@ export function normalizeWireSnapshot(
   };
 }
 
+const KNOWN_WS_TYPES = new Set([
+  'SNAPSHOT',
+  'ENTITY_UPDATE',
+  'POSITION_TICK',
+  'CLOCK_TICK',
+  'EVENT_INJECTED',
+  'IMPACT_ANALYSIS',
+  'RETASK_PROGRESS',
+  'RECOMMENDATION_READY',
+  'RECOMMENDATION_UPDATED',
+  'ALERT',
+  'PREDICTION_UPDATE',
+  'AUDIT_APPENDED',
+  'HEARTBEAT',
+]);
+
 /**
  * Live Data Service (REST + WebSocket)
  * Communicates with backend endpoints per context.md and /docs/API_CONTRACT.md.
@@ -133,12 +155,20 @@ export class LiveDataService implements IDataService {
   private subscribers: Set<(snapshot: OperationalSnapshot) => void> = new Set();
   private retaskProgressSubscribers: Set<(progress: RetaskProgressState) => void> = new Set();
   private impactSubscribers: Set<(impact: ImpactAnalysisPayload) => void> = new Set();
+  private alertSubscribers: Set<(alert: OperationalAlert) => void> = new Set();
+  private connectionSubscribers: Set<(status: ConnectionStatus, staleAgeSec?: number) => void> =
+    new Set();
+
   private speedMultiplier: 1 | 5 | 20 = 1;
   private currentSnapshot: OperationalSnapshot | null = null;
+  private currentConnectionStatus: ConnectionStatus = 'OFFLINE';
+  private lastMessageTimestamp: number = Date.now();
+  private staleTimer?: ReturnType<typeof setInterval>;
 
-  constructor() {
-    this.wsClient = new TacticalWebSocketClient({ url: serviceConfig.wsUrl });
+  constructor(customWsClient?: TacticalWebSocketClient) {
+    this.wsClient = customWsClient || new TacticalWebSocketClient({ url: serviceConfig.wsUrl });
     this.initWebSocket();
+    this.startStaleDetection();
   }
 
   public subscribeRetaskProgress(callback: (progress: RetaskProgressState) => void): () => void {
@@ -155,8 +185,114 @@ export class LiveDataService implements IDataService {
     };
   }
 
+  public subscribeAlerts(callback: (alert: OperationalAlert) => void): () => void {
+    this.alertSubscribers.add(callback);
+    return () => {
+      this.alertSubscribers.delete(callback);
+    };
+  }
+
+  public subscribeConnectionStatus(
+    callback: (status: ConnectionStatus, staleAgeSec?: number) => void,
+  ): () => void {
+    this.connectionSubscribers.add(callback);
+    callback(this.currentConnectionStatus);
+    return () => {
+      this.connectionSubscribers.delete(callback);
+    };
+  }
+
+  public setConnectionStatus(status: ConnectionStatus, staleAgeSec?: number): void {
+    this.currentConnectionStatus = status;
+    this.connectionSubscribers.forEach((cb) => cb(status, staleAgeSec));
+  }
+
+  public getConnectionStatus(): ConnectionStatus {
+    return this.currentConnectionStatus;
+  }
+
+  private startStaleDetection(): void {
+    if (this.staleTimer) clearInterval(this.staleTimer);
+    this.staleTimer = setInterval(() => {
+      if (
+        this.currentConnectionStatus === 'OFFLINE' ||
+        this.currentConnectionStatus === 'RECONNECTING'
+      ) {
+        return;
+      }
+      if (this.wsClient.isConnected()) {
+        const elapsedSec = Math.floor((Date.now() - this.lastMessageTimestamp) / 1000);
+        if (elapsedSec >= serviceConfig.staleAfterSec) {
+          this.setConnectionStatus('STALE', elapsedSec);
+        } else if (this.currentConnectionStatus === 'STALE') {
+          this.setConnectionStatus('LIVE');
+        }
+      }
+    }, 1000);
+  }
+
+  private shouldProcessVersion(version?: number): boolean {
+    if (typeof version !== 'number' || !this.currentSnapshot) {
+      return true;
+    }
+    const currentVer = this.currentSnapshot.stateVersion || 1;
+    return version >= currentVer;
+  }
+
   private initWebSocket(): void {
     this.wsClient.connect();
+
+    // Connection Lifecycle & Reconnect Resubscription
+    this.wsClient.subscribe<{ status: string; reconnected?: boolean }>(
+      'connection_status',
+      (info) => {
+        if (info.status === 'connected') {
+          this.lastMessageTimestamp = Date.now();
+          this.setConnectionStatus('LIVE');
+          // Resubscription via a fresh SNAPSHOT after reconnect
+          if (info.reconnected) {
+            this.getSnapshot(true).catch(() => {});
+          }
+        } else if (info.status === 'reconnecting') {
+          this.setConnectionStatus('RECONNECTING');
+        } else if (info.status === 'disconnected' || info.status === 'reconnect_failed') {
+          this.setConnectionStatus('OFFLINE');
+        }
+      },
+    );
+
+    // General message envelope interceptor for unknown types, stale reset, and stateVersion gap handling
+    this.wsClient.subscribe('*', (raw) => {
+      const envelope = raw as WebSocketEnvelope;
+      if (!envelope || typeof envelope !== 'object' || !envelope.type) return;
+
+      // Telemetry heartbeat reset
+      this.lastMessageTimestamp = Date.now();
+      if (this.currentConnectionStatus === 'STALE') {
+        this.setConnectionStatus('LIVE');
+      }
+
+      // Unknown message types are logged and ignored, never thrown
+      if (!KNOWN_WS_TYPES.has(envelope.type)) {
+        console.warn(`[LiveDataService] Unknown WebSocket message type ignored: "${envelope.type}"`);
+        return;
+      }
+
+      // State version monotonicity & gap handling
+      if (typeof envelope.stateVersion === 'number' && this.currentSnapshot) {
+        const currentVer = this.currentSnapshot.stateVersion || 1;
+        if (envelope.stateVersion < currentVer) {
+          // Ignore outdated update
+          return;
+        }
+        if (envelope.stateVersion > currentVer + 1 && currentVer > 0) {
+          // Version gap detected: missed intermediate updates! Request fresh snapshot
+          this.getSnapshot(true).catch(() => {});
+        } else {
+          this.currentSnapshot.stateVersion = envelope.stateVersion;
+        }
+      }
+    });
 
     // 1. SNAPSHOT
     this.wsClient.subscribe<WebSocketEnvelope<WireSnapshot | OperationalSnapshot>>(
@@ -165,6 +301,9 @@ export class LiveDataService implements IDataService {
         const payload = envelope?.payload ?? (envelope as unknown as WireSnapshot);
         if (payload) {
           this.currentSnapshot = normalizeWireSnapshot(payload);
+          if (envelope.stateVersion) {
+            this.currentSnapshot.stateVersion = envelope.stateVersion;
+          }
           this.notifySubscribers(this.currentSnapshot);
         }
       },
@@ -174,6 +313,7 @@ export class LiveDataService implements IDataService {
     this.wsClient.subscribe<WebSocketEnvelope<Partial<WireSnapshot>>>(
       'ENTITY_UPDATE',
       (envelope) => {
+        if (!envelope || !this.shouldProcessVersion(envelope.stateVersion)) return;
         const payload = envelope?.payload;
         if (payload && this.currentSnapshot) {
           if (Array.isArray(payload.bases)) {
@@ -237,7 +377,7 @@ export class LiveDataService implements IDataService {
         const paused = payload.paused ?? this.currentSnapshot.sim.paused;
         this.currentSnapshot.sim = { time, speed, paused };
         this.currentSnapshot.simTime = time;
-        this.currentSnapshot.speedMultiplier = speed;
+        this.currentSnapshot.speedMultiplier = speed as 1 | 5 | 20;
         this.notifySubscribers(this.currentSnapshot);
       }
     });
@@ -246,7 +386,10 @@ export class LiveDataService implements IDataService {
     this.wsClient.subscribe<WebSocketEnvelope<OpsEvent>>('EVENT_INJECTED', (envelope) => {
       const payload = envelope?.payload;
       if (payload && this.currentSnapshot) {
-        this.currentSnapshot.activeEvents = [payload, ...this.currentSnapshot.activeEvents].slice(0, 50);
+        this.currentSnapshot.activeEvents = [payload, ...this.currentSnapshot.activeEvents].slice(
+          0,
+          50,
+        );
         this.notifySubscribers(this.currentSnapshot);
       }
     });
@@ -307,9 +450,28 @@ export class LiveDataService implements IDataService {
     );
 
     // 10. ALERT
-    this.wsClient.subscribe<WebSocketEnvelope<Record<string, unknown>>>('ALERT', (_envelope) => {
-      // Dispatches operational alert
-    });
+    this.wsClient.subscribe<WebSocketEnvelope<OperationalAlert | Record<string, unknown>>>(
+      'ALERT',
+      (envelope) => {
+        const payload = envelope?.payload as OperationalAlert;
+        if (payload && payload.title) {
+          const alertObj: OperationalAlert = {
+            id: payload.id || `ALT-${Date.now()}`,
+            title: payload.title,
+            message: payload.message || payload.details || payload.title,
+            details: payload.details || payload.message || payload.title,
+            severity: payload.severity || 'warning',
+            type: payload.type || 'readiness',
+            category: payload.category || (payload.type ? payload.type.toUpperCase() : 'ALERT'),
+            timestamp: payload.timestamp || envelope.ts || new Date().toISOString(),
+            acknowledged: payload.acknowledged ?? false,
+            entityId: payload.entityId,
+            location: payload.location,
+          };
+          this.alertSubscribers.forEach((cb) => cb(alertObj));
+        }
+      },
+    );
 
     // 11. PREDICTION_UPDATE
     this.wsClient.subscribe<WebSocketEnvelope<Prediction[]>>(
@@ -345,9 +507,25 @@ export class LiveDataService implements IDataService {
     this.subscribers.forEach((cb) => cb(snapshot));
   }
 
-  public async getSnapshot(): Promise<OperationalSnapshot> {
+  // --- REST Endpoint Methods per API_CONTRACT.md section 4 ---
+
+  public async getHealth(): Promise<{
+    status: string;
+    version: string;
+    simTime: string;
+    solverReady: boolean;
+  }> {
+    return apiClient.get('/health');
+  }
+
+  public async getSnapshot(forceRefresh = false): Promise<OperationalSnapshot> {
+    if (this.currentSnapshot && !forceRefresh) {
+      return this.currentSnapshot;
+    }
     const raw = await apiClient.get<WireSnapshot | OperationalSnapshot>('/snapshot');
     this.currentSnapshot = normalizeWireSnapshot(raw);
+    this.lastMessageTimestamp = Date.now();
+    this.notifySubscribers(this.currentSnapshot);
     return this.currentSnapshot;
   }
 
@@ -371,6 +549,15 @@ export class LiveDataService implements IDataService {
     eventInput: Omit<OpsEvent, 'id' | 'timestamp'> | OpsEvent,
   ): Promise<OpsEvent> {
     return apiClient.post<OpsEvent>('/events', eventInput);
+  }
+
+  public async getRecommendations(status?: string): Promise<Recommendation[]> {
+    const query = status ? `?status=${encodeURIComponent(status)}` : '';
+    return apiClient.get<Recommendation[]>(`/recommendations${query}`);
+  }
+
+  public async getRecommendation(id: string): Promise<Recommendation> {
+    return apiClient.get<Recommendation>(`/recommendations/${id}`);
   }
 
   public async decideRecommendation(
@@ -423,8 +610,6 @@ export class LiveDataService implements IDataService {
     return this.speedMultiplier;
   }
 
-  // --- Extended Client Methods (per context.md spec) ---
-
   public async validateModification(
     id: string,
     modifications: unknown,
@@ -464,7 +649,11 @@ export class LiveDataService implements IDataService {
       speed,
     });
   }
+
+  public cleanup(): void {
+    if (this.staleTimer) clearInterval(this.staleTimer);
+    this.wsClient.disconnect();
+  }
 }
 
 export const liveDataService = new LiveDataService();
-

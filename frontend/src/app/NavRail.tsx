@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Tooltip } from '@/components/ui/Tooltip';
-import { useOpsStore } from '@/store';
+import { useAlertsStore } from '@/store/alertsStore';
 
 interface NavItem {
   to: string;
@@ -27,7 +27,7 @@ interface NavItem {
 
 export const NavRail: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(true);
-  const alerts = useOpsStore((state) => state.alerts);
+  const alerts = useAlertsStore((state) => state.alerts);
 
   const unackAlerts = alerts.filter((a) => !a.acknowledged).length;
 

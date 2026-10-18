@@ -10,7 +10,9 @@
     "format": "prettier --write \"src/**/*.{ts,tsx,css,md}\"",
     "test": "vitest run",
     "test:watch": "vitest",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "fake-backend": "node scripts/fake-backend.mjs",
+    "check:offline": "node scripts/check-offline.mjs"
   },
   "dependencies": {
     "@fontsource/inter": "^5.1.1",
