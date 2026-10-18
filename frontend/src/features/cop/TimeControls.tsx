@@ -23,11 +23,11 @@ export const TimeControls: React.FC<TimeControlsProps> = ({
     : '12:00:00Z';
 
   return (
-    <div className="flex items-center gap-2 bg-command-panel/90 backdrop-blur-md px-3 py-1.5 rounded border border-command-border/80 shadow-lg font-mono text-xs">
+    <div className="flex items-center gap-2 bg-command-panel px-2.5 py-1 rounded-[2px] border border-command-border font-mono text-xs">
       {/* Sim Zulu Clock */}
-      <div className="flex items-center gap-1.5 pr-2 border-r border-command-border/80">
+      <div className="flex items-center gap-1.5 pr-2 border-r border-command-border">
         <span className="text-[10px] text-command-muted">SIM ZULU:</span>
-        <span className="text-command-primary font-bold tracking-wider">{formattedZulu}</span>
+        <span className="text-command-primary font-bold tracking-wider tabular-nums">{formattedZulu}</span>
       </div>
 
       {/* Play / Pause */}
@@ -35,7 +35,7 @@ export const TimeControls: React.FC<TimeControlsProps> = ({
         type="button"
         title={isPaused ? 'Resume Simulation' : 'Pause Simulation'}
         onClick={onTogglePause}
-        className={`p-1 rounded transition-colors ${
+        className={`p-1 rounded-[1px] transition-none ${
           isPaused
             ? 'bg-command-warning text-black font-bold'
             : 'bg-command-bg hover:bg-command-raised text-command-heading border border-command-border'
@@ -45,11 +45,11 @@ export const TimeControls: React.FC<TimeControlsProps> = ({
       </button>
 
       {/* Speed Multipliers */}
-      <div className="flex items-center gap-1 bg-command-bg p-0.5 rounded border border-command-border">
+      <div className="flex items-center gap-0.5 bg-command-bg p-0.5 rounded-[1px] border border-command-border">
         <button
           type="button"
           onClick={() => onSpeedChange(1)}
-          className={`px-2 py-0.5 text-[10px] rounded font-bold transition-colors ${
+          className={`px-1.5 py-0.5 text-[10px] rounded-[1px] font-mono font-bold transition-none ${
             speedMultiplier === 1 && !isPaused
               ? 'bg-command-primary text-black'
               : 'text-command-muted hover:text-command-text'
@@ -60,7 +60,7 @@ export const TimeControls: React.FC<TimeControlsProps> = ({
         <button
           type="button"
           onClick={() => onSpeedChange(5)}
-          className={`px-2 py-0.5 text-[10px] rounded font-bold transition-colors ${
+          className={`px-1.5 py-0.5 text-[10px] rounded-[1px] font-mono font-bold transition-none ${
             speedMultiplier === 5 && !isPaused
               ? 'bg-command-primary text-black'
               : 'text-command-muted hover:text-command-text'
@@ -71,7 +71,7 @@ export const TimeControls: React.FC<TimeControlsProps> = ({
         <button
           type="button"
           onClick={() => onSpeedChange(20)}
-          className={`px-2 py-0.5 text-[10px] rounded font-bold transition-colors ${
+          className={`px-1.5 py-0.5 text-[10px] rounded-[1px] font-mono font-bold transition-none ${
             speedMultiplier === 20 && !isPaused
               ? 'bg-command-warning text-black'
               : 'text-command-muted hover:text-command-text'
@@ -87,7 +87,7 @@ export const TimeControls: React.FC<TimeControlsProps> = ({
           type="button"
           title="Reset Simulation to Initial Seed"
           onClick={onReset}
-          className="p-1 rounded bg-command-bg hover:bg-command-raised text-command-muted hover:text-command-primary transition-colors border border-command-border ml-1"
+          className="p-1 rounded-[1px] bg-command-bg hover:bg-command-raised text-command-muted hover:text-command-heading transition-none border border-command-border ml-0.5"
         >
           <RotateCcw className="w-3.5 h-3.5" />
         </button>

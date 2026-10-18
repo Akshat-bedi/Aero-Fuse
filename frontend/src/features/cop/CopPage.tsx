@@ -181,28 +181,28 @@ export const CopPage: React.FC = () => {
   return (
     <div className="relative w-full h-full flex flex-col overflow-hidden bg-command-bg select-none">
       {/* Tactical COP Header Bar */}
-      <div className="relative z-10 flex items-center justify-between px-3 py-2 bg-command-panel/95 border-b border-command-border/80 backdrop-blur-md shadow-md">
+      <div className="relative z-10 flex items-center justify-between px-2.5 py-1.5 bg-command-panel border-b border-command-border">
         {/* Left: Situational Summary Badges */}
-        <div className="flex items-center gap-3 font-mono text-xs">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-command-bg border border-command-border">
-            <Plane className="w-3.5 h-3.5 text-cyan-400" />
+        <div className="flex items-center gap-2 font-mono text-xs">
+          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-[1px] bg-command-bg border border-command-border">
+            <Plane className="w-3.5 h-3.5 text-command-primary" />
             <span className="text-command-muted text-[10px]">AIRBORNE:</span>
-            <span className="text-command-primary font-bold">{airborneCount}</span>
-            <span className="text-command-subdued text-[10px]">
-              / {airborneCount + serviceableCount} Ready
+            <span className="text-command-primary font-bold tabular-nums">{airborneCount}</span>
+            <span className="text-command-subdued text-[10px] tabular-nums">
+              / {airborneCount + serviceableCount} RDY
             </span>
           </div>
 
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded bg-command-bg border border-command-border">
-            <Route className="w-3.5 h-3.5 text-command-secondary" />
+          <div className="hidden sm:flex items-center gap-1.5 px-2 py-0.5 rounded-[1px] bg-command-bg border border-command-border">
+            <Route className="w-3.5 h-3.5 text-command-primary" />
             <span className="text-command-muted text-[10px]">ACTIVE SORTIES:</span>
-            <span className="text-command-heading font-bold">{activeMissionsCount}</span>
+            <span className="text-command-heading font-bold tabular-nums">{activeMissionsCount}</span>
           </div>
 
-          <div className="hidden md:flex items-center gap-1.5 px-2.5 py-1 rounded bg-command-bg border border-command-border">
+          <div className="hidden md:flex items-center gap-1.5 px-2 py-0.5 rounded-[1px] bg-command-bg border border-command-border">
             <ShieldAlert className="w-3.5 h-3.5 text-command-critical" />
             <span className="text-command-muted text-[10px]">THREATS:</span>
-            <span className="text-command-critical font-bold">{activeThreatsCount} Active</span>
+            <span className="text-command-critical font-bold tabular-nums">{activeThreatsCount} ACT</span>
           </div>
         </div>
 
@@ -217,30 +217,33 @@ export const CopPage: React.FC = () => {
         />
 
         {/* Right: Simulation Controls & Quick Entity Navigation Jump */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5">
           <button
             type="button"
             onClick={() => toggleScenarioControl()}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-cyan-950/60 hover:bg-cyan-900/80 text-cyan-300 border border-cyan-500/50 text-xs font-mono transition-colors shadow-sm"
+            aria-label="Simulation Controls"
+            className="flex items-center gap-1.5 px-2 py-1 rounded-[1px] bg-command-bg hover:bg-command-raised text-command-primary border border-command-border text-xs font-mono transition-none"
             title="Open Simulation Controls (Event Injection & Demo Scripts)"
           >
-            <Sliders className="w-3.5 h-3.5 text-cyan-400" />
-            <span className="hidden sm:inline">Simulation Controls</span>
+            <Sliders className="w-3.5 h-3.5 text-command-primary" />
+            <span className="hidden sm:inline">SIM CONTROLS</span>
           </button>
 
           <div className="relative">
             <button
               type="button"
               onClick={() => setIsJumpOpen(!isJumpOpen)}
-              className="flex items-center gap-1.5 px-2.5 py-1.5 rounded bg-command-bg hover:bg-command-raised text-command-text border border-command-border text-xs font-mono transition-colors"
+              aria-label="Tactical Jump"
+              title="Tactical Jump"
+              className="flex items-center gap-1.5 px-2 py-1 rounded-[1px] bg-command-bg hover:bg-command-raised text-command-text border border-command-border text-xs font-mono transition-none"
             >
               <Search className="w-3.5 h-3.5 text-command-muted" />
-              <span className="hidden sm:inline">Tactical Jump</span>
+              <span className="hidden sm:inline">JUMP</span>
             </button>
 
             {isJumpOpen && (
-              <div className="absolute right-0 mt-1 w-60 bg-command-panel border border-command-border rounded shadow-2xl p-2 z-30 font-mono text-xs">
-                <div className="text-[10px] text-command-subdued uppercase font-bold px-1.5 py-1 border-b border-command-border/50">
+              <div className="absolute right-0 mt-1 w-60 bg-command-panel border border-command-border rounded-[1px] p-1.5 z-30 font-mono text-xs">
+                <div className="text-[10px] text-command-muted uppercase font-bold px-1.5 py-1 border-b border-command-border">
                   Quick Focus Entities
                 </div>
                 <div className="py-1 max-h-56 overflow-y-auto space-y-0.5">
@@ -250,10 +253,10 @@ export const CopPage: React.FC = () => {
                       setSelectedEntity({ type: 'mission', id: 'M-04' });
                       setIsJumpOpen(false);
                     }}
-                    className="w-full text-left px-2 py-1 rounded hover:bg-command-raised text-command-secondary flex items-center justify-between"
+                    className="w-full text-left px-2 py-1 rounded-[1px] hover:bg-command-raised text-command-primary flex items-center justify-between"
                   >
                     <span>M-04 Strike (SAM Risk)</span>
-                    <span className="text-[10px] text-red-400">P1</span>
+                    <span className="text-[10px] text-command-critical font-bold">P1</span>
                   </button>
                   <button
                     type="button"
@@ -261,7 +264,7 @@ export const CopPage: React.FC = () => {
                       setSelectedEntity({ type: 'threat', id: 'THR-02' });
                       setIsJumpOpen(false);
                     }}
-                    className="w-full text-left px-2 py-1 rounded hover:bg-command-raised text-command-critical flex items-center justify-between"
+                    className="w-full text-left px-2 py-1 rounded-[1px] hover:bg-command-raised text-command-critical flex items-center justify-between"
                   >
                     <span>THR-02 Long-Range SAM</span>
                     <span className="text-[10px]">85km</span>
@@ -272,10 +275,10 @@ export const CopPage: React.FC = () => {
                       setSelectedEntity({ type: 'aircraft', id: 'AC-01' });
                       setIsJumpOpen(false);
                     }}
-                    className="w-full text-left px-2 py-1 rounded hover:bg-command-raised text-command-text flex items-center justify-between"
+                    className="w-full text-left px-2 py-1 rounded-[1px] hover:bg-command-raised text-command-text flex items-center justify-between"
                   >
                     <span>AC-01 (Fighter-A CAP)</span>
-                    <span className="text-[10px] text-cyan-400">Airborne</span>
+                    <span className="text-[10px] text-command-info">Airborne</span>
                   </button>
                   <button
                     type="button"
@@ -283,10 +286,10 @@ export const CopPage: React.FC = () => {
                       setSelectedEntity({ type: 'base', id: 'BASE-B' });
                       setIsJumpOpen(false);
                     }}
-                    className="w-full text-left px-2 py-1 rounded hover:bg-command-raised text-command-text flex items-center justify-between"
+                    className="w-full text-left px-2 py-1 rounded-[1px] hover:bg-command-raised text-command-text flex items-center justify-between"
                   >
                     <span>BASE-B Bastion Strike</span>
-                    <span className="text-[10px] text-amber-400">Degraded</span>
+                    <span className="text-[10px] text-command-warning">Degraded</span>
                   </button>
                 </div>
               </div>
@@ -369,10 +372,10 @@ export const CopPage: React.FC = () => {
 
         {/* Bottom Status Bar */}
         <div className="absolute bottom-1 right-2 z-10 pointer-events-none">
-          <div className="flex items-center gap-2 bg-command-panel/85 backdrop-blur-md px-2.5 py-1 rounded border border-command-border/70 text-[10px] font-mono text-command-muted">
-            <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+          <div className="flex items-center gap-2 bg-command-panel px-2 py-0.5 rounded-[1px] border border-command-border text-[9px] font-mono text-command-muted">
+            <span className="inline-block w-1.5 h-1.5 rounded-[1px] bg-command-nominal" />
             <span>LOCAL VECTOR ENGINE: 60 FPS NOMINAL</span>
-            <span className="text-command-subdued">|</span>
+            <span className="text-command-subdued">/</span>
             <span>VERIDIA THEATRE [EXERCISE]</span>
           </div>
         </div>

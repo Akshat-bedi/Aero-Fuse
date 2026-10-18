@@ -47,7 +47,7 @@ const OFFLINE_BASE_STYLE: StyleSpecification = {
       id: 'background',
       type: 'background',
       paint: {
-        'background-color': '#080b11', // Near-black tactical base surface
+        'background-color': '#080b0a', // Near-black tactical sea surface
       },
     },
   ],
@@ -239,9 +239,9 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       type: 'line',
       source: 'veridia-graticule',
       paint: {
-        'line-color': '#1d2a44',
-        'line-opacity': 0.45,
-        'line-width': 1,
+        'line-color': '#1c2621',
+        'line-opacity': 0.5,
+        'line-width': 0.8,
         'line-dasharray': [2, 4],
       },
     });
@@ -257,7 +257,9 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
         'text-allow-overlap': true,
       },
       paint: {
-        'text-color': '#475569',
+        'text-color': '#47554d',
+        'text-halo-color': '#0c0f0e',
+        'text-halo-width': 1.5,
       },
     });
 
@@ -271,9 +273,8 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       type: 'fill',
       source: 'veridia-landmass',
       paint: {
-        'line-color': '#0e1422',
-        'fill-color': '#0e1422',
-        'fill-opacity': 0.95,
+        'fill-color': '#151b18',
+        'fill-opacity': 1.0,
       },
     });
     map.addLayer({
@@ -281,8 +282,8 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       type: 'line',
       source: 'veridia-landmass',
       paint: {
-        'line-color': '#2a3b5c',
-        'line-width': 1.8,
+        'line-color': '#2a3630',
+        'line-width': 1.5,
         'line-opacity': 0.9,
       },
     });
@@ -297,7 +298,7 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       type: 'fill',
       source: 'veridia-terrain',
       paint: {
-        'fill-color': '#151e32',
+        'fill-color': '#1b231f',
         'fill-opacity': 0.7,
       },
     });
@@ -306,7 +307,7 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       type: 'line',
       source: 'veridia-terrain',
       paint: {
-        'line-color': '#1f2e4a',
+        'line-color': '#25312b',
         'line-width': 1,
         'line-dasharray': [3, 2],
       },
@@ -322,9 +323,9 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       type: 'line',
       source: 'veridia-rivers',
       paint: {
-        'line-color': '#1e3a5f',
-        'line-width': 1.6,
-        'line-opacity': 0.75,
+        'line-color': '#1c2a26',
+        'line-width': 1.4,
+        'line-opacity': 0.8,
       },
     });
 
@@ -338,8 +339,8 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       type: 'line',
       source: 'veridia-regions',
       paint: {
-        'line-color': '#223354',
-        'line-width': 1.2,
+        'line-color': '#2a3630',
+        'line-width': 1.0,
         'line-dasharray': [4, 4],
         'line-opacity': 0.6,
       },
@@ -351,13 +352,15 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       layout: {
         'text-field': ['get', 'name'],
         'text-font': ['Open Sans Regular'],
-        'text-size': 11,
+        'text-size': 10,
         'text-transform': 'uppercase',
         'text-letter-spacing': 0.15,
       },
       paint: {
-        'text-color': '#475569',
-        'text-opacity': 0.65,
+        'text-color': '#52665a',
+        'text-opacity': 0.7,
+        'text-halo-color': '#0c0f0e',
+        'text-halo-width': 1.5,
       },
     });
   };
@@ -408,7 +411,7 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       type: 'fill',
       source: 'threat-zones-source',
       paint: {
-        'fill-color': '#ef4444',
+        'fill-color': ['get', 'fillColor'],
         'fill-opacity': ['get', 'fillOpacity'],
       },
     });
@@ -417,8 +420,8 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       type: 'line',
       source: 'threat-zones-source',
       paint: {
-        'line-color': '#ef4444',
-        'line-width': 1.5,
+        'line-color': ['get', 'strokeColor'],
+        'line-width': 1.2,
         'line-dasharray': ['get', 'dashArray'],
       },
     });
@@ -428,12 +431,12 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       source: 'threat-zones-source',
       layout: {
         'text-field': ['get', 'label'],
-        'text-size': 10,
+        'text-size': 9,
         'text-font': ['Open Sans Regular'],
       },
       paint: {
-        'text-color': '#f87171',
-        'text-halo-color': '#080b11',
+        'text-color': '#d7dcd4',
+        'text-halo-color': '#0c0f0e',
         'text-halo-width': 2,
       },
     });
@@ -445,10 +448,10 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       type: 'line',
       source: 'range-rings-source',
       paint: {
-        'line-color': '#06b6d4',
-        'line-width': 1.5,
+        'line-color': '#4a5d52',
+        'line-width': 1.2,
         'line-dasharray': [3, 3],
-        'line-opacity': 0.85,
+        'line-opacity': 0.8,
       },
     });
     map.addLayer({
@@ -457,12 +460,12 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       source: 'range-rings-source',
       layout: {
         'text-field': ['get', 'label'],
-        'text-size': 10,
+        'text-size': 9,
       },
       paint: {
-        'text-color': '#22d3ee',
-        'text-halo-color': '#080b11',
-        'text-halo-width': 2,
+        'text-color': '#7e998a',
+        'text-halo-color': '#0c0f0e',
+        'text-halo-width': 1.5,
       },
     });
 
@@ -487,8 +490,8 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       type: 'line',
       source: 'mission-risk-source',
       paint: {
-        'line-color': '#ef4444',
-        'line-width': 4,
+        'line-color': '#c93b3b',
+        'line-width': 2.5,
         'line-dasharray': [2, 2],
         'line-opacity': 0.95,
       },
@@ -504,7 +507,7 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
         'circle-radius': ['get', 'radius'],
         'circle-color': ['get', 'color'],
         'circle-stroke-width': 1.5,
-        'circle-stroke-color': '#f8fafc',
+        'circle-stroke-color': '#d7dcd4',
       },
     });
     map.addLayer({
@@ -517,8 +520,8 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
         'text-offset': [0, 1.2],
       },
       paint: {
-        'text-color': '#e2e8f0',
-        'text-halo-color': '#080b11',
+        'text-color': '#d7dcd4',
+        'text-halo-color': '#0c0f0e',
         'text-halo-width': 2,
       },
     });
@@ -530,10 +533,10 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       type: 'line',
       source: 'flight-trails-source',
       paint: {
-        'line-color': '#06b6d4',
-        'line-width': 1.5,
-        'line-opacity': 0.45,
-        'line-dasharray': [1, 2],
+        'line-color': '#5b8ec2',
+        'line-width': 1.2,
+        'line-opacity': 0.4,
+        'line-dasharray': [2, 3],
       },
     });
 
@@ -544,9 +547,9 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       type: 'circle',
       source: 'airbases-source',
       paint: {
-        'circle-radius': 11,
+        'circle-radius': 9,
         'circle-color': 'transparent',
-        'circle-stroke-width': 2.5,
+        'circle-stroke-width': 2,
         'circle-stroke-color': ['get', 'statusColor'],
       },
     });
@@ -555,10 +558,10 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       type: 'circle',
       source: 'airbases-source',
       paint: {
-        'circle-radius': 5,
-        'circle-color': '#06b6d4',
+        'circle-radius': 3.5,
+        'circle-color': '#d7dcd4',
         'circle-stroke-width': 1,
-        'circle-stroke-color': '#ffffff',
+        'circle-stroke-color': '#0c0f0e',
       },
     });
     map.addLayer({
@@ -568,12 +571,12 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       layout: {
         'text-field': ['get', 'label'],
         'text-size': 10,
-        'text-offset': [0, 1.6],
+        'text-offset': [0, 1.4],
         'text-font': ['Open Sans Regular'],
       },
       paint: {
-        'text-color': '#f8fafc',
-        'text-halo-color': '#080b11',
+        'text-color': '#d7dcd4',
+        'text-halo-color': '#0c0f0e',
         'text-halo-width': 2,
       },
     });
@@ -585,10 +588,10 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       type: 'circle',
       source: 'aircraft-source',
       paint: {
-        'circle-radius': 7,
+        'circle-radius': 6,
         'circle-color': ['get', 'statusColor'],
-        'circle-stroke-width': 2,
-        'circle-stroke-color': '#080b11',
+        'circle-stroke-width': 1.8,
+        'circle-stroke-color': '#0c0f0e',
       },
     });
     map.addLayer({
@@ -602,9 +605,9 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
         'text-font': ['Open Sans Regular'],
       },
       paint: {
-        'text-color': '#22d3ee',
-        'text-halo-color': '#080b11',
-        'text-halo-width': 2,
+        'text-color': '#d7dcd4',
+        'text-halo-color': '#0c0f0e',
+        'text-halo-width': 2.5,
       },
     });
 
@@ -615,11 +618,11 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       type: 'circle',
       source: 'weather-source',
       paint: {
-        'circle-radius': 14,
+        'circle-radius': 12,
         'circle-color': ['get', 'severityBg'],
-        'circle-stroke-width': 1.5,
+        'circle-stroke-width': 1.2,
         'circle-stroke-color': ['get', 'severityColor'],
-        'circle-opacity': 0.8,
+        'circle-opacity': 0.7,
       },
     });
     map.addLayer({
@@ -631,8 +634,8 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
         'text-size': 9,
       },
       paint: {
-        'text-color': '#f8fafc',
-        'text-halo-color': '#080b11',
+        'text-color': '#d7dcd4',
+        'text-halo-color': '#0c0f0e',
         'text-halo-width': 1.5,
       },
     });
@@ -654,10 +657,10 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
         status: b.runwayStatus,
         statusColor:
           b.runwayStatus === 'open'
-            ? '#10b981'
+            ? '#48a972'
             : b.runwayStatus === 'degraded'
-            ? '#f59e0b'
-            : '#ef4444',
+            ? '#d9a521'
+            : '#c93b3b',
       },
       geometry: {
         type: 'Point' as const,
@@ -704,13 +707,13 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       const statusColor =
         ac.status === 'airborne'
           ? isSelected
-            ? '#22d3ee'
-            : '#06b6d4'
+            ? '#d9a521'
+            : '#5b8ec2'
           : ac.status === 'unserviceable'
-          ? '#ef4444'
+          ? '#c93b3b'
           : ac.status === 'maintenance'
-          ? '#f59e0b'
-          : '#10b981';
+          ? '#d9a521'
+          : '#48a972';
 
       aircraftFeatures.push({
         type: 'Feature',
@@ -815,33 +818,41 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
 
       if (!routeToRender || routeToRender.length < 2) return;
 
-      // Color code by priority: P1 Red, P2 Amber, P3 Cyan, P4 Slate
+      // Color code by priority: P1 Red, P2 Amber, P3 Steel Blue, P4 Slate
       let pColor =
         msn.priority === 1
-          ? '#ef4444'
+          ? '#c93b3b'
           : msn.priority === 2
-          ? '#f59e0b'
+          ? '#d9a521'
           : msn.priority === 3
-          ? '#06b6d4'
-          : '#64748b';
+          ? '#4a7bb0'
+          : '#54635a';
 
       if (isProposedOverlay) {
-        pColor = '#22d3ee'; // High visibility glowing cyan polyline for proposed bypass
+        pColor = '#d9a521'; // Amber dashed line for proposed bypass
       } else if (isImpacted && !isAfterPlanActive) {
-        pColor = '#ef4444'; // Pulsing red alert on impacted baseline
+        pColor = '#c93b3b'; // Impacted baseline in red
       }
 
-      let lineOpacity = isAnyMissionSelected && !isThisSelected ? 0.15 : isThisSelected ? 1.0 : 0.75;
+      let lineOpacity = isAnyMissionSelected && !isThisSelected ? 0.2 : isThisSelected ? 1.0 : 0.8;
       if (isAfterPlanActive && hasAnyReroutes) {
         if (isProposedOverlay) {
           lineOpacity = 1.0;
         } else if (!isThisSelected) {
-          lineOpacity = 0.15; // Unchanged routes are dimmed
+          lineOpacity = 0.2; // Unchanged routes are dimmed
         }
       }
 
-      const lineWidth = isProposedOverlay ? 5.0 : isThisSelected ? 4.5 : isImpacted ? 4.0 : 2.5;
-      const lineDash = isProposedOverlay ? [3, 2] : msn.status === 'in-progress' ? [1] : [2, 2];
+      const priorityLineWidths: Record<number, number> = {
+        1: 2.5,
+        2: 2.0,
+        3: 1.5,
+        4: 1.0,
+      };
+
+      const baseWidth = priorityLineWidths[msn.priority] || 1.5;
+      const lineWidth = isProposedOverlay ? 2.5 : isThisSelected ? baseWidth + 1.5 : isImpacted ? baseWidth + 1.0 : baseWidth;
+      const lineDash = isProposedOverlay ? [4, 3] : msn.status === 'in-progress' ? [1] : [3, 3];
 
       missionRouteFeatures.push({
         type: 'Feature',
@@ -888,8 +899,8 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
           type: 'Feature',
           properties: {
             label: `TGT: ${msn.target.name || msn.name}`,
-            color: '#ef4444',
-            radius: isThisSelected ? 6 : 4,
+            color: '#c93b3b',
+            radius: isThisSelected ? 5 : 3.5,
           },
           geometry: {
             type: 'Point',
@@ -926,8 +937,10 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
           entityId: thr.id,
           id: thr.id,
           label: `${thr.id} (${thr.type} ${thr.rangeKm}km - ${Math.round(thr.confidence * 100)}%)`,
-          fillOpacity: isSuspected ? 0.12 : Math.min(0.35, Math.max(0.18, thr.confidence * 0.35)),
-          dashArray: isSuspected ? [3, 3] : [1],
+          fillColor: isSuspected ? '#d9a521' : '#c93b3b',
+          strokeColor: isSuspected ? '#d9a521' : '#c93b3b',
+          fillOpacity: isSuspected ? 0.04 : 0.06, // light hatch fill, no solid red blobs
+          dashArray: isSuspected ? [4, 4] : [1],
         },
         geometry: {
           type: 'Polygon',
@@ -948,20 +961,20 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       const isCorridor = as.type === 'corridor';
 
       const fillColor = isNoFly
-        ? '#ef4444'
+        ? '#c93b3b'
         : isRestricted
-        ? '#f59e0b'
+        ? '#d9a521'
         : isCorridor
-        ? '#06b6d4'
-        : '#f97316';
+        ? '#5b8ec2'
+        : '#d9a521';
 
       const strokeColor = isNoFly
-        ? '#ef4444'
+        ? '#c93b3b'
         : isRestricted
-        ? '#f59e0b'
+        ? '#d9a521'
         : isCorridor
-        ? '#22d3ee'
-        : '#ea580c';
+        ? '#5b8ec2'
+        : '#d9a521';
 
       const dashArray = isCorridor ? [4, 2] : [1];
 
@@ -974,7 +987,7 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
           label: `${as.name} (${as.type.toUpperCase()})`,
           fillColor,
           strokeColor,
-          fillOpacity: isNoFly ? 0.22 : 0.12,
+          fillOpacity: isNoFly ? 0.15 : 0.08,
           dashArray,
         },
         geometry: as.polygon as GeoJSON.Polygon,
@@ -993,17 +1006,17 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
 
       const severityColor =
         w.severity === 'severe'
-          ? '#ef4444'
+          ? '#c93b3b'
           : w.severity === 'caution'
-          ? '#f59e0b'
-          : '#10b981';
+          ? '#d9a521'
+          : '#48a972';
 
       const severityBg =
         w.severity === 'severe'
-          ? 'rgba(239, 68, 68, 0.25)'
+          ? 'rgba(201, 59, 59, 0.15)'
           : w.severity === 'caution'
-          ? 'rgba(245, 158, 11, 0.25)'
-          : 'rgba(16, 185, 129, 0.25)';
+          ? 'rgba(217, 165, 33, 0.15)'
+          : 'rgba(72, 169, 114, 0.15)';
 
       weatherFeatures.push({
         type: 'Feature',
@@ -1128,9 +1141,9 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       <div ref={mapContainerRef} className="w-full h-full cursor-crosshair" />
 
       {/* Top Left: Theater & Operational Sector HUD */}
-      <div className="absolute top-3 left-3 pointer-events-none flex flex-col gap-1 z-10">
-        <div className="flex items-center gap-2 bg-command-panel/90 backdrop-blur-md px-3 py-1.5 rounded border border-command-border/80 shadow-lg font-mono text-xs">
-          <Crosshair className="w-3.5 h-3.5 text-command-primary animate-pulse" />
+      <div className="absolute top-2 left-2 pointer-events-none flex flex-col gap-1 z-10">
+        <div className="flex items-center gap-2 bg-command-panel px-2.5 py-1 rounded-[2px] border border-command-border font-mono text-xs">
+          <Crosshair className="w-3.5 h-3.5 text-command-primary" />
           <span className="font-bold text-command-heading tracking-wide">
             THEATER: REPUBLIC OF VERIDIA
           </span>
@@ -1141,16 +1154,16 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
       </div>
 
       {/* Top Right: Tactical Map Navigation & Zoom Controls */}
-      <div className="absolute top-3 right-3 flex flex-col gap-1.5 z-10">
-        <div className="flex flex-col bg-command-panel/90 backdrop-blur-md rounded border border-command-border/80 shadow-lg overflow-hidden">
+      <div className="absolute top-2 right-2 flex flex-col gap-1 z-10">
+        <div className="flex flex-col bg-command-panel rounded-[2px] border border-command-border overflow-hidden">
           <button
             type="button"
             title="Reset North & Theater View"
             onClick={handleResetView}
-            className="p-2 hover:bg-command-raised text-command-muted hover:text-command-primary transition-colors border-b border-command-border/60 flex items-center justify-center"
+            className="p-1.5 hover:bg-command-raised text-command-muted hover:text-command-heading transition-none border-b border-command-border flex items-center justify-center"
           >
             <Compass
-              className="w-4 h-4 transition-transform duration-300"
+              className="w-3.5 h-3.5"
               style={{ transform: `rotate(${-mapBearing}deg)` }}
             />
           </button>
@@ -1158,45 +1171,45 @@ const TacticalMapComponent: React.FC<TacticalMapProps> = ({
             type="button"
             title="Zoom In"
             onClick={handleZoomIn}
-            className="p-2 hover:bg-command-raised text-command-muted hover:text-command-primary transition-colors border-b border-command-border/60"
+            className="p-1.5 hover:bg-command-raised text-command-muted hover:text-command-heading transition-none border-b border-command-border"
           >
-            <ZoomIn className="w-4 h-4" />
+            <ZoomIn className="w-3.5 h-3.5" />
           </button>
           <button
             type="button"
             title="Zoom Out"
             onClick={handleZoomOut}
-            className="p-2 hover:bg-command-raised text-command-muted hover:text-command-primary transition-colors border-b border-command-border/60"
+            className="p-1.5 hover:bg-command-raised text-command-muted hover:text-command-heading transition-none border-b border-command-border"
           >
-            <ZoomOut className="w-4 h-4" />
+            <ZoomOut className="w-3.5 h-3.5" />
           </button>
           <button
             type="button"
             title="Reset View"
             onClick={handleResetView}
-            className="p-2 hover:bg-command-raised text-command-muted hover:text-command-primary transition-colors"
+            className="p-1.5 hover:bg-command-raised text-command-muted hover:text-command-heading transition-none"
           >
-            <Maximize2 className="w-4 h-4" />
+            <Maximize2 className="w-3.5 h-3.5" />
           </button>
         </div>
       </div>
 
       {/* Bottom Center: Live Cursor Coordinates HUD */}
-      <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
-        <div className="bg-command-panel/90 backdrop-blur-md px-4 py-1.5 rounded border border-command-border/80 shadow-xl font-mono text-xs flex items-center gap-4 text-command-muted">
+      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 z-10 pointer-events-none">
+        <div className="bg-command-panel px-3 py-1 rounded-[2px] border border-command-border font-mono text-xs flex items-center gap-3 text-command-muted">
           <div>
             LAT:{' '}
-            <span className="text-command-heading font-bold">
+            <span className="text-command-heading font-bold tabular-nums">
               {cursorCoords ? `${cursorCoords.lat.toFixed(4)}°N` : '05.0000°N'}
             </span>
           </div>
-          <div className="border-l border-command-border pl-4">
+          <div className="border-l border-command-border pl-3">
             LNG:{' '}
-            <span className="text-command-heading font-bold">
+            <span className="text-command-heading font-bold tabular-nums">
               {cursorCoords ? `${cursorCoords.lng.toFixed(4)}°E` : '06.0000°E'}
             </span>
           </div>
-          <div className="border-l border-command-border pl-4 text-[10px] text-command-primary">
+          <div className="border-l border-command-border pl-3 text-[10px] text-command-primary">
             ELEV: ~1,400 FT MSL
           </div>
         </div>

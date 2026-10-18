@@ -64,7 +64,7 @@ export const EntityDetailPanel: React.FC<EntityDetailPanelProps> = ({
   const { type, id } = selectedEntity;
 
   return (
-    <div className="absolute top-14 right-3 z-20 w-84 sm:w-96 max-h-[calc(100vh-4.5rem)] flex flex-col bg-command-panel/95 backdrop-blur-md rounded border border-command-border shadow-2xl overflow-hidden font-mono text-xs animate-in slide-in-from-right-4 duration-200">
+    <div className="absolute top-12 right-2 z-20 w-84 sm:w-96 max-h-[calc(100vh-4.5rem)] flex flex-col bg-command-panel rounded-[2px] border border-command-border overflow-hidden font-mono text-xs">
       {type === 'aircraft' && (
         <AircraftDetailView
           aircraft={aircraft[id]}

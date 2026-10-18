@@ -265,44 +265,44 @@ export const ScenarioControlPanel: React.FC = () => {
   return (
     <aside
       aria-label="Simulation controls"
-      className="fixed inset-y-0 right-0 z-40 w-full sm:w-[480px] bg-ops-surface-base/95 backdrop-blur-xl border-l border-ops-border shadow-2xl text-white flex flex-col animate-in slide-in-from-right duration-300 pointer-events-auto"
+      className="fixed inset-y-0 right-0 z-40 w-full sm:w-[480px] bg-command-panel border-l border-command-border text-command-text flex flex-col pointer-events-auto font-mono text-xs"
     >
       {/* Top Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-ops-border/80 bg-ops-surface-panel/60">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-md bg-ops-accent/10 border border-ops-accent/40 flex items-center justify-center text-ops-accent">
-            <Sliders className="w-4 h-4" />
+      <div className="flex items-center justify-between px-3 py-2 border-b border-command-border bg-command-raised">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-[1px] bg-command-bg border border-command-border flex items-center justify-center text-command-primary">
+            <Sliders className="w-3.5 h-3.5" />
           </div>
           <div>
-            <h2 className="text-sm font-bold tracking-wide uppercase text-slate-100 flex items-center gap-2">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-command-heading flex items-center gap-2">
               <span>Simulation Controls</span>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800">
+              <span className="text-[9px] font-mono px-1 py-0.2 rounded-[1px] bg-command-bg text-command-primary border border-command-border">
                 STAGE 6
               </span>
             </h2>
-            <p className="text-xs text-ops-text-muted">Dynamic Retasking & Event Injection Engine</p>
+            <p className="text-[10px] text-command-muted font-mono">Dynamic Retasking & Event Injection Engine</p>
           </div>
         </div>
 
         <button
           type="button"
           onClick={() => toggleScenarioControl(false)}
-          className="text-ops-text-muted hover:text-white p-1 rounded-md hover:bg-slate-800/80 transition-colors"
+          className="text-command-muted hover:text-command-heading p-1 rounded-[1px] hover:bg-command-panel transition-none"
           title="Close Panel"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-ops-border/60 bg-ops-surface-panel/40 px-3 pt-2 gap-1 font-mono text-xs">
+      <div className="flex border-b border-command-border bg-command-bg px-2 pt-1 gap-1 font-mono text-xs">
         <button
           type="button"
           onClick={() => setActiveTab('single')}
-          className={`flex items-center gap-1.5 px-3 py-2 border-b-2 transition-all ${
+          className={`flex items-center gap-1.5 px-2.5 py-1.5 border-b-2 transition-none uppercase text-xs ${
             activeTab === 'single'
-              ? 'border-cyan-400 text-cyan-300 font-bold bg-ops-surface-base/80'
-              : 'border-transparent text-ops-text-muted hover:text-slate-200'
+              ? 'border-command-primary text-command-primary font-bold bg-command-raised/40'
+              : 'border-transparent text-command-muted hover:text-command-text'
           }`}
         >
           <Sliders className="w-3.5 h-3.5" />
@@ -312,10 +312,10 @@ export const ScenarioControlPanel: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveTab('scripts')}
-          className={`flex items-center gap-1.5 px-3 py-2 border-b-2 transition-all ${
+          className={`flex items-center gap-1.5 px-2.5 py-1.5 border-b-2 transition-none uppercase text-xs ${
             activeTab === 'scripts'
-              ? 'border-cyan-400 text-cyan-300 font-bold bg-ops-surface-base/80'
-              : 'border-transparent text-ops-text-muted hover:text-slate-200'
+              ? 'border-command-primary text-command-primary font-bold bg-command-raised/40'
+              : 'border-transparent text-command-muted hover:text-command-text'
           }`}
         >
           <FileCode className="w-3.5 h-3.5" />
