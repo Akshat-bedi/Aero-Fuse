@@ -34,18 +34,18 @@ export const Toast: React.FC<ToastProps> = ({ toast }) => {
   return (
     <div
       className={cn(
-        'w-80 shadow-panel border border-command-border border-l-4 rounded p-3 select-none flex items-start gap-2.5 animate-in slide-in-from-right-4 duration-200 pointer-events-auto',
+        'w-80 border border-command-border border-l-[3px] rounded-[1px] p-2.5 select-none flex items-start gap-2 pointer-events-auto',
         borders[toast.type],
       )}
       role="alert"
     >
       <div className="mt-0.5">{icons[toast.type]}</div>
       <div className="flex-1 min-w-0">
-        <h4 className="text-xs font-semibold uppercase tracking-wider text-command-heading truncate">
+        <h4 className="text-xs font-mono font-semibold uppercase tracking-wider text-command-heading truncate">
           {toast.title}
         </h4>
         {toast.message && (
-          <p className="text-[11px] text-command-muted mt-0.5 leading-snug font-sans">
+          <p className="text-[10px] text-command-muted mt-0.5 leading-snug font-mono">
             {toast.message}
           </p>
         )}
@@ -53,7 +53,7 @@ export const Toast: React.FC<ToastProps> = ({ toast }) => {
       <button
         type="button"
         onClick={() => removeToast(toast.id)}
-        className="text-command-muted hover:text-command-text p-0.5 rounded transition-colors"
+        className="text-command-muted hover:text-command-text p-0.5 rounded-[1px] transition-none"
         aria-label="Dismiss notification"
       >
         <X className="w-3.5 h-3.5" />

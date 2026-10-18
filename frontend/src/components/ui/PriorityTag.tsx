@@ -22,25 +22,25 @@ const PRIORITY_CONFIG: Record<
   P1: {
     code: 'P1',
     description: 'CRITICAL',
-    styles: 'bg-red-950/80 text-red-300 border-red-600/70 shadow-[0_0_8px_rgba(239,68,68,0.3)]',
+    styles: 'bg-command-critical-bg text-command-critical border-command-critical-border',
     icon: Flame,
   },
   P2: {
     code: 'P2',
     description: 'HIGH',
-    styles: 'bg-amber-950/80 text-amber-300 border-amber-600/70',
+    styles: 'bg-command-warning-bg text-command-warning border-command-warning-border',
     icon: AlertTriangle,
   },
   P3: {
     code: 'P3',
     description: 'ROUTINE',
-    styles: 'bg-blue-950/80 text-blue-300 border-blue-600/70',
+    styles: 'bg-command-info-bg text-command-info border-command-info-border',
     icon: Clock,
   },
   P4: {
     code: 'P4',
     description: 'LOW',
-    styles: 'bg-slate-900/80 text-slate-300 border-slate-700/70',
+    styles: 'bg-command-inactive-bg text-command-inactive border-command-inactive-border',
     icon: ArrowDown,
   },
 };
@@ -60,15 +60,15 @@ export const PriorityTag: React.FC<PriorityTagProps> = ({
 
   const sizeClasses =
     size === 'sm'
-      ? 'text-[10px] px-1.5 py-0.5 gap-1 font-mono'
-      : 'text-xs px-2.5 py-1 gap-1.5 font-mono';
+      ? 'text-[10px] px-1.5 py-0.2 gap-1 font-mono'
+      : 'text-xs px-2 py-0.5 gap-1.5 font-mono';
 
   const iconSizes = size === 'sm' ? 'w-3 h-3' : 'w-3.5 h-3.5';
 
   return (
     <span
       className={cn(
-        'inline-flex items-center font-bold rounded border uppercase select-none tracking-wider',
+        'inline-flex items-center font-bold font-mono rounded-[1px] border uppercase select-none tracking-wider',
         config.styles,
         sizeClasses,
         className,
@@ -79,8 +79,8 @@ export const PriorityTag: React.FC<PriorityTagProps> = ({
       <span>{config.code}</span>
       {showDescription && (
         <>
-          <span className="opacity-40">|</span>
-          <span className="text-[10px] tracking-normal font-sans font-medium">
+          <span className="opacity-40 font-mono">/</span>
+          <span className="text-[10px] tracking-normal font-mono font-medium">
             {config.description}
           </span>
         </>

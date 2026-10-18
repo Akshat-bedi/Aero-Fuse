@@ -84,18 +84,18 @@ export const StatusBadge: React.FC<StatusBadgeProps> = ({
 
   const sizeClasses =
     size === 'sm'
-      ? 'text-[10px] px-1.5 py-0.5 gap-1 font-mono tracking-tight'
-      : 'text-xs px-2.5 py-1 gap-1.5 font-mono tracking-wide';
+      ? 'text-[10px] px-1.5 py-0.2 gap-1 font-mono tracking-wider'
+      : 'text-xs px-2 py-0.5 gap-1.5 font-mono tracking-wider';
 
   const iconSizes = size === 'sm' ? 'w-3 h-3' : 'w-3.5 h-3.5';
 
   return (
     <span
       className={cn(
-        'inline-flex items-center font-medium rounded border uppercase select-none transition-colors',
+        'inline-flex items-center font-mono font-medium rounded-[1px] border uppercase select-none transition-none',
         config.styles,
         sizeClasses,
-        pulse && 'animate-pulse',
+        (pulse || status === 'critical') && 'animate-slow-blink',
         className,
       )}
       role="status"

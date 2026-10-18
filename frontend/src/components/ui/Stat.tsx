@@ -40,31 +40,31 @@ export const Stat: React.FC<StatProps> = ({
   return (
     <div
       className={cn(
-        'p-3.5 bg-command-panel border border-command-border rounded-md shadow-sm select-none flex flex-col justify-between transition-colors',
-        status && cn('border-l-4', statusBorder[status]),
+        'p-2 bg-command-panel border border-command-border rounded-[2px] select-none flex flex-col justify-between',
+        status && cn('border-l-[3px]', statusBorder[status]),
         className,
       )}
     >
-      <div className="flex items-center justify-between text-command-muted text-[11px] font-semibold uppercase tracking-wider mb-2">
+      <div className="flex items-center justify-between text-command-muted text-[10px] font-mono font-semibold uppercase tracking-wider mb-1">
         <span>{label}</span>
         {icon && <span className="text-command-subdued">{icon}</span>}
       </div>
 
       <div className="flex items-baseline gap-1.5 my-0.5">
-        <span className="text-2xl font-bold font-mono text-command-heading tracking-tight">
+        <span className="text-lg font-bold font-mono text-command-heading tabular-nums">
           {value}
         </span>
         {unit && (
-          <span className="text-xs font-mono text-command-muted font-normal">
+          <span className="text-[10px] font-mono text-command-muted font-normal">
             {unit}
           </span>
         )}
       </div>
 
       {(trend || subtitle) && (
-        <div className="flex items-center justify-between text-[11px] mt-2 pt-1.5 border-t border-command-border/40 font-mono">
+        <div className="flex items-center justify-between text-[9px] mt-1 pt-1 border-t border-command-border font-mono">
           {typeof trend === 'string' ? (
-            <span className="text-command-muted text-[10px] font-sans truncate">
+            <span className="text-command-muted truncate">
               {trend}
             </span>
           ) : trend ? (
@@ -79,13 +79,13 @@ export const Stat: React.FC<StatProps> = ({
               )}
             >
               {trend.direction === 'up' && (
-                <ArrowUpRight className="w-3.5 h-3.5 flex-shrink-0" />
+                <ArrowUpRight className="w-3 h-3 flex-shrink-0" />
               )}
               {trend.direction === 'down' && (
-                <ArrowDownRight className="w-3.5 h-3.5 flex-shrink-0" />
+                <ArrowDownRight className="w-3 h-3 flex-shrink-0" />
               )}
               {trend.direction === 'neutral' && (
-                <Minus className="w-3.5 h-3.5 flex-shrink-0" />
+                <Minus className="w-3 h-3 flex-shrink-0" />
               )}
               <span>{trend.value}</span>
             </div>
@@ -94,7 +94,7 @@ export const Stat: React.FC<StatProps> = ({
           )}
 
           {subtitle && (
-            <span className="text-command-muted text-[10px] font-sans truncate">
+            <span className="text-command-muted truncate">
               {subtitle}
             </span>
           )}

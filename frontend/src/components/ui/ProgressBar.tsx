@@ -88,13 +88,13 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
       {/* Bar container */}
       <div
         className={cn(
-          'w-full bg-command-bg border border-command-border/80 rounded-full overflow-hidden p-0.5',
+          'w-full bg-command-bg border border-command-border rounded-[1px] overflow-hidden p-[1px]',
           heightStyles[size],
         )}
       >
         <div
           className={cn(
-            'h-full rounded-full transition-all duration-300',
+            'h-full rounded-[1px] transition-none',
             fillStyles[derivedStatus],
           )}
           style={{ width: `${percentage}%` }}

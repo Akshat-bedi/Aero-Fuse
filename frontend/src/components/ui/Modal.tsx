@@ -57,7 +57,7 @@ export const Modal: React.FC<ModalProps> = ({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in duration-150"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 select-none"
       onClick={(e) => {
         if (e.target === e.currentTarget) {
           onClose();
@@ -69,19 +69,19 @@ export const Modal: React.FC<ModalProps> = ({
       <div
         ref={modalRef}
         className={cn(
-          'w-full bg-command-panel border border-command-border-strong rounded-lg shadow-2xl flex flex-col max-h-[90vh] overflow-hidden animate-in zoom-in-95 duration-150',
+          'w-full bg-command-panel border border-command-border rounded-[2px] flex flex-col max-h-[90vh] overflow-hidden',
           sizeClasses[size],
           className,
         )}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-command-border/80 bg-command-raised/50 select-none">
+        <div className="flex items-center justify-between px-3 py-2 border-b border-command-border bg-command-raised select-none">
           <div className="flex flex-col">
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-command-heading">
+            <h2 className="text-xs font-mono font-semibold uppercase tracking-wider text-command-heading">
               {title}
             </h2>
             {subtitle && (
-              <p className="text-[11px] text-command-muted font-sans mt-0.5">
+              <p className="text-[10px] text-command-muted font-mono mt-0.5">
                 {subtitle}
               </p>
             )}
@@ -90,22 +90,22 @@ export const Modal: React.FC<ModalProps> = ({
             <button
               type="button"
               onClick={onClose}
-              className="text-command-muted hover:text-command-text p-1 rounded hover:bg-command-raised transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-command-primary"
+              className="text-command-muted hover:text-command-text p-1 rounded-[1px] hover:bg-command-raised/80 transition-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-command-primary"
               aria-label="Close dialog"
             >
-              <X className="w-4 h-4" aria-hidden="true" />
+              <X className="w-3.5 h-3.5" aria-hidden="true" />
             </button>
           )}
         </div>
 
         {/* Content Body */}
-        <div className="p-4 overflow-y-auto text-sm text-command-text flex-1">
+        <div className="p-3.5 overflow-y-auto text-xs text-command-text flex-1 font-mono">
           {children}
         </div>
 
         {/* Footer */}
         {footer && (
-          <div className="flex items-center justify-end gap-2.5 px-4 py-3 border-t border-command-border/80 bg-command-raised/40">
+          <div className="flex items-center justify-end gap-2 px-3 py-2 border-t border-command-border bg-command-raised/50">
             {footer}
           </div>
         )}
