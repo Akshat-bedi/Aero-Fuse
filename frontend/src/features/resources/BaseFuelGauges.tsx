@@ -35,12 +35,12 @@ export const BaseFuelGauges: React.FC<BaseFuelGaugesProps> = ({
         return (
           <div
             key={base.id}
-            className={`p-3 rounded border font-mono text-xs flex flex-col justify-between transition-all bg-command-panel/95 backdrop-blur-md shadow-md ${
+            className={`p-3 rounded-[1px] border font-mono text-xs flex flex-col justify-between transition-all bg-command-panel ${
               isCriticalFuel
-                ? 'border-red-500/80 shadow-red-950/20'
+                ? 'border-command-critical-border bg-command-critical-bg'
                 : isLowFuel
-                ? 'border-amber-500/80 shadow-amber-950/20'
-                : 'border-command-border/80'
+                ? 'border-command-warning-border bg-command-warning-bg'
+                : 'border-command-border'
             }`}
           >
             {/* Header */}
@@ -95,8 +95,8 @@ export const BaseFuelGauges: React.FC<BaseFuelGaugesProps> = ({
                 </div>
 
                 {isLowFuel && (
-                  <div className="flex items-center gap-1 text-[10px] text-amber-400 font-semibold pt-1">
-                    <AlertTriangle className="w-3 h-3 text-amber-400" />
+                  <div className="flex items-center gap-1 text-[10px] text-command-warning font-semibold pt-1">
+                    <AlertTriangle className="w-3 h-3 text-command-warning" />
                     <span>Resupply convoy / airlift required</span>
                   </div>
                 )}

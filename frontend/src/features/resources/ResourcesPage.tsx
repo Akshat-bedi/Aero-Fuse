@@ -11,7 +11,7 @@ import {
   Plane,
   Users,
   Package,
-  Sparkles,
+  Activity,
 } from 'lucide-react';
 
 export const ResourcesPage: React.FC = () => {
@@ -56,7 +56,7 @@ export const ResourcesPage: React.FC = () => {
     {
       id: 'predictions',
       label: 'Predictive Insights',
-      icon: <Sparkles className="w-4 h-4 text-amber-400" />,
+      icon: <Activity className="w-4 h-4 text-command-primary" />,
       badge: criticalPredictions > 0 ? `${criticalPredictions} Urgent` : predictions.length,
     },
   ];
@@ -68,7 +68,7 @@ export const ResourcesPage: React.FC = () => {
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
           <div>
             <div className="flex items-center gap-2 font-mono text-[10px] text-command-muted uppercase">
-              <span className="px-1.5 py-0.5 rounded bg-command-bg border border-command-border text-command-primary font-bold">
+              <span className="px-1.5 py-0.5 rounded-[1px] bg-command-bg border border-command-border text-command-primary font-bold">
                 ATO-RES-04
               </span>
               <span>LOGISTICS & ASSET READINESS</span>

@@ -166,7 +166,7 @@ export const WeaponsLogisticsTab: React.FC<WeaponsLogisticsTabProps> = ({
       </div>
 
       {/* 3. Weapons Inventory Matrix Table */}
-      <div className="p-3.5 rounded bg-command-panel/90 border border-command-border/80 shadow-md space-y-3">
+      <div className="p-3.5 rounded-[1px] bg-command-panel border border-command-border space-y-3">
         <div className="flex items-center justify-between pb-2 border-b border-command-border/50">
           <div className="flex items-center gap-2">
             <Package className="w-4 h-4 text-command-secondary" />
@@ -176,22 +176,22 @@ export const WeaponsLogisticsTab: React.FC<WeaponsLogisticsTabProps> = ({
           </div>
           <div className="flex items-center gap-2 text-[10px] font-mono">
             <span className="flex items-center gap-1 text-command-critical font-bold">
-              <span className="w-2 h-2 rounded-full bg-red-500" />
+              <span className="w-2 h-2 rounded-[1px] bg-command-critical" />
               <span>Out of Stock (0)</span>
             </span>
             <span className="flex items-center gap-1 text-command-warning font-bold">
-              <span className="w-2 h-2 rounded-full bg-amber-500" />
+              <span className="w-2 h-2 rounded-[1px] bg-command-warning" />
               <span>Low (&lt;15)</span>
             </span>
             <span className="flex items-center gap-1 text-command-nominal font-bold">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              <span className="w-2 h-2 rounded-[1px] bg-command-nominal" />
               <span>Nominal (≥15)</span>
             </span>
           </div>
         </div>
 
         {/* Matrix Table */}
-        <div className="overflow-x-auto rounded border border-command-border/60">
+        <div className="overflow-x-auto rounded-[1px] border border-command-border">
           <table className="w-full text-left font-mono text-xs">
             <thead className="bg-command-raised text-command-muted uppercase text-[10px] tracking-wider border-b border-command-border">
               <tr>
@@ -242,7 +242,7 @@ export const WeaponsLogisticsTab: React.FC<WeaponsLogisticsTabProps> = ({
                         {row.compatibleAircraft.map((p) => (
                           <span
                             key={p}
-                            className="px-1.5 py-0.5 rounded bg-command-panel text-[9px] font-semibold text-command-muted border border-command-border/50"
+                            className="px-1.5 py-0.5 rounded-[1px] bg-command-panel text-[9px] font-semibold text-command-muted border border-command-border/50"
                           >
                             {p}
                           </span>
@@ -259,12 +259,12 @@ export const WeaponsLogisticsTab: React.FC<WeaponsLogisticsTabProps> = ({
                       return (
                         <td key={bId} className="p-2.5 text-center">
                           <span
-                            className={`inline-flex items-center justify-center min-w-[36px] px-2 py-0.5 rounded text-[11px] font-bold ${
+                            className={`inline-flex items-center justify-center min-w-[36px] px-2 py-0.5 rounded-[1px] text-[11px] font-bold ${
                               isZero
-                                ? 'bg-red-950/80 text-red-300 border border-red-500/80'
+                                ? 'bg-command-critical-bg text-command-critical border border-command-critical-border'
                                 : isLow
-                                ? 'bg-amber-950/70 text-amber-300 border border-amber-500/70'
-                                : 'bg-command-panel text-command-text border border-command-border/60'
+                                ? 'bg-command-warning-bg text-command-warning border border-command-warning-border'
+                                : 'bg-command-panel text-command-text border border-command-border'
                             }`}
                           >
                             {isZero ? '0' : qty}

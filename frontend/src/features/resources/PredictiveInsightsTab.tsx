@@ -3,7 +3,7 @@ import { Prediction } from '@/types';
 import { PredictionFilterState } from './types';
 import { Stat, ProgressBar } from '@/components/ui';
 import {
-  Sparkles,
+  Activity,
   Clock,
   Plane,
   Users,
@@ -92,15 +92,15 @@ export const PredictiveInsightsTab: React.FC<PredictiveInsightsTabProps> = ({
   const getEntityIcon = (type: string) => {
     switch (type) {
       case 'aircraft':
-        return <Plane className="w-3.5 h-3.5 text-cyan-400" />;
+        return <Plane className="w-3.5 h-3.5 text-command-secondary" />;
       case 'crew':
         return <Users className="w-3.5 h-3.5 text-command-primary" />;
       case 'base':
-        return <Building className="w-3.5 h-3.5 text-amber-400" />;
+        return <Building className="w-3.5 h-3.5 text-command-warning" />;
       case 'weather':
-        return <CloudRain className="w-3.5 h-3.5 text-blue-400" />;
+        return <CloudRain className="w-3.5 h-3.5 text-command-secondary" />;
       default:
-        return <Sparkles className="w-3.5 h-3.5 text-command-muted" />;
+        return <Activity className="w-3.5 h-3.5 text-command-muted" />;
     }
   };
 
@@ -135,10 +135,10 @@ export const PredictiveInsightsTab: React.FC<PredictiveInsightsTabProps> = ({
       </div>
 
       {/* 2. Filter & Sort Bar */}
-      <div className="p-3 rounded bg-command-panel/85 border border-command-border/70 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+      <div className="p-3 rounded-[1px] bg-command-panel/85 border border-command-border/70 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
         <div className="flex flex-wrap items-center gap-2">
           {/* Urgency Filter */}
-          <div className="flex items-center gap-1.5 bg-command-bg px-2 py-1 rounded border border-command-border">
+          <div className="flex items-center gap-1.5 bg-command-bg px-2 py-1 rounded-[1px] border border-command-border">
             <span className="text-[10px] text-command-muted uppercase">Urgency:</span>
             <select
               aria-label="Filter by urgency"
@@ -156,7 +156,7 @@ export const PredictiveInsightsTab: React.FC<PredictiveInsightsTabProps> = ({
           </div>
 
           {/* Entity Type Filter */}
-          <div className="flex items-center gap-1.5 bg-command-bg px-2 py-1 rounded border border-command-border">
+          <div className="flex items-center gap-1.5 bg-command-bg px-2 py-1 rounded-[1px] border border-command-border">
             <span className="text-[10px] text-command-muted uppercase">Entity:</span>
             <select
               aria-label="Filter by entity type"
@@ -178,7 +178,7 @@ export const PredictiveInsightsTab: React.FC<PredictiveInsightsTabProps> = ({
           </div>
 
           {/* Sort By Toggle */}
-          <div className="flex items-center gap-1.5 bg-command-bg px-2 py-1 rounded border border-command-border">
+          <div className="flex items-center gap-1.5 bg-command-bg px-2 py-1 rounded-[1px] border border-command-border">
             <span className="text-[10px] text-command-muted uppercase">Sort By:</span>
             <button
               type="button"
@@ -197,7 +197,7 @@ export const PredictiveInsightsTab: React.FC<PredictiveInsightsTabProps> = ({
           placeholder="Filter predictions by keyword..."
           value={filters.search}
           onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-          className="w-full sm:w-60 px-2.5 py-1 bg-command-bg border border-command-border rounded text-command-text placeholder-command-subdued focus:outline-none focus:border-command-primary text-xs"
+          className="w-full sm:w-60 px-2.5 py-1 bg-command-bg border border-command-border rounded-[1px] text-command-text placeholder-command-subdued focus:outline-none focus:border-command-primary text-xs"
         />
       </div>
 
@@ -211,12 +211,12 @@ export const PredictiveInsightsTab: React.FC<PredictiveInsightsTabProps> = ({
           return (
             <div
               key={`${pred.entityId}-${idx}`}
-              className={`p-4 rounded border flex flex-col justify-between font-mono text-xs transition-all shadow-md bg-command-panel/95 backdrop-blur-md ${
+              className={`p-4 rounded-[1px] border flex flex-col justify-between font-mono text-xs transition-colors bg-command-panel ${
                 urgency === 'critical'
-                  ? 'border-red-500/80 shadow-red-950/20'
+                  ? 'border-command-critical-border bg-command-critical-bg/20'
                   : urgency === 'high'
-                  ? 'border-amber-500/80 shadow-amber-950/20'
-                  : 'border-command-border/80'
+                  ? 'border-command-warning-border bg-command-warning-bg/20'
+                  : 'border-command-border'
               }`}
             >
               {/* Card Header */}
@@ -224,11 +224,11 @@ export const PredictiveInsightsTab: React.FC<PredictiveInsightsTabProps> = ({
                 <div className="flex items-center justify-between pb-2 border-b border-command-border/50">
                   <div className="flex items-center gap-2">
                     <span
-                      className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-bold uppercase ${
+                      className={`inline-flex items-center px-2 py-0.5 rounded-[1px] text-[10px] font-bold uppercase ${
                         urgency === 'critical'
-                          ? 'bg-red-950 text-red-300 border border-red-500'
+                          ? 'bg-command-critical-bg text-command-critical border border-command-critical-border'
                           : urgency === 'high'
-                          ? 'bg-amber-950 text-amber-300 border border-amber-500'
+                          ? 'bg-command-warning-bg text-command-warning border border-command-warning-border'
                           : 'bg-command-bg text-command-primary border border-command-border'
                       }`}
                     >
@@ -261,7 +261,7 @@ export const PredictiveInsightsTab: React.FC<PredictiveInsightsTabProps> = ({
                 </div>
 
                 {/* Confidence Bar & Time Horizon Readout */}
-                <div className="space-y-1.5 p-2 rounded bg-command-bg border border-command-border/60">
+                <div className="space-y-1.5 p-2 rounded-[1px] bg-command-bg border border-command-border/60">
                   <div className="flex items-center justify-between text-[11px]">
                     <span className="text-command-muted">Model Confidence:</span>
                     <span
@@ -290,7 +290,7 @@ export const PredictiveInsightsTab: React.FC<PredictiveInsightsTabProps> = ({
                 </div>
 
                 {/* Proactive Recommendation (Decision Support Principle) */}
-                <div className="mt-3 p-2.5 rounded bg-command-raised/70 border border-command-border/60 text-[11px] font-sans space-y-1">
+                <div className="mt-3 p-2.5 rounded-[1px] bg-command-raised/70 border border-command-border/60 text-[11px] font-sans space-y-1">
                   <div className="flex items-center gap-1.5 font-mono text-[10px] font-bold text-command-secondary uppercase">
                     <ShieldAlert className="w-3.5 h-3.5" />
                     <span>Recommended Proactive Commander Action:</span>

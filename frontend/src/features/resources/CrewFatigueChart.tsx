@@ -53,14 +53,14 @@ export const CrewFatigueChart: React.FC<CrewFatigueChartProps> = ({
         axisPointer: {
           type: 'cross',
           crossStyle: {
-            color: '#64748b',
+            color: '#879a8e',
           },
         },
-        backgroundColor: '#0f172a',
-        borderColor: '#334155',
+        backgroundColor: '#141917',
+        borderColor: '#26332c',
         borderWidth: 1,
         textStyle: {
-          color: '#f8fafc',
+          color: '#e6ede8',
           fontFamily: 'monospace',
           fontSize: 11,
         },
@@ -68,10 +68,10 @@ export const CrewFatigueChart: React.FC<CrewFatigueChartProps> = ({
       legend: {
         top: '2%',
         right: '4%',
-        itemWidth: 10,
-        itemHeight: 10,
+        itemWidth: 8,
+        itemHeight: 8,
         textStyle: {
-          color: '#94a3b8',
+          color: '#879a8e',
           fontFamily: 'monospace',
           fontSize: 10,
         },
@@ -87,10 +87,10 @@ export const CrewFatigueChart: React.FC<CrewFatigueChartProps> = ({
         type: 'category',
         data: metrics.categories,
         axisLine: {
-          lineStyle: { color: '#334155' },
+          lineStyle: { color: '#26332c' },
         },
         axisLabel: {
-          color: '#94a3b8',
+          color: '#879a8e',
           fontFamily: 'monospace',
           fontSize: 10,
         },
@@ -103,17 +103,17 @@ export const CrewFatigueChart: React.FC<CrewFatigueChartProps> = ({
           max: 100,
           splitLine: {
             lineStyle: {
-              color: '#1e293b',
+              color: '#1a231e',
               type: 'dashed',
             },
           },
           axisLabel: {
-            color: '#64748b',
+            color: '#879a8e',
             fontFamily: 'monospace',
             fontSize: 10,
           },
           nameTextStyle: {
-            color: '#64748b',
+            color: '#879a8e',
             fontFamily: 'monospace',
             fontSize: 9,
           },
@@ -125,13 +125,13 @@ export const CrewFatigueChart: React.FC<CrewFatigueChartProps> = ({
           max: 16,
           splitLine: { show: false },
           axisLabel: {
-            color: '#64748b',
+            color: '#879a8e',
             fontFamily: 'monospace',
             fontSize: 10,
             formatter: '{value}h',
           },
           nameTextStyle: {
-            color: '#64748b',
+            color: '#879a8e',
             fontFamily: 'monospace',
             fontSize: 9,
           },
@@ -143,18 +143,18 @@ export const CrewFatigueChart: React.FC<CrewFatigueChartProps> = ({
           type: 'bar',
           data: metrics.avgFatigue,
           itemStyle: {
-            color: '#06b6d4',
+            color: '#5b8ec2',
           },
           markLine: {
             data: [
               {
                 yAxis: 75,
                 name: 'Fatigue Threshold',
-                lineStyle: { color: '#f59e0b', type: 'dashed' },
+                lineStyle: { color: '#d9a521', type: 'dashed' },
                 label: {
                   formatter: 'Caution (75%)',
                   position: 'insideEndTop',
-                  color: '#f59e0b',
+                  color: '#d9a521',
                   fontSize: 9,
                   fontFamily: 'monospace',
                 },
@@ -168,21 +168,21 @@ export const CrewFatigueChart: React.FC<CrewFatigueChartProps> = ({
           yAxisIndex: 1,
           data: metrics.peakDuty,
           itemStyle: {
-            color: '#f43f5e',
+            color: '#c93b3b',
           },
           lineStyle: {
-            width: 2.5,
+            width: 1.5,
           },
           markLine: {
             data: [
               {
                 yAxis: 12,
                 name: 'Duty Limit',
-                lineStyle: { color: '#ef4444', type: 'solid', width: 2 },
+                lineStyle: { color: '#c93b3b', type: 'solid', width: 1.5 },
                 label: {
                   formatter: '12h Hard Limit',
                   position: 'insideEndTop',
-                  color: '#ef4444',
+                  color: '#c93b3b',
                   fontSize: 9,
                   fontFamily: 'monospace',
                 },
