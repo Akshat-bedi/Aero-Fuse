@@ -74,7 +74,7 @@ describe('ScenarioControlPanel (Stage 6: Event Injection & Demo Replay)', () => 
   });
 
   it('renders prebuilt demo scripts and executes SAM site scenario', async () => {
-    const runDemoSpy = vi.spyOn(mockDataService, 'runDemoScript');
+    const runDemoSpy = vi.spyOn(mockDataService, 'runDemoScript').mockResolvedValue({ status: 'completed' });
     render(<ScenarioControlPanel />);
 
     // Switch to Demo Scripts tab
@@ -97,7 +97,7 @@ describe('ScenarioControlPanel (Stage 6: Event Injection & Demo Replay)', () => 
   });
 
   it('executes runway closure + aircraft AOG compound scenario', async () => {
-    const runDemoSpy = vi.spyOn(mockDataService, 'runDemoScript');
+    const runDemoSpy = vi.spyOn(mockDataService, 'runDemoScript').mockResolvedValue({ status: 'completed' });
     render(<ScenarioControlPanel />);
 
     const scriptsTab = screen.getByRole('button', { name: /Demo Scripts/i });

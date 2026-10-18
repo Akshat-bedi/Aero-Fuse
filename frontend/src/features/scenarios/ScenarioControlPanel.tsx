@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useUiStore } from '@/store/uiStore';
 import { useEntitiesStore } from '@/store/entitiesStore';
 import { useEventsStore } from '@/store/eventsStore';
@@ -93,6 +93,14 @@ export const ScenarioControlPanel: React.FC = () => {
 
   // Demo Scripts State
   const [isRunningScript, setIsRunningScript] = useState<boolean>(false);
+  const isMountedRef = useRef(true);
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
   const [customScriptJson, setCustomScriptJson] = useState<string>(
     JSON.stringify(
       [
@@ -215,7 +223,9 @@ export const ScenarioControlPanel: React.FC = () => {
         message: `Failed to execute demo script "${name}".`,
       });
     } finally {
-      setIsRunningScript(false);
+      if (isMountedRef.current) {
+        setIsRunningScript(false);
+      }
     }
   };
 
@@ -246,7 +256,9 @@ export const ScenarioControlPanel: React.FC = () => {
         message: 'Invalid script format. Must be an array of { delayMs, event } objects.',
       });
     } finally {
-      setIsRunningScript(false);
+      if (isMountedRef.current) {
+        setIsRunningScript(false);
+      }
     }
   };
 
