@@ -25,6 +25,7 @@ import {
   ImpactAnalysisPayload,
   RetaskStage,
   AircraftType,
+  Tradeoff,
 } from '@/types';
 import { mockRetaskEngine } from './mockRetaskEngine';
 import { serviceConfig } from './config';
@@ -1514,8 +1515,61 @@ export class MockDataService implements IDataService {
               newCrew,
             ];
           }
+        } else if (change.kind === 'reroute' && change.missionId && change.after) {
+          const msn = this.missions[change.missionId];
+          if (msn && msn.routeOptions) {
+            const targetRoute = msn.routeOptions.find(
+              (ro) => ro.id === change.after || ro.name.includes(String(change.after)),
+            );
+            if (targetRoute) {
+              msn.route = [...targetRoute.waypoints];
+            }
+          }
         }
       });
+
+      // Also apply any manual modifications if present
+      if (modifications && typeof modifications === 'object') {
+        const mods = modifications as Record<string, unknown>;
+        if (mods.aircraftSwap && typeof mods.aircraftSwap === 'object') {
+          const swap = mods.aircraftSwap as { missionId: string; newAircraftId: string; oldAircraftId?: string };
+          const msn = this.missions[swap.missionId];
+          if (msn && swap.newAircraftId) {
+            const oldId = swap.oldAircraftId || msn.assigned.aircraftIds[0];
+            msn.assigned.aircraftIds = [
+              ...msn.assigned.aircraftIds.filter((aid) => aid !== oldId),
+              swap.newAircraftId,
+            ];
+            if (this.aircraft[swap.newAircraftId]) {
+              this.aircraft[swap.newAircraftId].assignedMissionId = swap.missionId;
+            }
+            if (oldId && this.aircraft[oldId]) {
+              this.aircraft[oldId].assignedMissionId = undefined;
+            }
+          }
+        }
+        if (mods.crewSwap && typeof mods.crewSwap === 'object') {
+          const swap = mods.crewSwap as { missionId: string; newCrewId: string; oldCrewId?: string };
+          const msn = this.missions[swap.missionId];
+          if (msn && swap.newCrewId) {
+            const oldId = swap.oldCrewId || msn.assigned.crewIds[0];
+            msn.assigned.crewIds = [
+              ...msn.assigned.crewIds.filter((cid) => cid !== oldId),
+              swap.newCrewId,
+            ];
+          }
+        }
+        if (mods.routeSwap && typeof mods.routeSwap === 'object') {
+          const swap = mods.routeSwap as { missionId: string; routeId: string };
+          const msn = this.missions[swap.missionId];
+          if (msn && msn.routeOptions) {
+            const opt = msn.routeOptions.find((r) => r.id === swap.routeId || r.name.includes(swap.routeId));
+            if (opt) {
+              msn.route = [...opt.waypoints];
+            }
+          }
+        }
+      }
     }
 
     this.stateVersion++;
@@ -1574,30 +1628,113 @@ export class MockDataService implements IDataService {
 
   public async validateModification(
     id: string,
-    _modifications: unknown,
+    modifications: unknown,
   ): Promise<ModificationValidationResult> {
     const rec = this.recommendations[id];
+    const conflicts: string[] = [];
+    const mods = (modifications || {}) as Record<string, unknown>;
+
+    if (mods.aircraftSwap && typeof mods.aircraftSwap === 'object') {
+      const { missionId, newAircraftId } = mods.aircraftSwap as { missionId: string; newAircraftId: string };
+      const msn = this.missions[missionId];
+      const ac = this.aircraft[newAircraftId];
+      if (msn && ac) {
+        if (ac.type !== msn.requiredAircraftType) {
+          conflicts.push(
+            `Airframe type disparity: ${ac.tailNumber} (${ac.type}) incompatible with mission requirement (${msn.requiredAircraftType})`,
+          );
+        }
+        if (ac.assignedMissionId && ac.assignedMissionId !== missionId) {
+          conflicts.push(
+            `Airframe double-booking: ${ac.tailNumber} already committed to sortie ${ac.assignedMissionId}`,
+          );
+        }
+        if (ac.status === 'unserviceable' || ac.status === 'maintenance') {
+          conflicts.push(
+            `Airframe unserviceable: ${ac.tailNumber} currently in ${ac.status} posture`,
+          );
+        }
+      }
+    }
+
+    if (mods.crewSwap && typeof mods.crewSwap === 'object') {
+      const { missionId, newCrewId } = mods.crewSwap as { missionId: string; newCrewId: string };
+      const msn = this.missions[missionId];
+      const cr = this.crew[newCrewId];
+      if (msn && cr) {
+        if (cr.fatigueIndex >= 75) {
+          conflicts.push(
+            `Aircrew fatigue threshold: ${cr.callsign} at critical fatigue index ${cr.fatigueIndex}/100`,
+          );
+        }
+        if (cr.dutyHoursLast24h >= 12) {
+          conflicts.push(
+            `Duty window limit: ${cr.callsign} has logged ${cr.dutyHoursLast24h}h in past 24h (12h maximum limit)`,
+          );
+        }
+        if (msn.requiredCrewQuals) {
+          for (const q of msn.requiredCrewQuals) {
+            if (!cr.qualifications.includes(q)) {
+              conflicts.push(
+                `Qualification deficiency: ${cr.callsign} lacks required qualification [${q}]`,
+              );
+            }
+          }
+        }
+      }
+    }
+
+    const valid = conflicts.length === 0;
+    const score = valid
+      ? rec
+        ? Math.min(99, rec.score - 2)
+        : 88
+      : Math.max(30, (rec ? rec.score : 80) - 35);
+
+    const tradeoffs: Tradeoff[] = [
+      {
+        label: 'Manual Swap Delay',
+        delta: valid ? 6 : 45,
+        unit: 'min',
+        direction: valid ? 'neutral' : 'bad',
+      },
+      {
+        label: 'Target Alignment Score',
+        delta: valid ? 92 : 45,
+        unit: '%',
+        direction: valid ? 'good' : 'bad',
+      },
+      {
+        label: 'Constraint Conflicts',
+        delta: conflicts.length,
+        unit: 'conflicts',
+        direction: conflicts.length === 0 ? 'good' : 'bad',
+      },
+    ];
+
     return {
-      valid: true,
-      conflicts: [],
-      score: rec ? rec.score - 4 : 85,
-      tradeoffs: [
-        { label: 'Manual Swap Delay', delta: 5, unit: 'min', direction: 'bad' },
-        { label: 'Target Alignment', delta: 95, unit: '%', direction: 'good' },
-      ],
+      valid,
+      conflicts,
+      score,
+      tradeoffs,
     };
   }
 
   public async getEligibleResources(missionId: string): Promise<EligibleResourcesResult> {
     const msn = this.missions[missionId];
     if (!msn) {
-      return { aircraft: [], crew: [] };
+      return {
+        aircraft: Object.values(this.aircraft).filter((a) => a.status === 'serviceable'),
+        crew: Object.values(this.crew).filter((c) => c.status === 'available'),
+      };
     }
     const eligibleAircraft = Object.values(this.aircraft).filter(
-      (a) => a.type === msn.requiredAircraftType && a.status === 'serviceable',
+      (a) =>
+        a.type === msn.requiredAircraftType &&
+        (a.status === 'serviceable' || a.status === 'turnaround'),
     );
     const eligibleCrew = Object.values(this.crew).filter(
-      (c) => c.status === 'available' && c.fatigueIndex < 50,
+      (c) => c.status === 'available' && c.fatigueIndex < 75,
     );
     return { aircraft: eligibleAircraft, crew: eligibleCrew };
   }
