@@ -85,6 +85,12 @@ export const MissionsPage: React.FC = () => {
     return { total, airborne, planned, atRisk, completed, conflictCount };
   }, [missionsList, allConflicts]);
 
+  // Extract pending recommendation changes for timeline ghost bars
+  const pendingChanges = useMemo(() => {
+    const pendingRecs = Object.values(recommendations).filter((r) => r.status === 'pending');
+    return pendingRecs.flatMap((r) => r.changes || []);
+  }, [recommendations]);
+
   const hasActiveFilters =
     filters.priority !== 'all' ||
     filters.type !== 'all' ||
@@ -391,6 +397,7 @@ export const MissionsPage: React.FC = () => {
           simTime={simTime}
           selectedMissionId={selectedMissionId}
           onSelectMission={selectMission}
+          proposedChanges={pendingChanges}
         />
       )}
 
