@@ -9,6 +9,8 @@ import {
   Crew,
   Prediction,
   Tradeoff,
+  RetaskProgressState,
+  ImpactAnalysisPayload,
 } from '@/types';
 
 export interface DecisionPayload {
@@ -73,6 +75,8 @@ export interface IDataService {
     action: 'pause' | 'resume' | 'speed' | 'reset',
     speed?: 1 | 5 | 20,
   ): Promise<{ simTime: string; speed: number; paused: boolean }>;
+  subscribeRetaskProgress?(callback: (progress: RetaskProgressState) => void): () => void;
+  subscribeImpact?(callback: (impact: ImpactAnalysisPayload) => void): () => void;
   setMockConflictsEnabled?(enabled: boolean): void;
   getIsMockConflictsEnabled?(): boolean;
 }

@@ -21,6 +21,10 @@ import {
   WeaponStock,
   Prediction,
   MapBounds,
+  RetaskProgressState,
+  ImpactAnalysisPayload,
+  RetaskStage,
+  AircraftType,
 } from '@/types';
 import { mockRetaskEngine } from './mockRetaskEngine';
 import { serviceConfig } from './config';
@@ -1095,6 +1099,8 @@ export class MockDataService implements IDataService {
   private auditLog: AuditEntry[] = generateSeedAuditLog();
 
   private subscribers: Set<(snapshot: OperationalSnapshot) => void> = new Set();
+  private retaskProgressSubscribers: Set<(progress: RetaskProgressState) => void> = new Set();
+  private impactSubscribers: Set<(impact: ImpactAnalysisPayload) => void> = new Set();
   private intervalId?: ReturnType<typeof setInterval>;
   private auditCounter = 4;
   private eventCounter = 1;
@@ -1201,6 +1207,28 @@ export class MockDataService implements IDataService {
     };
   }
 
+  public subscribeRetaskProgress(callback: (progress: RetaskProgressState) => void): () => void {
+    this.retaskProgressSubscribers.add(callback);
+    return () => {
+      this.retaskProgressSubscribers.delete(callback);
+    };
+  }
+
+  public subscribeImpact(callback: (impact: ImpactAnalysisPayload) => void): () => void {
+    this.impactSubscribers.add(callback);
+    return () => {
+      this.impactSubscribers.delete(callback);
+    };
+  }
+
+  private notifyRetaskProgress(progress: RetaskProgressState): void {
+    this.retaskProgressSubscribers.forEach((cb) => cb(progress));
+  }
+
+  private notifyImpact(impact: ImpactAnalysisPayload): void {
+    this.impactSubscribers.forEach((cb) => cb(impact));
+  }
+
   public async injectEvent(
     eventInput: Omit<OpsEvent, 'id' | 'timestamp'> | OpsEvent,
   ): Promise<OpsEvent> {
@@ -1233,16 +1261,169 @@ export class MockDataService implements IDataService {
       }
     } else if (fullEvent.type === 'THREAT_DETECTED') {
       const thrId = `THR-${String(Object.keys(this.threats).length + 1).padStart(2, '0')}`;
-      const pos = (fullEvent.payload.position as { lat: number; lng: number }) || { lat: 5.5, lng: 7.2 };
+      const pos = (fullEvent.payload.position as { lat: number; lng: number }) || { lat: 4.8, lng: 7.5 };
       this.threats[thrId] = {
         id: thrId,
         type: (fullEvent.payload.threatType as Threat['type']) || 'SAM',
         position: pos,
-        rangeKm: (fullEvent.payload.rangeKm as number) || 60,
-        confidence: (fullEvent.payload.confidence as number) || 0.85,
+        rangeKm: (fullEvent.payload.rangeKm as number) || 85,
+        confidence: (fullEvent.payload.confidence as number) || 0.9,
         lastSeen: timestamp,
         status: 'active',
       };
+    } else if (fullEvent.type === 'WEATHER_DEGRADED') {
+      const baseId = (fullEvent.payload.baseId as string) || (fullEvent.payload.region as string);
+      const severity = (fullEvent.payload.severity as 'nominal' | 'caution' | 'severe') || 'severe';
+      if (baseId && this.bases[baseId]) {
+        this.bases[baseId].weather.severity = severity;
+        if (fullEvent.payload.visibilityKm) this.bases[baseId].weather.visibilityKm = fullEvent.payload.visibilityKm as number;
+        if (fullEvent.payload.windKts) this.bases[baseId].weather.windKts = fullEvent.payload.windKts as number;
+        if (severity === 'severe') {
+          this.bases[baseId].runwayStatus = 'closed';
+        } else if (severity === 'caution') {
+          this.bases[baseId].runwayStatus = 'degraded';
+        }
+      }
+    } else if (fullEvent.type === 'NEW_PRIORITY_MISSION') {
+      const msnName = (fullEvent.payload.name as string) || 'Emergency Intercept Alpha';
+      const msnType = (fullEvent.payload.type as Mission['type']) || 'CAP';
+      const priority = (fullEvent.payload.priority as 1 | 2 | 3 | 4) || 1;
+      const launchBaseId = (fullEvent.payload.launchBaseId as string) || 'BASE-A';
+      const targetCoords = (fullEvent.payload.targetCoordinates as { lat: number; lng: number }) || { lat: 8.0, lng: 5.5 };
+      const reqAcType = (fullEvent.payload.requiredAircraftType as string) || 'Fighter-A';
+
+      const newMsnId = `M-${String(Object.keys(this.missions).length + 1).padStart(2, '0')}`;
+      const launchBase = this.bases[launchBaseId] || this.bases['BASE-A'];
+      const route = [
+        { ...launchBase.location },
+        { ...targetCoords },
+        { ...launchBase.location },
+      ];
+
+      this.missions[newMsnId] = {
+        id: newMsnId,
+        name: msnName,
+        type: msnType,
+        priority,
+        status: 'planned',
+        launchBaseId: launchBase.id,
+        target: {
+          name: `${msnName} Target Area`,
+          lat: targetCoords.lat,
+          lng: targetCoords.lng,
+        },
+        windowStart: timestamp,
+        windowEnd: new Date(Date.now() + 2 * 3600000).toISOString(),
+        requiredAircraftType: (reqAcType as AircraftType) || 'Fighter-A',
+        requiredCrewQuals: ['day-vfr'],
+        requiredWeapons: [],
+        assigned: {
+          aircraftIds: [],
+          crewIds: [],
+        },
+        route,
+        currentWaypointIndex: 0,
+        routeOptions: [
+          { id: 'Route A', name: 'Direct Intercept', waypoints: route, distanceKm: 85, riskScore: 12 },
+        ],
+      };
+    }
+
+    // Determine impacted missions
+    const impactedMissionIds: string[] = [];
+    const impactReasons: string[] = [];
+
+    if (fullEvent.type === 'THREAT_DETECTED') {
+      const pos = (fullEvent.payload.position as { lat: number; lng: number }) || { lat: 4.8, lng: 7.5 };
+      const rangeKm = (fullEvent.payload.rangeKm as number) || 85;
+      Object.values(this.missions).forEach((m) => {
+        const intersects = m.route?.some((pt) => {
+          const dLat = (pt.lat - pos.lat) * 111;
+          const dLng = (pt.lng - pos.lng) * 111 * Math.cos(((pt.lat + pos.lat) / 2) * (Math.PI / 180));
+          return Math.sqrt(dLat * dLat + dLng * dLng) <= rangeKm + 15;
+        });
+        if (intersects) {
+          impactedMissionIds.push(m.id);
+          m.status = 'at-risk';
+          impactReasons.push(`${m.name} (${m.id}) flight corridor intersects detected weapon engagement zone.`);
+        }
+      });
+    } else if (fullEvent.type === 'AIRCRAFT_UNSERVICEABLE') {
+      const acId = fullEvent.payload.aircraftId as string;
+      Object.values(this.missions).forEach((m) => {
+        if (m.assigned.aircraftIds.includes(acId)) {
+          impactedMissionIds.push(m.id);
+          m.status = 'at-risk';
+          impactReasons.push(`Assigned airframe ${acId} declared unserviceable.`);
+        }
+      });
+    } else if (fullEvent.type === 'BASE_CLOSED') {
+      const baseId = fullEvent.payload.baseId as string;
+      Object.values(this.missions).forEach((m) => {
+        if (m.launchBaseId === baseId) {
+          impactedMissionIds.push(m.id);
+          m.status = 'at-risk';
+          impactReasons.push(`Launch base ${baseId} runway closed.`);
+        }
+      });
+    } else if (fullEvent.type === 'WEATHER_DEGRADED') {
+      const baseId = (fullEvent.payload.baseId as string) || (fullEvent.payload.region as string);
+      Object.values(this.missions).forEach((m) => {
+        if (m.launchBaseId === baseId) {
+          impactedMissionIds.push(m.id);
+          m.status = 'at-risk';
+          impactReasons.push(`Base ${baseId} weather degraded below operational minima.`);
+        }
+      });
+    } else if (fullEvent.type === 'CREW_UNAVAILABLE') {
+      const crewId = fullEvent.payload.crewId as string;
+      Object.values(this.missions).forEach((m) => {
+        if (m.assigned.crewIds.includes(crewId)) {
+          impactedMissionIds.push(m.id);
+          m.status = 'at-risk';
+          impactReasons.push(`Assigned crew member ${crewId} stood down.`);
+        }
+      });
+    } else if (fullEvent.type === 'NEW_PRIORITY_MISSION') {
+      impactReasons.push('Immediate tasking requirement requires resource preemption.');
+    }
+
+    // Emit impact analysis immediately
+    const impactPayload: ImpactAnalysisPayload = {
+      eventId: fullEvent.id,
+      eventType: fullEvent.type,
+      impactedMissionIds,
+      reasons: impactReasons.length > 0 ? impactReasons : ['Operational posture re-evaluated against doctrine.'],
+      timeToDecisionMin: 5,
+    };
+    this.notifyImpact(impactPayload);
+    this.notifySubscribers();
+
+    // Stage progression
+    const isTest =
+      typeof process !== 'undefined' &&
+      (process.env?.NODE_ENV === 'test' || Boolean((globalThis as unknown as Record<string, unknown>).__vitest__));
+    const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    const stages: { stage: RetaskStage; message: string; elapsed: number }[] = [
+      { stage: 'fusing', message: 'Fusing real-time sensor radar tracks & telemetry...', elapsed: 350 },
+      { stage: 'constraints', message: 'Validating airspace corridor clearances & duty limits...', elapsed: 850 },
+      { stage: 'optimising', message: 'Computing Pareto multi-objective resource allocations...', elapsed: 1450 },
+      { stage: 'ranking', message: 'Ranking retasking options against Commander doctrine...', elapsed: 1950 },
+    ];
+
+    const delayMs = isTest ? 5 : 350;
+    let currentElapsed = 0;
+
+    for (const step of stages) {
+      currentElapsed += delayMs;
+      this.notifyRetaskProgress({
+        isReplanActive: true,
+        stage: step.stage,
+        elapsedMs: isTest ? currentElapsed : step.elapsed,
+        message: step.message,
+      });
+      await sleep(delayMs);
     }
 
     // Evaluate recommendation via mockRetaskEngine
@@ -1254,8 +1435,19 @@ export class MockDataService implements IDataService {
       threats: this.threats,
     });
 
+    if (impactedMissionIds.length > 0 && (!rec.impactedMissionIds || rec.impactedMissionIds.length === 0)) {
+      rec.impactedMissionIds = [...impactedMissionIds];
+    }
+
     this.recommendations[rec.id] = rec;
     this.stateVersion++;
+
+    this.notifyRetaskProgress({
+      isReplanActive: false,
+      stage: 'ready',
+      elapsedMs: isTest ? currentElapsed + delayMs : 2100,
+      message: 'Retasking plan formulated. Pending commander authorization.',
+    });
 
     // Record audit log
     this.appendAuditEntry({
@@ -1447,7 +1639,12 @@ export class MockDataService implements IDataService {
         payload: { baseId: 'BASE-B', runwayStatus: 'closed', durationHours: 6 },
         description: 'Runway closed at BASE-B due to emergency cratering',
       });
-      return { status: 'completed', eventCount: 1 };
+      await this.injectEvent({
+        type: 'AIRCRAFT_UNSERVICEABLE',
+        payload: { aircraftId: 'AC-07', reason: 'Hydraulic failure on emergency diversion approach (AOG)' },
+        description: 'Strike airframe AC-07 declared AOG at Sector Alpha',
+      });
+      return { status: 'completed', eventCount: 2 };
     }
     return { status: 'unknown_script' };
   }

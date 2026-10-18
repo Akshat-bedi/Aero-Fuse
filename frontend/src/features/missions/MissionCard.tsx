@@ -11,6 +11,7 @@ import { ConflictItem, MISSION_TYPE_CONFIG } from './types';
 import { PriorityTag } from '@/components/ui/PriorityTag';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { formatTimeZulu, cn } from '@/lib/utils';
+import { useUiStore } from '@/store/uiStore';
 
 export interface MissionCardProps {
   mission: Mission;
@@ -34,12 +35,17 @@ export const MissionCard: React.FC<MissionCardProps> = ({
   const typeConfig = MISSION_TYPE_CONFIG[mission.type] || MISSION_TYPE_CONFIG.CAP;
   const TypeIcon = typeConfig.icon;
 
-  const hasCriticalConflict = conflicts.some((c) => c.severity === 'critical');
+  const impactedMissionIds = useUiStore((s) => s.impactedMissionIds);
+  const isImpacted = impactedMissionIds.includes(mission.id);
+
+  const hasCriticalConflict = conflicts.some((c) => c.severity === 'critical') || isImpacted;
   const hasWarningConflict = conflicts.some((c) => c.severity === 'warning');
 
   // Map mission status to operational status for StatusBadge
   const opStatus =
-    mission.status === 'in-progress'
+    isImpacted
+      ? 'critical'
+      : mission.status === 'in-progress'
       ? 'nominal'
       : mission.status === 'at-risk'
       ? 'critical'
@@ -75,6 +81,8 @@ export const MissionCard: React.FC<MissionCardProps> = ({
         'bg-command-panel/90 hover:bg-command-raised/90 backdrop-blur-sm',
         isSelected
           ? 'border-cyan-400 ring-1 ring-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.25)]'
+          : isImpacted
+          ? 'border-red-500 ring-2 ring-red-500/70 shadow-[0_0_16px_rgba(239,68,68,0.4)] animate-pulse'
           : mission.status === 'at-risk'
           ? 'border-red-600/50 hover:border-red-500'
           : 'border-slate-800 hover:border-slate-700',
@@ -163,12 +171,19 @@ export const MissionCard: React.FC<MissionCardProps> = ({
       <div className="flex items-center justify-between gap-1.5 pt-1">
         <StatusBadge
           status={opStatus}
-          label={mission.status}
+          label={isImpacted ? 'at-risk' : mission.status}
           size="sm"
-          pulse={mission.status === 'in-progress'}
+          pulse={mission.status === 'in-progress' || isImpacted}
         />
 
-        {conflicts.length > 0 && (
+        {isImpacted && (
+          <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border font-bold bg-red-950 text-red-300 border-red-500/80 shadow-[0_0_8px_rgba(239,68,68,0.3)] animate-pulse">
+            <AlertTriangle className="w-3 h-3 text-red-400" />
+            <span>IMPACTED</span>
+          </span>
+        )}
+
+        {!isImpacted && conflicts.length > 0 && (
           <span
             className={cn(
               'inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border font-semibold animate-pulse',

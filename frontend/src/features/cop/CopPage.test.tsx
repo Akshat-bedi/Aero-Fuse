@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { CopPage } from './CopPage';
-import { useEntitiesStore } from '@/store';
+import { useEntitiesStore, useUiStore } from '@/store';
 import { mockDataService } from '@/services/mockDataService';
 
 describe('CopPage (Common Operating Picture Hero Screen)', () => {
@@ -126,5 +126,48 @@ describe('CopPage (Common Operating Picture Hero Screen)', () => {
     expect(screen.getByText(/Aviation Fuel Stock/i)).toBeInTheDocument();
     expect(screen.getByText(/Shelter Capacity/i)).toBeInTheDocument();
     expect(screen.getByText(/Stationed Airframes/i)).toBeInTheDocument();
+  });
+
+  it('renders Simulation Controls button and toggles the scenario control panel', () => {
+    useUiStore.getState().setScenarioControlOpen(false);
+    render(<CopPage />);
+
+    const simBtn = screen.getByRole('button', { name: /Simulation Controls/i });
+    expect(simBtn).toBeInTheDocument();
+
+    fireEvent.click(simBtn);
+    expect(screen.getByRole('complementary', { name: /Simulation Controls/i })).toBeInTheDocument();
+  });
+
+  it('renders PlanCompareToggle and toggles CURRENT and PROPOSED views', () => {
+    useUiStore.getState().setMapPlanView('before');
+    render(<CopPage />);
+
+    expect(screen.getByText('CURRENT')).toBeInTheDocument();
+    expect(screen.getByText('PROPOSED')).toBeInTheDocument();
+
+    const proposedBtn = screen.getByText('PROPOSED');
+    fireEvent.click(proposedBtn);
+    expect(useUiStore.getState().mapPlanView).toBe('after');
+
+    const currentBtn = screen.getByText('CURRENT');
+    fireEvent.click(currentBtn);
+    expect(useUiStore.getState().mapPlanView).toBe('before');
+  });
+
+  it('displays ImpactBanner with countdown when an operational impact is active', () => {
+    useUiStore.getState().setImpact({
+      eventId: 'EV-0001',
+      eventType: 'THREAT_DETECTED',
+      impactedMissionIds: ['M-04'],
+      reasons: ['Flight corridor intersects detected SAM engagement zone.'],
+      timeToDecisionMin: 5,
+    });
+
+    render(<CopPage />);
+
+    expect(screen.getByText(/TACTICAL IMPACT ALERT/i)).toBeInTheDocument();
+    expect(screen.getByText(/1 mission\(s\) at risk/i)).toBeInTheDocument();
+    expect(screen.getByText(/Flight corridor intersects detected SAM engagement zone/i)).toBeInTheDocument();
   });
 });

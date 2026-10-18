@@ -3,6 +3,7 @@ import { useEntitiesStore } from './entitiesStore';
 import { useRecommendationsStore } from './recommendationsStore';
 import { useEventsStore } from './eventsStore';
 import { useAuditStore } from './auditStore';
+import { useUiStore } from './uiStore';
 import { OperationalSnapshot } from '@/types';
 
 let isInitialized = false;
@@ -17,7 +18,7 @@ export function initStoreSubscriptions(): () => void {
   }
   isInitialized = true;
 
-  const unsubscribe = dataService.subscribe((snapshot: OperationalSnapshot) => {
+  const unsubscribeSnapshot = dataService.subscribe((snapshot: OperationalSnapshot) => {
     // 1. Sync Entities Store
     useEntitiesStore.getState().setSnapshot(snapshot);
 
@@ -32,13 +33,32 @@ export function initStoreSubscriptions(): () => void {
     }
   });
 
+  // Stage 6: Subscribe to Retask Progress Telemetry
+  const unsubscribeProgress = dataService.subscribeRetaskProgress?.((progress) => {
+    useUiStore.getState().setRetaskProgress(progress);
+  });
+
+  // Stage 6: Subscribe to Impact Analysis
+  const unsubscribeImpact = dataService.subscribeImpact?.((impact) => {
+    useUiStore.getState().setImpact(impact);
+    // Append operational alert or notification
+    useUiStore.getState().addToast({
+      type: 'critical',
+      title: `Tactical Alert: ${impact.eventType}`,
+      message: `${impact.impactedMissionIds.length} sortie(s) impacted: ${impact.impactedMissionIds.join(', ')}. AI replanning engaged.`,
+      durationMs: 6000,
+    });
+  });
+
   // Initial audit log fetch
   dataService.getAuditLog().then((entries) => {
     useAuditStore.getState().setAuditLog(entries);
   }).catch(() => {});
 
   return () => {
-    unsubscribe();
+    unsubscribeSnapshot();
+    unsubscribeProgress?.();
+    unsubscribeImpact?.();
     isInitialized = false;
   };
 }

@@ -17,7 +17,10 @@ export const ReadinessStrip: React.FC<ReadinessStripProps> = ({
   className = '',
   isCompact = false,
 }) => {
-  const { aircraft, crew, weaponStocks, weather } = useEntitiesStore();
+  const aircraft = useEntitiesStore((s) => s.aircraft);
+  const crew = useEntitiesStore((s) => s.crew);
+  const weaponStocks = useEntitiesStore((s) => s.weaponStocks);
+  const weather = useEntitiesStore((s) => s.weather);
 
   // Fleet Readiness Metrics
   const fleetMetrics = useMemo(() => {

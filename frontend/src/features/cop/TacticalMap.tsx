@@ -9,6 +9,8 @@ import {
   WeatherState,
   LatLng,
 } from '@/types';
+import { useUiStore } from '@/store/uiStore';
+import { useRecommendationsStore } from '@/store/recommendationsStore';
 import { SelectedEntity, LayerVisibilityState, COMBAT_RADIUS_KM } from './types';
 import { generateCirclePolygon, evaluateRouteRisk } from '@/lib/geo';
 import landmassGeoJson from '@/assets/geo/landmass.json';
@@ -51,7 +53,7 @@ const OFFLINE_BASE_STYLE: StyleSpecification = {
   ],
 };
 
-export const TacticalMap: React.FC<TacticalMapProps> = ({
+const TacticalMapComponent: React.FC<TacticalMapProps> = ({
   bases,
   aircraft,
   missions,
@@ -62,29 +64,50 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
   onSelectEntity,
   layers,
 }) => {
+  const { mapPlanView, mapPlacementMode, impactedMissionIds } = useUiStore();
+  const recommendations = useRecommendationsStore((s) => s.recommendations);
+
   const mapContainerRef = useRef<HTMLDivElement>(null);
   const mapRef = useRef<MapLibreMap | null>(null);
   const isLoadedRef = useRef(false);
   const trailsRef = useRef<Record<string, LatLng[]>>({});
+  const animationFrameRef = useRef<number | null>(null);
 
   const [cursorCoords, setCursorCoords] = useState<LatLng | null>(null);
   const [mapBearing, setMapBearing] = useState(0);
 
+  const onSelectEntityRef = useRef(onSelectEntity);
+  useEffect(() => {
+    onSelectEntityRef.current = onSelectEntity;
+  });
+
   const updateAllDynamicSourcesRef = useRef<(map: MapLibreMap) => void>(() => {});
+
+  // Update cursor on map placement mode
+  useEffect(() => {
+    if (!mapRef.current) return;
+    if (mapPlacementMode === 'threat') {
+      mapRef.current.getCanvas().style.cursor = 'crosshair';
+    } else {
+      mapRef.current.getCanvas().style.cursor = '';
+    }
+  }, [mapPlacementMode]);
 
   // Initialize MapLibre GL map instance once
   useEffect(() => {
     if (!mapContainerRef.current || mapRef.current) return;
 
+    const savedViewport = useUiStore.getState().mapViewport;
+
     const map = new maplibregl.Map({
       container: mapContainerRef.current,
       style: OFFLINE_BASE_STYLE,
-      center: [6.0, 5.0], // Center on Republic of Veridia [lng, lat]
-      zoom: 6.2,
+      center: savedViewport.center, // Center on Republic of Veridia or saved pan [lng, lat]
+      zoom: savedViewport.zoom,
       minZoom: 4.8,
       maxZoom: 13,
-      bearing: 0,
-      pitch: 0,
+      bearing: savedViewport.bearing,
+      pitch: savedViewport.pitch,
       maxBounds: [
         [-2.5, -2.0], // Southwest [lng, lat]
         [14.5, 12.0], // Northeast [lng, lat]
@@ -96,6 +119,7 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
     map.addControl(new maplibregl.ScaleControl({ maxWidth: 120, unit: 'metric' }), 'bottom-left');
 
     map.on('load', () => {
+      if (!mapRef.current || mapRef.current !== map) return;
       isLoadedRef.current = true;
       setupStaticVectorSources(map);
       setupDynamicSources(map);
@@ -114,7 +138,22 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
     });
 
     map.on('rotate', () => {
-      setMapBearing(Math.round(map.getBearing()));
+      const b = Math.round(map.getBearing ? map.getBearing() : 0);
+      setMapBearing(b);
+    });
+
+    // Persist viewport camera updates on user pan/zoom/rotate
+    map.on('moveend', () => {
+      const center = map.getCenter();
+      const zoom = map.getZoom();
+      const bearing = map.getBearing ? map.getBearing() : 0;
+      const pitch = map.getPitch ? map.getPitch() : 0;
+      useUiStore.getState().setMapViewport({
+        center: [center.lng, center.lat],
+        zoom,
+        bearing,
+        pitch,
+      });
     });
 
     // Interactive clicking on vector entities
@@ -128,6 +167,9 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
 
     interactiveLayers.forEach((layerId) => {
       map.on('click', layerId, (e) => {
+        if (useUiStore.getState().mapPlacementMode === 'threat') {
+          return;
+        }
         if (!e.features || e.features.length === 0) return;
         const feat = e.features[0];
         const entityType = feat.properties?.entityType;
@@ -135,37 +177,55 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
 
         if (entityType && entityId) {
           e.originalEvent.stopPropagation();
-          onSelectEntity({ type: entityType, id: entityId });
+          onSelectEntityRef.current?.({ type: entityType, id: entityId });
         }
       });
 
       map.on('mouseenter', layerId, () => {
-        map.getCanvas().style.cursor = 'pointer';
+        if (useUiStore.getState().mapPlacementMode !== 'threat') {
+          map.getCanvas().style.cursor = 'pointer';
+        }
       });
 
       map.on('mouseleave', layerId, () => {
-        map.getCanvas().style.cursor = '';
+        if (useUiStore.getState().mapPlacementMode !== 'threat') {
+          map.getCanvas().style.cursor = '';
+        }
       });
     });
 
-    // Clicking anywhere else clears selection
+    // Clicking on map (or empty space)
     map.on('click', (e) => {
+      if (useUiStore.getState().mapPlacementMode === 'threat') {
+        useUiStore.getState().setPendingThreatCoords({
+          lat: +e.lngLat.lat.toFixed(4),
+          lng: +e.lngLat.lng.toFixed(4),
+        });
+        useUiStore.getState().setMapPlacementMode(null);
+        return;
+      }
       if (e.defaultPrevented) return;
       // If clicked on empty space, deselect
       const features = map.queryRenderedFeatures(e.point, { layers: interactiveLayers });
       if (features.length === 0) {
-        onSelectEntity(null);
+        onSelectEntityRef.current?.(null);
       }
     });
 
     mapRef.current = map;
 
     return () => {
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
       isLoadedRef.current = false;
-      map.remove();
-      mapRef.current = null;
+      if (mapRef.current) {
+        mapRef.current.remove();
+        mapRef.current = null;
+      }
     };
-  }, [onSelectEntity]);
+  }, []);
 
   // Setup static fictional geography vectors
   const setupStaticVectorSources = (map: MapLibreMap) => {
@@ -718,14 +778,45 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
     const activeThreatsList = Object.values(threats);
     const activeAirspacesList = Object.values(airspace);
 
-    Object.values(missions).forEach((msn) => {
-      if (!msn.route || msn.route.length < 2) return;
+    // Identify proposed reroutes from pending recommendations
+    const pendingRecs = Object.values(recommendations).filter((r) => r.status === 'pending');
+    const proposedReroutes: Record<string, string> = {};
+    pendingRecs.forEach((r) => {
+      r.changes?.forEach((c) => {
+        if (c.kind === 'reroute' || c.type === 'MODIFY_ROUTE') {
+          proposedReroutes[c.missionId] = String(c.after || c.toValue || 'Route C');
+        }
+      });
+    });
 
+    const isAfterPlanActive = mapPlanView === 'after';
+    const hasAnyReroutes = Object.keys(proposedReroutes).length > 0;
+
+    Object.values(missions).forEach((msn) => {
+      const isImpacted = impactedMissionIds.includes(msn.id);
       const isThisSelected = isAnyMissionSelected && selectedEntity.id === msn.id;
-      const isDimmed = isAnyMissionSelected && !isThisSelected;
+      const hasProposedChange = Boolean(proposedReroutes[msn.id]);
+
+      let routeToRender = msn.route;
+      let isProposedOverlay = false;
+
+      if (isAfterPlanActive && hasProposedChange && msn.routeOptions) {
+        const proposedRouteName = proposedReroutes[msn.id];
+        const matchOption =
+          msn.routeOptions.find((ro) => ro.name === proposedRouteName) ||
+          msn.routeOptions.find((ro) => ro.name.includes('Route C')) ||
+          msn.routeOptions[2] ||
+          msn.routeOptions[msn.routeOptions.length - 1];
+        if (matchOption && matchOption.waypoints && matchOption.waypoints.length >= 2) {
+          routeToRender = matchOption.waypoints;
+          isProposedOverlay = true;
+        }
+      }
+
+      if (!routeToRender || routeToRender.length < 2) return;
 
       // Color code by priority: P1 Red, P2 Amber, P3 Cyan, P4 Slate
-      const pColor =
+      let pColor =
         msn.priority === 1
           ? '#ef4444'
           : msn.priority === 2
@@ -734,7 +825,23 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
           ? '#06b6d4'
           : '#64748b';
 
-      const lineDash = msn.status === 'in-progress' ? [1] : [2, 2];
+      if (isProposedOverlay) {
+        pColor = '#22d3ee'; // High visibility glowing cyan polyline for proposed bypass
+      } else if (isImpacted && !isAfterPlanActive) {
+        pColor = '#ef4444'; // Pulsing red alert on impacted baseline
+      }
+
+      let lineOpacity = isAnyMissionSelected && !isThisSelected ? 0.15 : isThisSelected ? 1.0 : 0.75;
+      if (isAfterPlanActive && hasAnyReroutes) {
+        if (isProposedOverlay) {
+          lineOpacity = 1.0;
+        } else if (!isThisSelected) {
+          lineOpacity = 0.15; // Unchanged routes are dimmed
+        }
+      }
+
+      const lineWidth = isProposedOverlay ? 5.0 : isThisSelected ? 4.5 : isImpacted ? 4.0 : 2.5;
+      const lineDash = isProposedOverlay ? [3, 2] : msn.status === 'in-progress' ? [1] : [2, 2];
 
       missionRouteFeatures.push({
         type: 'Feature',
@@ -742,20 +849,20 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
           entityType: 'mission',
           entityId: msn.id,
           id: msn.id,
-          name: msn.name,
+          name: isProposedOverlay ? `${msn.name} (PROPOSED BYPASS)` : msn.name,
           routeColor: pColor,
-          lineWidth: isThisSelected ? 4.5 : 2.5,
-          lineOpacity: isDimmed ? 0.15 : isThisSelected ? 1.0 : 0.75,
+          lineWidth,
+          lineOpacity,
           lineDash,
         },
         geometry: {
           type: 'LineString',
-          coordinates: msn.route.map((p) => [p.lng, p.lat]),
+          coordinates: routeToRender.map((p) => [p.lng, p.lat]),
         },
       });
 
       // Evaluate route risk segments
-      const riskAnalysis = evaluateRouteRisk(msn.route, activeThreatsList, activeAirspacesList);
+      const riskAnalysis = evaluateRouteRisk(routeToRender, activeThreatsList, activeAirspacesList);
       riskAnalysis.segments.forEach((seg) => {
         if (seg.status === 'critical' || seg.status === 'caution') {
           missionRiskFeatures.push({
@@ -916,15 +1023,32 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
       type: 'FeatureCollection',
       features: weatherFeatures,
     });
-  }, [bases, aircraft, missions, threats, airspace, weather, selectedEntity]);
+  }, [bases, aircraft, missions, threats, airspace, weather, selectedEntity, mapPlanView, impactedMissionIds, recommendations]);
 
   updateAllDynamicSourcesRef.current = updateAllDynamicSources;
 
-  // Synchronize on data updates
+  // Synchronize on data updates (batched via requestAnimationFrame)
   useEffect(() => {
-    if (mapRef.current && isLoadedRef.current) {
-      updateAllDynamicSources(mapRef.current);
+    if (!mapRef.current || !isLoadedRef.current) return;
+    const map = mapRef.current;
+
+    if (animationFrameRef.current !== null) {
+      cancelAnimationFrame(animationFrameRef.current);
     }
+
+    animationFrameRef.current = requestAnimationFrame(() => {
+      animationFrameRef.current = null;
+      if (mapRef.current && isLoadedRef.current) {
+        updateAllDynamicSources(map);
+      }
+    });
+
+    return () => {
+      if (animationFrameRef.current !== null) {
+        cancelAnimationFrame(animationFrameRef.current);
+        animationFrameRef.current = null;
+      }
+    };
   }, [updateAllDynamicSources]);
 
   // Synchronize layer visibility toggles
@@ -980,6 +1104,12 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
 
   // Pan / Fit theater bounds
   const handleResetView = () => {
+    useUiStore.getState().setMapViewport({
+      center: [6.0, 5.0],
+      zoom: 6.2,
+      bearing: 0,
+      pitch: 0,
+    });
     mapRef.current?.flyTo({
       center: [6.0, 5.0],
       zoom: 6.2,
@@ -1074,3 +1204,6 @@ export const TacticalMap: React.FC<TacticalMapProps> = ({
     </div>
   );
 };
+
+export const TacticalMap = React.memo(TacticalMapComponent);
+TacticalMap.displayName = 'TacticalMap';

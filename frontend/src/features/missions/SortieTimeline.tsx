@@ -11,6 +11,7 @@ import { ConflictItem, TimelineZoom, MISSION_TYPE_CONFIG } from './types';
 import { StatusBadge } from '@/components/ui/StatusBadge';
 import { Button } from '@/components/ui/Button';
 import { formatTimeZulu, cn } from '@/lib/utils';
+import { useUiStore } from '@/store/uiStore';
 import {
   ChevronDown,
   ChevronRight,
@@ -60,6 +61,7 @@ export const SortieTimeline: React.FC<SortieTimelineProps> = ({
   onSelectMission,
   proposedChanges,
 }) => {
+  const impactedMissionIds = useUiStore((s) => s.impactedMissionIds);
   const [zoom, setZoom] = useState<TimelineZoom>('12h');
   const [collapsedBases, setCollapsedBases] = useState<Record<string, boolean>>({});
   const [hoveredMissionId, setHoveredMissionId] = useState<string | null>(null);
@@ -512,6 +514,7 @@ export const SortieTimeline: React.FC<SortieTimelineProps> = ({
                               const widthPx = Math.max(30, rightPx - leftPx);
 
                               const isSelected = selectedMissionId === m.id;
+                              const isImpacted = impactedMissionIds.includes(m.id);
                               const conflicts = conflictsByMission.get(m.id) || [];
                               const hasCritical = conflicts.some(
                                 (c) => c.severity === 'critical',
@@ -564,6 +567,8 @@ export const SortieTimeline: React.FC<SortieTimelineProps> = ({
                                       m.status === 'planned' && 'border-dashed bg-opacity-40',
                                       m.status === 'at-risk' &&
                                         'border-red-500 border-2 shadow-[0_0_8px_rgba(239,68,68,0.5)]',
+                                      isImpacted &&
+                                        'border-red-500 border-2 ring-2 ring-red-500/80 shadow-[0_0_14px_rgba(239,68,68,0.8)] animate-pulse z-20',
                                       m.status === 'completed' &&
                                         'opacity-50 grayscale contrast-75',
                                       isSelected &&

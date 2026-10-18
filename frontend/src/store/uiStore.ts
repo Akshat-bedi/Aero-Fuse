@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { OperationalAlert, ToastItem } from '@/types';
+import { OperationalAlert, ToastItem, ImpactAnalysisPayload, RetaskProgressState, LatLng } from '@/types';
 import { serviceConfig } from '@/services/config';
 
 export interface UIState {
@@ -30,6 +30,41 @@ export interface UIState {
   toasts: ToastItem[];
   addToast: (toast: Omit<ToastItem, 'id'>) => void;
   removeToast: (id: string) => void;
+
+  // Stage 6: Impact Analysis & Visual Highlighting
+  impactedMissionIds: string[];
+  activeImpact: ImpactAnalysisPayload | null;
+  setImpact: (impact: ImpactAnalysisPayload | null) => void;
+  clearImpact: () => void;
+
+  // Stage 6: Retask Staged Progress
+  retaskProgress: RetaskProgressState | null;
+  setRetaskProgress: (progress: RetaskProgressState | null) => void;
+
+  // Stage 6: Map Plan Comparison (BEFORE vs AFTER)
+  mapPlanView: 'before' | 'after';
+  setMapPlanView: (view: 'before' | 'after') => void;
+  toggleMapPlanView: () => void;
+
+  // Stage 6: Scenario Control Panel & Map Placement
+  isScenarioControlOpen: boolean;
+  setScenarioControlOpen: (open: boolean) => void;
+  toggleScenarioControl: (open?: boolean) => void;
+  mapPlacementMode: 'threat' | null;
+  setMapPlacementMode: (mode: 'threat' | null) => void;
+  pendingThreatCoords: LatLng | null;
+  setPendingThreatCoords: (coords: LatLng | null) => void;
+
+  // COP: Map Viewport Camera Persistence
+  mapViewport: MapViewport;
+  setMapViewport: (viewport: Partial<MapViewport>) => void;
+}
+
+export interface MapViewport {
+  center: [number, number];
+  zoom: number;
+  bearing: number;
+  pitch: number;
 }
 
 const INITIAL_ALERTS: OperationalAlert[] = [
@@ -144,6 +179,54 @@ export const useUiStore = create<UIState>((set) => ({
   },
   removeToast: (id) =>
     set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) })),
+
+  // Stage 6: Impact Analysis & Visual Highlighting
+  impactedMissionIds: [],
+  activeImpact: null,
+  setImpact: (impact) =>
+    set({
+      activeImpact: impact,
+      impactedMissionIds: impact?.impactedMissionIds || [],
+    }),
+  clearImpact: () =>
+    set({
+      activeImpact: null,
+      impactedMissionIds: [],
+    }),
+
+  // Stage 6: Retask Staged Progress
+  retaskProgress: null,
+  setRetaskProgress: (progress) => set({ retaskProgress: progress }),
+
+  // Stage 6: Map Plan Comparison
+  mapPlanView: 'before',
+  setMapPlanView: (view) => set({ mapPlanView: view }),
+  toggleMapPlanView: () =>
+    set((state) => ({ mapPlanView: state.mapPlanView === 'before' ? 'after' : 'before' })),
+
+  // Stage 6: Scenario Control Panel & Map Placement
+  isScenarioControlOpen: false,
+  setScenarioControlOpen: (open) => set({ isScenarioControlOpen: open }),
+  toggleScenarioControl: (open) =>
+    set((state) => ({
+      isScenarioControlOpen: typeof open === 'boolean' ? open : !state.isScenarioControlOpen,
+    })),
+  mapPlacementMode: null,
+  setMapPlacementMode: (mode) => set({ mapPlacementMode: mode }),
+  pendingThreatCoords: null,
+  setPendingThreatCoords: (coords) => set({ pendingThreatCoords: coords }),
+
+  // COP: Map Viewport Camera Persistence
+  mapViewport: {
+    center: [6.0, 5.0],
+    zoom: 6.2,
+    bearing: 0,
+    pitch: 0,
+  },
+  setMapViewport: (viewport) =>
+    set((state) => ({
+      mapViewport: { ...state.mapViewport, ...viewport },
+    })),
 }));
 
 // Backward compatibility alias for Stage 1 code

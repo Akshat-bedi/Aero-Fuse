@@ -19,6 +19,8 @@ import {
   Crew,
   Mission,
   Prediction,
+  RetaskProgressState,
+  ImpactAnalysisPayload,
 } from '@/types';
 import { apiClient } from './apiClient';
 import { TacticalWebSocketClient } from './wsClient';
@@ -129,12 +131,28 @@ export function normalizeWireSnapshot(
 export class LiveDataService implements IDataService {
   private wsClient: TacticalWebSocketClient;
   private subscribers: Set<(snapshot: OperationalSnapshot) => void> = new Set();
+  private retaskProgressSubscribers: Set<(progress: RetaskProgressState) => void> = new Set();
+  private impactSubscribers: Set<(impact: ImpactAnalysisPayload) => void> = new Set();
   private speedMultiplier: 1 | 5 | 20 = 1;
   private currentSnapshot: OperationalSnapshot | null = null;
 
   constructor() {
     this.wsClient = new TacticalWebSocketClient({ url: serviceConfig.wsUrl });
     this.initWebSocket();
+  }
+
+  public subscribeRetaskProgress(callback: (progress: RetaskProgressState) => void): () => void {
+    this.retaskProgressSubscribers.add(callback);
+    return () => {
+      this.retaskProgressSubscribers.delete(callback);
+    };
+  }
+
+  public subscribeImpact(callback: (impact: ImpactAnalysisPayload) => void): () => void {
+    this.impactSubscribers.add(callback);
+    return () => {
+      this.impactSubscribers.delete(callback);
+    };
   }
 
   private initWebSocket(): void {
@@ -234,7 +252,7 @@ export class LiveDataService implements IDataService {
     });
 
     // 6. IMPACT_ANALYSIS
-    this.wsClient.subscribe<WebSocketEnvelope<{ impactedMissionIds: string[]; reasons: string[] }>>(
+    this.wsClient.subscribe<WebSocketEnvelope<ImpactAnalysisPayload>>(
       'IMPACT_ANALYSIS',
       (envelope) => {
         const payload = envelope?.payload;
@@ -247,16 +265,20 @@ export class LiveDataService implements IDataService {
               };
             }
           });
+          this.impactSubscribers.forEach((cb) => cb(payload));
           this.notifySubscribers(this.currentSnapshot);
         }
       },
     );
 
     // 7. RETASK_PROGRESS
-    this.wsClient.subscribe<WebSocketEnvelope<{ stage: string; elapsedMs: number }>>(
+    this.wsClient.subscribe<WebSocketEnvelope<RetaskProgressState>>(
       'RETASK_PROGRESS',
-      (_envelope) => {
-        // Can be dispatched to UI progress listeners
+      (envelope) => {
+        const payload = envelope?.payload;
+        if (payload) {
+          this.retaskProgressSubscribers.forEach((cb) => cb(payload));
+        }
       },
     );
 
