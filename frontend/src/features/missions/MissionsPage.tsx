@@ -125,41 +125,36 @@ export const MissionsPage: React.FC = () => {
   return (
     <div className="space-y-4" data-testid="missions-page">
       {/* Top ATO Summary Metric Tiles */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
         <Stat
           label="Total ATO Sorties"
           value={stats.total}
           unit="missions"
           status="nominal"
-          className="bg-command-panel/80"
         />
         <Stat
           label="Airborne / Active"
           value={stats.airborne}
           unit="sorties"
           status="info"
-          className="bg-command-panel/80"
         />
         <Stat
           label="Planned / Approved"
           value={stats.planned}
           unit="sorties"
           status="nominal"
-          className="bg-command-panel/80"
         />
         <Stat
           label="At-Risk Sorties"
           value={stats.atRisk}
           unit="critical"
           status={stats.atRisk > 0 ? 'critical' : 'nominal'}
-          className="bg-command-panel/80"
         />
         <Stat
           label="Completed Sorties"
           value={stats.completed}
           unit="sorties"
           status="nominal"
-          className="bg-command-panel/80"
         />
         <Stat
           label="Active Conflicts"
@@ -167,8 +162,7 @@ export const MissionsPage: React.FC = () => {
           unit="detected"
           status={stats.conflictCount > 0 ? 'warning' : 'nominal'}
           className={cn(
-            'bg-command-panel/80',
-            stats.conflictCount > 0 && 'ring-1 ring-amber-500/50',
+            stats.conflictCount > 0 && 'border-command-warning-border',
           )}
         />
       </div>
@@ -176,15 +170,15 @@ export const MissionsPage: React.FC = () => {
       {/* Operational Conflict Banner */}
       {stats.conflictCount > 0 && (
         <div
-          className="p-3 rounded-lg border border-amber-600/60 bg-amber-950/40 flex flex-wrap items-center justify-between gap-3 text-xs font-mono"
+          className="p-2.5 rounded-[1px] border border-command-warning-border bg-command-warning-bg/20 flex flex-wrap items-center justify-between gap-3 text-xs font-mono"
           data-testid="conflict-alert-banner"
         >
-          <div className="flex items-center gap-2 text-amber-200">
-            <AlertTriangle className="w-4 h-4 text-amber-400 flex-shrink-0 animate-pulse" />
+          <div className="flex items-center gap-2 text-command-warning">
+            <AlertTriangle className="w-4 h-4 text-command-warning flex-shrink-0" />
             <span className="font-bold">
               {stats.conflictCount} Scheduling & Readiness Conflicts Detected in Current ATO Cycle
             </span>
-            <span className="hidden sm:inline text-slate-400">
+            <span className="hidden sm:inline text-command-muted">
               (Double-booked airframes, turnaround violations, or pilot duty limits)
             </span>
           </div>
@@ -192,14 +186,14 @@ export const MissionsPage: React.FC = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => setFilters((prev) => ({ ...prev, status: 'at-risk' }))}
-              className="text-[11px] underline text-amber-300 hover:text-amber-100"
+              className="text-[11px] underline text-command-warning hover:text-command-heading"
             >
               Filter At-Risk
             </button>
-            <span className="text-slate-600">•</span>
+            <span className="text-command-muted">•</span>
             <button
               onClick={() => setViewMode('timeline')}
-              className="text-[11px] underline text-cyan-300 hover:text-cyan-100"
+              className="text-[11px] underline text-command-primary hover:text-command-heading"
             >
               Inspect on Timeline
             </button>
@@ -208,17 +202,17 @@ export const MissionsPage: React.FC = () => {
       )}
 
       {/* Controls & Filter Bar */}
-      <div className="p-3 rounded-lg border border-slate-800 bg-command-panel/90 space-y-3">
+      <div className="p-2.5 rounded-[1px] border border-command-border bg-command-panel space-y-2.5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           {/* View Switcher Toggle */}
-          <div className="flex items-center bg-slate-900 border border-slate-800 rounded p-0.5">
+          <div className="flex items-center bg-command-bg border border-command-border rounded-[1px] p-0.5">
             <button
               onClick={() => setViewMode('board')}
               className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold rounded transition-colors',
+                'flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold rounded-[1px] transition-none',
                 viewMode === 'board'
-                  ? 'bg-cyan-500 text-slate-950 shadow'
-                  : 'text-slate-400 hover:text-slate-200',
+                  ? 'bg-command-raised text-command-primary border border-command-border'
+                  : 'text-command-muted hover:text-command-heading',
               )}
               data-testid="view-toggle-board"
             >
@@ -229,10 +223,10 @@ export const MissionsPage: React.FC = () => {
             <button
               onClick={() => setViewMode('timeline')}
               className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold rounded transition-colors',
+                'flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold rounded-[1px] transition-none',
                 viewMode === 'timeline'
-                  ? 'bg-cyan-500 text-slate-950 shadow'
-                  : 'text-slate-400 hover:text-slate-200',
+                  ? 'bg-command-raised text-command-primary border border-command-border'
+                  : 'text-command-muted hover:text-command-heading',
               )}
               data-testid="view-toggle-timeline"
             >
@@ -243,10 +237,10 @@ export const MissionsPage: React.FC = () => {
             <button
               onClick={() => setViewMode('table')}
               className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 text-xs font-mono font-bold rounded transition-colors',
+                'flex items-center gap-1.5 px-3 py-1 text-xs font-mono font-bold rounded-[1px] transition-none',
                 viewMode === 'table'
-                  ? 'bg-cyan-500 text-slate-950 shadow'
-                  : 'text-slate-400 hover:text-slate-200',
+                  ? 'bg-command-raised text-command-primary border border-command-border'
+                  : 'text-command-muted hover:text-command-heading',
               )}
               data-testid="view-toggle-table"
             >
@@ -257,7 +251,7 @@ export const MissionsPage: React.FC = () => {
 
           {/* Search Box */}
           <div className="relative flex-1 max-w-xs min-w-[200px]">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-command-muted absolute left-2.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
               placeholder="Search sorties, IDs, targets..."
@@ -265,16 +259,16 @@ export const MissionsPage: React.FC = () => {
               onChange={(e) =>
                 setFilters((prev) => ({ ...prev, search: e.target.value }))
               }
-              className="w-full pl-8 pr-3 py-1.5 rounded bg-slate-900 border border-slate-800 text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-cyan-500 font-mono"
+              className="w-full pl-8 pr-3 py-1 rounded-[1px] bg-command-bg border border-command-border text-xs text-command-text placeholder:text-command-muted focus:outline-none focus:border-command-primary font-mono"
             />
           </div>
         </div>
 
         {/* Filter Dropdowns row */}
-        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-800/80 text-xs">
-          <div className="flex items-center gap-1 text-slate-400 font-mono text-[11px] mr-1">
-            <Filter className="w-3 h-3 text-cyan-400" />
-            <span>Filters:</span>
+        <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-command-border text-xs">
+          <div className="flex items-center gap-1 text-command-muted font-mono text-[11px] mr-1">
+            <Filter className="w-3 h-3 text-command-primary" />
+            <span className="uppercase tracking-wider">Filters:</span>
           </div>
 
           {/* Base Filter */}
@@ -283,7 +277,7 @@ export const MissionsPage: React.FC = () => {
             onChange={(e) =>
               setFilters((prev) => ({ ...prev, baseId: e.target.value }))
             }
-            className="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300 font-mono text-[11px] focus:outline-none focus:border-cyan-500"
+            className="px-2 py-1 rounded-[1px] bg-command-bg border border-command-border text-command-text font-mono text-[11px] focus:outline-none focus:border-command-primary"
           >
             <option value="all">All Bases</option>
             {basesList.map((b) => (
@@ -302,7 +296,7 @@ export const MissionsPage: React.FC = () => {
                 type: e.target.value as 'all' | MissionType,
               }))
             }
-            className="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300 font-mono text-[11px] focus:outline-none focus:border-cyan-500"
+            className="px-2 py-1 rounded-[1px] bg-command-bg border border-command-border text-command-text font-mono text-[11px] focus:outline-none focus:border-command-primary"
           >
             <option value="all">All Mission Types</option>
             <option value="CAP">CAP</option>
@@ -325,7 +319,7 @@ export const MissionsPage: React.FC = () => {
                     : (Number(e.target.value) as PriorityLevel),
               }))
             }
-            className="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300 font-mono text-[11px] focus:outline-none focus:border-cyan-500"
+            className="px-2 py-1 rounded-[1px] bg-command-bg border border-command-border text-command-text font-mono text-[11px] focus:outline-none focus:border-command-primary"
           >
             <option value="all">All Priorities</option>
             <option value="1">P1 Critical</option>
@@ -343,7 +337,7 @@ export const MissionsPage: React.FC = () => {
                 status: e.target.value as 'all' | MissionStatus,
               }))
             }
-            className="px-2.5 py-1 rounded bg-slate-900 border border-slate-800 text-slate-300 font-mono text-[11px] focus:outline-none focus:border-cyan-500"
+            className="px-2 py-1 rounded-[1px] bg-command-bg border border-command-border text-command-text font-mono text-[11px] focus:outline-none focus:border-command-primary"
           >
             <option value="all">All Statuses</option>
             <option value="planned">Planned</option>
@@ -359,16 +353,16 @@ export const MissionsPage: React.FC = () => {
               variant="ghost"
               size="sm"
               onClick={resetFilters}
-              className="text-[11px] font-mono gap-1 text-slate-400 hover:text-slate-200"
+              className="text-[11px] font-mono gap-1 text-command-muted hover:text-command-heading"
             >
               <RotateCcw className="w-3 h-3" />
               <span>Reset</span>
             </Button>
           )}
 
-          <div className="ml-auto font-mono text-[11px] text-slate-400">
-            Showing <span className="text-cyan-400 font-bold">{filteredMissions.length}</span> of{' '}
-            <span className="text-slate-300">{missionsList.length}</span> sorties
+          <div className="ml-auto font-mono text-[11px] text-command-muted">
+            Showing <span className="text-command-primary font-bold">{filteredMissions.length}</span> of{' '}
+            <span className="text-command-heading">{missionsList.length}</span> sorties
           </div>
         </div>
       </div>

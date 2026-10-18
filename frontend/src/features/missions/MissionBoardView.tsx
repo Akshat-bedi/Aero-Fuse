@@ -19,9 +19,7 @@ interface ColumnConfig {
   status: MissionStatus;
   title: string;
   icon: React.ComponentType<{ className?: string }>;
-  headerBorder: string;
-  badgeStyle: string;
-  dotColor: string;
+  statusEdge: string;
 }
 
 const BOARD_COLUMNS: ColumnConfig[] = [
@@ -29,41 +27,31 @@ const BOARD_COLUMNS: ColumnConfig[] = [
     status: 'planned',
     title: 'Planned',
     icon: Clock,
-    headerBorder: 'border-blue-500/40',
-    badgeStyle: 'bg-blue-950/80 text-blue-300 border-blue-700/60',
-    dotColor: 'bg-blue-400',
+    statusEdge: 'border-l-command-muted',
   },
   {
     status: 'approved',
     title: 'Approved',
     icon: FileCheck,
-    headerBorder: 'border-cyan-500/40',
-    badgeStyle: 'bg-cyan-950/80 text-cyan-300 border-cyan-700/60',
-    dotColor: 'bg-cyan-400',
+    statusEdge: 'border-l-command-secondary',
   },
   {
     status: 'in-progress',
     title: 'In-Progress',
     icon: PlayCircle,
-    headerBorder: 'border-emerald-500/40',
-    badgeStyle: 'bg-emerald-950/80 text-emerald-300 border-emerald-700/60',
-    dotColor: 'bg-emerald-400 animate-ping',
+    statusEdge: 'border-l-command-nominal',
   },
   {
     status: 'at-risk',
     title: 'At-Risk',
     icon: AlertTriangle,
-    headerBorder: 'border-red-500/50',
-    badgeStyle: 'bg-red-950/80 text-red-300 border-red-700/60 shadow-[0_0_8px_rgba(239,68,68,0.3)]',
-    dotColor: 'bg-red-500',
+    statusEdge: 'border-l-command-critical',
   },
   {
     status: 'completed',
     title: 'Completed',
     icon: CheckCircle2,
-    headerBorder: 'border-slate-600/40',
-    badgeStyle: 'bg-slate-900/80 text-slate-300 border-slate-700/60',
-    dotColor: 'bg-slate-400',
+    statusEdge: 'border-l-command-subdued',
   },
 ];
 
@@ -78,7 +66,7 @@ export const MissionBoardView: React.FC<MissionBoardViewProps> = ({
 }) => {
   return (
     <div
-      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3.5 items-start"
+      className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-3 items-start"
       data-testid="mission-board-view"
     >
       {BOARD_COLUMNS.map((col) => {
@@ -88,29 +76,28 @@ export const MissionBoardView: React.FC<MissionBoardViewProps> = ({
         return (
           <div
             key={col.status}
-            className="flex flex-col rounded-lg bg-command-base/60 border border-slate-800/80 p-2.5 min-h-[500px]"
+            className="flex flex-col rounded-[2px] bg-command-panel border border-command-border p-1.5 min-h-[500px]"
             data-testid={`kanban-column-${col.status}`}
           >
             {/* Column Header */}
             <div
               className={cn(
-                'flex items-center justify-between pb-2.5 mb-2.5 border-b',
-                col.headerBorder,
+                'flex items-center justify-between p-2 mb-2 bg-command-raised border-b border-command-border border-l-[3px]',
+                col.statusEdge,
               )}
             >
-              <div className="flex items-center gap-2">
-                <span className="relative flex h-2 w-2">
-                  <span className={cn('h-2 w-2 rounded-full', col.dotColor)} />
-                </span>
-                <ColIcon className="w-4 h-4 text-slate-300" />
-                <h3 className="text-xs font-bold uppercase tracking-wider text-slate-200">
+              <div className="flex items-center gap-1.5">
+                <ColIcon className="w-3.5 h-3.5 text-command-muted" />
+                <h3 className="text-xs font-mono font-bold uppercase tracking-wider text-command-heading">
                   {col.title}
                 </h3>
               </div>
               <span
                 className={cn(
-                  'px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold border',
-                  col.badgeStyle,
+                  'px-1.5 py-0.2 rounded-[1px] text-[10px] font-mono font-semibold border',
+                  col.status === 'at-risk' && columnMissions.length > 0
+                    ? 'bg-command-critical-bg text-command-critical border-command-critical-border font-bold'
+                    : 'bg-command-bg text-command-muted border-command-border',
                 )}
               >
                 {columnMissions.length}
@@ -118,11 +105,11 @@ export const MissionBoardView: React.FC<MissionBoardViewProps> = ({
             </div>
 
             {/* Cards container */}
-            <div className="flex-1 space-y-2.5 overflow-y-auto max-h-[calc(100vh-280px)] pr-1">
+            <div className="flex-1 space-y-2 overflow-y-auto max-h-[calc(100vh-280px)] pr-0.5">
               {columnMissions.length === 0 ? (
-                <div className="h-28 rounded border border-dashed border-slate-800/80 flex items-center justify-center p-3 text-center">
-                  <span className="text-[11px] font-mono text-slate-400">
-                    No {col.title.toLowerCase()} sorties
+                <div className="h-20 rounded-[1px] border border-command-border bg-command-bg flex items-center justify-center p-3 text-center">
+                  <span className="text-[10px] font-mono text-command-subdued uppercase tracking-wider">
+                    NO SORTIES
                   </span>
                 </div>
               ) : (

@@ -17,7 +17,7 @@ import {
   ChevronRight,
   Clock,
   AlertTriangle,
-  Sparkles,
+  Target,
   Plane,
   Crosshair,
 } from 'lucide-react';
@@ -232,54 +232,50 @@ export const SortieTimeline: React.FC<SortieTimelineProps> = ({
 
   return (
     <div
-      className="flex flex-col rounded-lg border border-slate-800 bg-command-panel/90 shadow-xl overflow-hidden"
+      className="flex flex-col rounded-[2px] border border-command-border bg-command-panel overflow-hidden"
       data-testid="sortie-timeline"
     >
       {/* Top Toolbar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 bg-command-base/90 border-b border-slate-800 text-xs">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-3 py-2 bg-command-raised border-b border-command-border text-xs">
         {/* Left: Title & Now marker status */}
         <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2">
-            <Clock className="w-4 h-4 text-cyan-400" />
-            <span className="font-mono font-bold text-slate-200 uppercase tracking-wider">
+          <div className="flex items-center gap-1.5">
+            <Clock className="w-3.5 h-3.5 text-command-primary" />
+            <span className="font-mono font-bold text-command-heading uppercase tracking-wider text-xs">
               Sortie Schedule Timeline
             </span>
           </div>
-          <span className="text-slate-600">|</span>
-          <div className="flex items-center gap-1.5 font-mono text-[11px] text-cyan-300 bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-800/60">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-cyan-400 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-cyan-500"></span>
-            </span>
+          <span className="text-command-border">|</span>
+          <div className="flex items-center gap-1.5 font-mono text-[11px] text-command-primary bg-command-bg px-2 py-0.5 rounded-[1px] border border-command-border">
             <span>SIM NOW: {formatTimeZulu(simTime)}</span>
           </div>
         </div>
 
         {/* Center: Legend */}
-        <div className="hidden lg:flex items-center gap-3 text-[11px] font-mono text-slate-300">
+        <div className="hidden lg:flex items-center gap-3 text-[10px] font-mono text-command-muted">
           <div className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-sm bg-red-600" />
+            <span className="w-2.5 h-2.5 rounded-[1px] bg-command-critical" />
             <span>P1 Critical</span>
           </div>
           <div className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-sm bg-amber-500" />
+            <span className="w-2.5 h-2.5 rounded-[1px] bg-command-warning" />
             <span>P2 High</span>
           </div>
           <div className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-sm bg-cyan-500" />
+            <span className="w-2.5 h-2.5 rounded-[1px] bg-command-secondary" />
             <span>P3 Routine</span>
           </div>
           <div className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-sm bg-slate-600" />
+            <span className="w-2.5 h-2.5 rounded-[1px] bg-command-subdued" />
             <span>P4 Low</span>
           </div>
           <div className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-sm bg-amber-900/60 border border-dashed border-amber-500" />
+            <span className="w-2.5 h-2.5 rounded-[1px] bg-[#1c2320] border border-command-border" />
             <span>Turnaround (45m)</span>
           </div>
           <div className="flex items-center gap-1">
-            <span className="w-2.5 h-2.5 rounded-sm bg-cyan-950/80 border border-dashed border-cyan-400" />
-            <span>Ghost (AI Proposed)</span>
+            <span className="w-2.5 h-2.5 rounded-[1px] border border-dashed border-[#d7dcd4] bg-[#2a3630]/40" />
+            <span>Ghost (Proposed)</span>
           </div>
         </div>
 
@@ -292,21 +288,21 @@ export const SortieTimeline: React.FC<SortieTimelineProps> = ({
             className="text-[11px] font-mono gap-1"
             title="Pan view to current simulation time"
           >
-            <Crosshair className="w-3.5 h-3.5 text-cyan-400" />
+            <Crosshair className="w-3.5 h-3.5 text-command-primary" />
             <span>Center on Now</span>
           </Button>
 
           {/* Zoom Buttons */}
-          <div className="flex items-center bg-slate-900 border border-slate-700 rounded p-0.5">
+          <div className="flex items-center bg-command-bg border border-command-border rounded-[1px] p-0.5">
             {(['1h', '6h', '12h', '24h'] as TimelineZoom[]).map((z) => (
               <button
                 key={z}
                 onClick={() => setZoom(z)}
                 className={cn(
-                  'px-2 py-0.5 text-[10px] font-mono font-bold rounded uppercase transition-colors',
+                  'px-2 py-0.5 text-[10px] font-mono font-bold rounded-[1px] uppercase transition-none',
                   zoom === z
-                    ? 'bg-cyan-500 text-slate-950 shadow'
-                    : 'text-slate-400 hover:text-slate-200',
+                    ? 'bg-command-primary text-black font-semibold'
+                    : 'text-command-muted hover:text-command-heading',
                 )}
               >
                 {z}
@@ -319,14 +315,14 @@ export const SortieTimeline: React.FC<SortieTimelineProps> = ({
       {/* Main Gantt Body: Left Track Names + Right Horizontally Scrollable Timeline Area */}
       <div className="flex flex-row relative select-none">
         {/* Left Track Column: Bases & Aircraft Info */}
-        <div className="w-64 flex-shrink-0 bg-command-base/95 border-r border-slate-800 z-20 shadow-md">
+        <div className="w-64 flex-shrink-0 bg-command-panel border-r border-command-border z-20">
           {/* Header spacer aligned with ruler */}
-          <div className="h-10 px-3 flex items-center border-b border-slate-800 bg-slate-900/90 text-[11px] font-mono text-slate-400 uppercase tracking-wider font-semibold">
+          <div className="h-9 px-3 flex items-center border-b border-command-border bg-command-raised text-[10px] font-mono text-command-muted uppercase tracking-wider font-bold">
             Bases & Airframes
           </div>
 
           {/* Base & Aircraft Rows */}
-          <div className="divide-y divide-slate-800/80">
+          <div className="divide-y divide-command-border/60">
             {basesList.map((base) => {
               const isCollapsed = !!collapsedBases[base.id];
               const baseAircraft = aircraftByBase[base.id] || [];
@@ -336,19 +332,19 @@ export const SortieTimeline: React.FC<SortieTimelineProps> = ({
                   {/* Base Header Row */}
                   <div
                     onClick={() => toggleBaseCollapse(base.id)}
-                    className="h-9 px-3 flex items-center justify-between bg-slate-900/60 hover:bg-slate-800/60 cursor-pointer transition-colors"
+                    className="h-8 px-2.5 flex items-center justify-between bg-command-raised border-b border-command-border cursor-pointer transition-none"
                   >
                     <div className="flex items-center gap-1.5 min-w-0">
                       {isCollapsed ? (
-                        <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
+                        <ChevronRight className="w-3.5 h-3.5 text-command-muted" />
                       ) : (
-                        <ChevronDown className="w-3.5 h-3.5 text-slate-400" />
+                        <ChevronDown className="w-3.5 h-3.5 text-command-muted" />
                       )}
-                      <span className="font-mono text-xs font-bold text-cyan-300 truncate">
+                      <span className="font-mono text-xs font-bold text-command-heading truncate">
                         {base.name}
                       </span>
                     </div>
-                    <span className="text-[10px] font-mono px-1.5 py-0.2 rounded bg-slate-800 text-slate-400 border border-slate-700">
+                    <span className="text-[10px] font-mono px-1.5 py-0.2 rounded-[1px] bg-command-bg text-command-muted border border-command-border">
                       {baseAircraft.length} AC
                     </span>
                   </div>
@@ -358,19 +354,19 @@ export const SortieTimeline: React.FC<SortieTimelineProps> = ({
                     baseAircraft.map((ac) => (
                       <div
                         key={ac.id}
-                        className="h-14 px-3 flex items-center justify-between border-t border-slate-800/40 bg-command-panel/40 hover:bg-slate-800/30 transition-colors"
+                        className="h-12 px-2.5 flex items-center justify-between border-t border-command-border/40 bg-command-panel/60 hover:bg-command-raised transition-none"
                       >
                         <div className="flex flex-col min-w-0">
                           <div className="flex items-center gap-1.5">
-                            <Plane className="w-3.5 h-3.5 text-slate-400" />
-                            <span className="font-mono text-xs font-bold text-slate-200">
+                            <Plane className="w-3.5 h-3.5 text-command-muted" />
+                            <span className="font-mono text-xs font-bold text-command-heading">
                               {ac.tailNumber}
                             </span>
-                            <span className="text-[10px] font-mono text-slate-400">
+                            <span className="text-[10px] font-mono text-command-muted">
                               ({ac.callsign})
                             </span>
                           </div>
-                          <span className="text-[10px] text-slate-400 truncate">
+                          <span className="text-[10px] text-command-subdued truncate font-mono">
                             {ac.type} • {ac.fuelPct}% fuel
                           </span>
                         </div>
@@ -390,8 +386,8 @@ export const SortieTimeline: React.FC<SortieTimelineProps> = ({
                           label={ac.status}
                           size="sm"
                           showIcon={false}
-                          pulse={ac.status === 'airborne'}
-                          className="text-[9px] px-1 py-0"
+                          pulse={false}
+                          className="text-[9px] px-1 py-0 rounded-[1px]"
                         />
                       </div>
                     ))}
@@ -404,27 +400,27 @@ export const SortieTimeline: React.FC<SortieTimelineProps> = ({
         {/* Right Timeline Canvas (Scrollable) */}
         <div
           ref={scrollContainerRef}
-          className="flex-1 overflow-x-auto overflow-y-hidden relative bg-command-base"
+          className="flex-1 overflow-x-auto overflow-y-hidden relative bg-command-bg"
         >
           <div
             style={{ width: `${totalTimelineWidthPx}px` }}
             className="relative min-h-[500px]"
           >
             {/* Top Ruler Bar */}
-            <div className="sticky top-0 h-10 bg-slate-900/95 border-b border-slate-800 z-10 flex">
+            <div className="sticky top-0 h-9 bg-command-raised border-b border-command-border z-10 flex">
               {rulerTicks.map((tick, idx) => (
                 <div
                   key={idx}
                   style={{ left: `${tick.px}px` }}
                   className={cn(
                     'absolute top-0 bottom-0 flex flex-col justify-between border-l',
-                    tick.isMajor ? 'border-slate-700/80' : 'border-slate-800/50',
+                    tick.isMajor ? 'border-command-border' : 'border-command-border/40',
                   )}
                 >
                   <span
                     className={cn(
-                      'text-[10px] font-mono px-1 py-1 select-none',
-                      tick.isMajor ? 'text-slate-300 font-semibold' : 'text-slate-400',
+                      'text-[10px] font-mono px-1 py-0.5 select-none',
+                      tick.isMajor ? 'text-command-heading font-semibold' : 'text-command-muted',
                     )}
                   >
                     {tick.label}
@@ -432,7 +428,7 @@ export const SortieTimeline: React.FC<SortieTimelineProps> = ({
                   <div
                     className={cn(
                       'w-0.5',
-                      tick.isMajor ? 'h-2 bg-slate-600' : 'h-1 bg-slate-800',
+                      tick.isMajor ? 'h-2 bg-command-border-hover' : 'h-1 bg-command-border',
                     )}
                   />
                 </div>
@@ -446,19 +442,18 @@ export const SortieTimeline: React.FC<SortieTimelineProps> = ({
                 <div
                   key={`grid-${idx}`}
                   style={{ left: `${tick.px}px` }}
-                  className="absolute top-10 bottom-0 w-px border-l border-slate-800/40 pointer-events-none"
+                  className="absolute top-9 bottom-0 w-px border-l border-command-border/30 pointer-events-none"
                 />
               ))}
 
-            {/* "NOW" Vertical Line (Bright Cyan with animated indicator) */}
+            {/* "NOW" Vertical Line (1px solid amber line) */}
             <div
               ref={currentNowRef}
               style={{ left: `${nowPx}px` }}
-              className="absolute top-0 bottom-0 w-0.5 bg-cyan-400 z-30 pointer-events-none shadow-[0_0_10px_rgba(34,211,238,0.8)]"
+              className="absolute top-0 bottom-0 w-[1px] bg-command-primary z-30 pointer-events-none shadow-none"
             >
               {/* NOW flag badge */}
-              <div className="sticky top-1 -ml-7 px-1.5 py-0.5 rounded bg-cyan-400 text-slate-950 font-mono font-bold text-[9px] shadow-lg flex items-center gap-1 select-none pointer-events-auto">
-                <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping" />
+              <div className="sticky top-1 -ml-5 px-1.5 py-0.2 rounded-[1px] bg-command-primary text-black font-mono font-bold text-[9px] shadow-none flex items-center gap-1 select-none pointer-events-auto">
                 <span>NOW</span>
               </div>
             </div>
@@ -528,13 +523,13 @@ export const SortieTimeline: React.FC<SortieTimelineProps> = ({
                               const taWidthPx = Math.max(16, taRightPx - taLeftPx);
 
                               // Bar styling based on priority & status
-                              let barStyle = 'bg-cyan-800/80 border-cyan-500 text-cyan-100';
+                              let barStyle = 'bg-command-secondary text-white border border-[#386694]';
                               if (m.priority === 1) {
-                                barStyle = 'bg-red-800/80 border-red-500 text-red-100';
+                                barStyle = 'bg-command-critical text-white border border-[#a82b2b]';
                               } else if (m.priority === 2) {
-                                barStyle = 'bg-amber-800/80 border-amber-500 text-amber-100';
+                                barStyle = 'bg-command-warning text-black border border-[#b58514]';
                               } else if (m.priority === 4) {
-                                barStyle = 'bg-slate-800/80 border-slate-600 text-slate-200';
+                                barStyle = 'bg-command-subdued text-command-text border border-command-border';
                               }
 
                               const typeCfg =
@@ -562,21 +557,22 @@ export const SortieTimeline: React.FC<SortieTimelineProps> = ({
                                       setTooltipPos(null);
                                     }}
                                     className={cn(
-                                      'absolute top-2 bottom-2 rounded px-2 flex items-center justify-between border cursor-pointer transition-all duration-150 select-none z-10',
-                                      barStyle,
-                                      m.status === 'planned' && 'border-dashed bg-opacity-40',
+                                      'absolute top-2 bottom-2 rounded-[1px] px-2 flex items-center justify-between border cursor-pointer transition-none select-none z-10 font-mono',
+                                      m.status === 'planned'
+                                        ? 'bg-transparent border-dashed border-command-border text-command-text'
+                                        : barStyle,
                                       m.status === 'at-risk' &&
-                                        'border-red-500 border-2 shadow-[0_0_8px_rgba(239,68,68,0.5)]',
+                                        'border-2 border-command-critical bg-command-critical-bg text-command-critical',
                                       isImpacted &&
-                                        'border-red-500 border-2 ring-2 ring-red-500/80 shadow-[0_0_14px_rgba(239,68,68,0.8)] animate-pulse z-20',
+                                        'border-2 border-command-critical bg-command-critical-bg text-command-critical animate-slow-blink z-20',
                                       m.status === 'completed' &&
-                                        'opacity-50 grayscale contrast-75',
+                                        'opacity-40 grayscale contrast-75',
                                       isSelected &&
-                                        'ring-2 ring-cyan-400 border-cyan-400 shadow-[0_0_12px_rgba(34,211,238,0.6)] z-20',
+                                        'border-2 border-command-primary ring-1 ring-command-primary z-20',
                                     )}
                                   >
                                     <div className="flex items-center gap-1.5 min-w-0 truncate">
-                                      <TypeIcon className="w-3.5 h-3.5 flex-shrink-0" />
+                                      <TypeIcon className="w-3 h-3 flex-shrink-0" />
                                       <span className="font-mono font-bold text-[11px] truncate">
                                         {m.id}
                                       </span>
@@ -589,12 +585,12 @@ export const SortieTimeline: React.FC<SortieTimelineProps> = ({
                                     {conflicts.length > 0 && (
                                       <div
                                         className={cn(
-                                          'flex-shrink-0 ml-1 p-0.5 rounded animate-pulse',
-                                          hasCritical ? 'bg-red-600' : 'bg-amber-600',
+                                          'flex-shrink-0 ml-1 p-0.5 rounded-[1px] flex items-center justify-center',
+                                          hasCritical ? 'bg-command-critical text-white' : 'bg-command-warning text-black',
                                         )}
                                         title={`${conflicts.length} Active Conflicts`}
                                       >
-                                        <AlertTriangle className="w-3 h-3 text-white" />
+                                        <AlertTriangle className="w-3 h-3" />
                                       </div>
                                     )}
                                   </div>
@@ -606,7 +602,7 @@ export const SortieTimeline: React.FC<SortieTimelineProps> = ({
                                         left: `${taLeftPx}px`,
                                         width: `${taWidthPx}px`,
                                       }}
-                                      className="absolute top-3.5 bottom-3.5 rounded-sm bg-[repeating-linear-gradient(45deg,rgba(245,158,11,0.25),rgba(245,158,11,0.25)_4px,transparent_4px,transparent_8px)] border border-amber-600/40 pointer-events-none"
+                                      className="absolute top-3.5 bottom-3.5 rounded-none bg-[repeating-linear-gradient(45deg,rgba(84,99,90,0.25),rgba(84,99,90,0.25)_4px,transparent_4px,transparent_8px)] border border-command-border/60 pointer-events-none"
                                       title="Turnaround Window (45m)"
                                     />
                                   )}
@@ -640,18 +636,18 @@ export const SortieTimeline: React.FC<SortieTimelineProps> = ({
                                     setTooltipPos(null);
                                   }}
                                   className={cn(
-                                    'absolute top-2 bottom-2 rounded px-2 flex items-center justify-between cursor-pointer transition-all duration-150 select-none z-10',
-                                    'bg-cyan-950/50 border-2 border-dashed border-cyan-400 text-cyan-300 shadow-[0_0_8px_rgba(34,211,238,0.3)] hover:bg-cyan-900/60',
+                                    'absolute top-2 bottom-2 rounded-[1px] px-2 flex items-center justify-between cursor-pointer transition-none select-none z-10 font-mono',
+                                    'border border-dashed border-[#d7dcd4] bg-[repeating-linear-gradient(45deg,rgba(215,220,212,0.06),rgba(215,220,212,0.06)_4px,transparent_4px,transparent_8px)] text-[#d7dcd4] hover:bg-[#d7dcd4]/10',
                                   )}
                                   data-testid={`ghost-bar-${ghost.recId}`}
                                 >
                                   <div className="flex items-center gap-1.5 min-w-0 truncate">
-                                    <Sparkles className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0 animate-pulse" />
-                                    <span className="font-mono font-bold text-[10px] uppercase tracking-wider text-cyan-200 truncate">
+                                    <Target className="w-3.5 h-3.5 text-[#d7dcd4] flex-shrink-0" />
+                                    <span className="font-mono font-bold text-[10px] uppercase tracking-wider text-[#d7dcd4] truncate">
                                       PROPOSED RETASK ({ghost.recId})
                                     </span>
                                   </div>
-                                  <span className="text-[9px] font-mono font-bold px-1 rounded bg-cyan-900/80 text-cyan-300 border border-cyan-600/60 ml-1">
+                                  <span className="text-[9px] font-mono font-bold px-1 rounded-[1px] bg-command-bg text-[#d7dcd4] border border-command-border ml-1">
                                     SCORE {ghost.score}
                                   </span>
                                 </div>
@@ -676,18 +672,18 @@ export const SortieTimeline: React.FC<SortieTimelineProps> = ({
             left: `${Math.min(window.innerWidth - 320, Math.max(16, tooltipPos.x))}px`,
             top: `${Math.min(window.innerHeight - 200, tooltipPos.y)}px`,
           }}
-          className="z-50 w-80 p-3 rounded-lg border border-slate-700 bg-slate-900/95 shadow-2xl text-xs pointer-events-none backdrop-blur-md animate-in fade-in duration-100"
+          className="z-50 w-80 p-2.5 rounded-[1px] border border-command-border bg-command-panel text-xs pointer-events-none font-mono text-command-text"
         >
-          <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-slate-800">
-            <span className="font-mono text-cyan-400 font-bold">
+          <div className="flex items-center justify-between pb-1 mb-1.5 border-b border-command-border">
+            <span className="font-mono text-command-primary font-bold">
               {activeTooltipMission.id} • {activeTooltipMission.name}
             </span>
-            <span className="font-mono text-[10px] uppercase text-slate-400">
+            <span className="font-mono text-[10px] uppercase text-command-muted">
               P{activeTooltipMission.priority}
             </span>
           </div>
 
-          <div className="space-y-1 text-[11px] font-mono text-slate-300 mb-2">
+          <div className="space-y-0.5 text-[11px] font-mono text-command-muted mb-2">
             <div>Type: {activeTooltipMission.type}</div>
             <div>
               Window: {formatTimeZulu(activeTooltipMission.windowStart)} -{' '}
@@ -698,15 +694,15 @@ export const SortieTimeline: React.FC<SortieTimelineProps> = ({
 
           {/* Conflict warnings in tooltip */}
           {conflictsByMission.get(activeTooltipMission.id) && (
-            <div className="mt-2 pt-2 border-t border-slate-800 space-y-1">
+            <div className="mt-2 pt-1.5 border-t border-command-border space-y-1">
               {conflictsByMission.get(activeTooltipMission.id)?.map((cnf) => (
                 <div
                   key={cnf.id}
                   className={cn(
-                    'flex items-start gap-1.5 text-[10px] font-mono p-1 rounded',
+                    'flex items-start gap-1.5 text-[10px] font-mono p-1 rounded-[1px] border',
                     cnf.severity === 'critical'
-                      ? 'bg-red-950/80 text-red-300'
-                      : 'bg-amber-950/80 text-amber-300',
+                      ? 'bg-command-critical-bg text-command-critical border-command-critical-border'
+                      : 'bg-command-warning-bg text-command-warning border-command-warning-border',
                   )}
                 >
                   <AlertTriangle className="w-3 h-3 flex-shrink-0 mt-0.5" />
@@ -726,29 +722,29 @@ export const SortieTimeline: React.FC<SortieTimelineProps> = ({
             left: `${Math.min(window.innerWidth - 320, Math.max(16, tooltipPos.x))}px`,
             top: `${Math.min(window.innerHeight - 200, tooltipPos.y)}px`,
           }}
-          className="z-50 w-80 p-3 rounded-lg border border-cyan-500/80 bg-slate-950/95 shadow-[0_0_16px_rgba(34,211,238,0.3)] text-xs pointer-events-none backdrop-blur-md animate-in fade-in duration-100"
+          className="z-50 w-80 p-2.5 rounded-[1px] border border-command-border bg-command-panel text-xs pointer-events-none font-mono text-command-text"
         >
-          <div className="flex items-center justify-between pb-1.5 mb-1.5 border-b border-cyan-800/60">
-            <div className="flex items-center gap-1.5 font-mono text-cyan-300 font-bold">
-              <Sparkles className="w-3.5 h-3.5 text-cyan-400" />
-              <span>AI DSS PROPOSED RETASK</span>
+          <div className="flex items-center justify-between pb-1 mb-1.5 border-b border-command-border">
+            <div className="flex items-center gap-1.5 font-mono text-command-primary font-bold">
+              <Target className="w-3.5 h-3.5 text-command-primary" />
+              <span>PROPOSED RETASK</span>
             </div>
-            <span className="font-mono text-[10px] text-cyan-400 font-bold">
+            <span className="font-mono text-[10px] text-command-primary font-bold">
               REC SCORE: {activeTooltipGhost.score}/100
             </span>
           </div>
 
-          <p className="text-[11px] text-slate-200 mb-2 leading-relaxed">
+          <p className="text-[11px] text-command-text mb-2 leading-relaxed font-mono">
             {activeTooltipGhost.summary}
           </p>
 
-          <div className="text-[10px] font-mono text-slate-400 bg-slate-900/80 p-2 rounded border border-slate-800">
+          <div className="text-[10px] font-mono text-command-muted bg-command-bg p-2 rounded-[1px] border border-command-border">
             <div>Target Sortie: {activeTooltipGhost.mission.name}</div>
             <div>
               Window: {formatTimeZulu(activeTooltipGhost.mission.windowStart)} -{' '}
               {formatTimeZulu(activeTooltipGhost.mission.windowEnd)}
             </div>
-            <div className="text-cyan-400 mt-1 font-semibold">
+            <div className="text-command-primary mt-1 font-semibold">
               Click bar to inspect impacted mission & proposal
             </div>
           </div>
