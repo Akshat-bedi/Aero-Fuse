@@ -4,11 +4,11 @@ import { CopPage } from '@/features/cop';
 import { ResourcesPage } from '@/features/resources';
 import { MissionsPage } from '@/features/missions';
 import {
-  RecommendationsPage,
   ScenariosPage,
   AlertsPage,
-  AuditLogPage,
 } from './pages/RoutesPages';
+import { RecommendationsPage } from '@/features/recommendations';
+import { AuditLogPage } from '@/features/audit';
 import { ComponentGalleryPage } from './pages/ComponentGalleryPage';
 import { DebugDataPage } from './pages/DebugDataPage';
 
@@ -44,6 +44,10 @@ export const router = createBrowserRouter([
       {
         path: 'audit-log',
         element: <AuditLogPage />,
+      },
+      {
+        path: 'audit',
+        element: <Navigate to="/audit-log" replace />,
       },
       {
         path: 'dev/components',
