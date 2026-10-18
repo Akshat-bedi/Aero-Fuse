@@ -67,25 +67,25 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     const activeVariant = isConfirming ? confirmVariant : variant;
 
     const baseStyles =
-      'inline-flex items-center justify-center font-medium transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-command-primary focus-visible:ring-offset-1 focus-visible:ring-offset-command-bg select-none disabled:opacity-45 disabled:pointer-events-none disabled:cursor-not-allowed uppercase tracking-wider text-xs border';
+      'inline-flex items-center justify-center font-mono font-medium transition-none focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-command-primary focus-visible:ring-offset-1 focus-visible:ring-offset-command-bg select-none disabled:opacity-40 disabled:pointer-events-none disabled:cursor-not-allowed uppercase tracking-wider text-xs border';
 
     const sizeStyles: Record<ButtonSize, string> = {
-      sm: 'h-7 px-2.5 py-1 text-[11px] gap-1.5 rounded',
-      md: 'h-9 px-3.5 py-1.5 text-xs gap-2 rounded',
-      lg: 'h-11 px-5 py-2 text-sm gap-2.5 rounded-md',
+      sm: 'h-6 px-2 py-0.5 text-[10px] gap-1.5 rounded-[1px]',
+      md: 'h-8 px-3 py-1 text-xs gap-2 rounded-[2px]',
+      lg: 'h-9 px-4 py-1.5 text-xs gap-2.5 rounded-[2px]',
     };
 
     const variantStyles: Record<ButtonVariant, string> = {
       primary:
-        'bg-command-primary text-black border-command-primary hover:bg-command-primary-hover active:bg-cyan-400 font-semibold shadow-tactical',
+        'bg-command-primary text-black border-command-primary hover:bg-command-primary-hover active:bg-command-primary/90 font-semibold',
       secondary:
         'bg-command-raised text-command-text border-command-border hover:bg-command-raised-hover hover:border-command-border-strong active:bg-command-panel',
       danger:
-        'bg-command-critical text-white border-command-critical hover:bg-red-600 active:bg-red-700 font-semibold shadow-alert',
+        'bg-command-critical text-command-heading border-command-critical hover:bg-command-critical/80 active:bg-command-critical/90 font-semibold',
       ghost:
         'bg-transparent text-command-muted border-transparent hover:text-command-text hover:bg-command-raised active:bg-command-panel',
       confirm:
-        'bg-command-warning text-black border-command-warning hover:bg-amber-400 active:bg-amber-500 font-bold animate-pulse',
+        'bg-command-warning text-black border-command-warning hover:bg-command-warning/80 active:bg-command-warning/90 font-bold',
     };
 
     return (
@@ -100,7 +100,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         {isLoading ? (
           <Loader2 className="w-3.5 h-3.5 animate-spin" aria-hidden="true" />
         ) : isConfirming ? (
-          <AlertCircle className="w-3.5 h-3.5 animate-bounce" aria-hidden="true" />
+          <AlertCircle className="w-3.5 h-3.5 text-black" aria-hidden="true" />
         ) : (
           icon
         )}

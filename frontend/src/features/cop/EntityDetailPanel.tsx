@@ -64,7 +64,7 @@ export const EntityDetailPanel: React.FC<EntityDetailPanelProps> = ({
   const { type, id } = selectedEntity;
 
   return (
-    <div className="absolute top-14 right-3 z-20 w-84 sm:w-96 max-h-[calc(100vh-4.5rem)] flex flex-col bg-command-panel/95 backdrop-blur-md rounded border border-command-border shadow-2xl overflow-hidden font-mono text-xs animate-in slide-in-from-right-4 duration-200">
+    <div className="absolute top-12 right-2 z-20 w-84 sm:w-96 max-h-[calc(100vh-4.5rem)] flex flex-col bg-command-panel rounded-[2px] border border-command-border overflow-hidden font-mono text-xs">
       {type === 'aircraft' && (
         <AircraftDetailView
           aircraft={aircraft[id]}
@@ -507,9 +507,9 @@ const BaseDetailView: React.FC<BaseDetailViewProps> = ({
             <div className="flex items-center gap-2 text-[10px] text-command-muted">
               <span>{serviceableCount} Ready</span>
               <span>•</span>
-              <span className="text-cyan-400">{airborneCount} Flown</span>
+              <span className="text-command-primary">{airborneCount} Flown</span>
               <span>•</span>
-              <span className="text-red-400">{unserviceableCount} AOG</span>
+              <span className="text-command-critical">{unserviceableCount} AOG</span>
             </div>
           </div>
 
@@ -645,7 +645,7 @@ const MissionDetailView: React.FC<MissionDetailViewProps> = ({
             </p>
           </div>
         ) : (
-          <div className="p-2 rounded bg-emerald-950/30 border border-emerald-500/40 flex items-center gap-2 text-emerald-400 text-[11px]">
+          <div className="p-2 rounded-[1px] bg-command-nominal-bg border border-command-nominal-border flex items-center gap-2 text-command-nominal text-[11px]">
             <CheckCircle2 className="w-3.5 h-3.5" />
             <span>Flight path clear of active SAM envelopes & no-fly zones</span>
           </div>

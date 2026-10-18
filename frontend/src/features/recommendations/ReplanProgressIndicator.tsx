@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useUiStore } from '@/store/uiStore';
 import { RetaskStage } from '@/types';
-import { Cpu, CheckCircle2, Loader2, Sparkles } from 'lucide-react';
+import { Cpu, CheckCircle2, Loader2 } from 'lucide-react';
 
 interface StageConfig {
   key: RetaskStage;
@@ -51,41 +51,40 @@ export const ReplanProgressIndicator: React.FC = () => {
     <div
       role="status"
       aria-live="polite"
-      className="absolute bottom-6 left-1/2 -translate-x-1/2 z-30 w-11/12 max-w-2xl bg-ops-surface-panel/95 backdrop-blur-md border border-cyan-500/50 rounded-lg p-3.5 shadow-2xl shadow-cyan-950/40 text-white animate-in fade-in slide-in-from-bottom-4 duration-300 pointer-events-auto"
+      className="absolute bottom-4 left-1/2 -translate-x-1/2 z-30 w-11/12 max-w-2xl bg-command-panel border border-command-border rounded-[2px] p-2.5 text-command-text pointer-events-auto font-mono"
     >
       {/* Top Header: Title, Live Message & Elapsed Time */}
-      <div className="flex items-center justify-between gap-2 mb-3">
+      <div className="flex items-center justify-between gap-2 mb-2">
         <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-md bg-cyan-950 border border-cyan-500 flex items-center justify-center text-cyan-400">
+          <div className="w-6 h-6 rounded-[1px] bg-command-raised border border-command-border flex items-center justify-center text-command-primary">
             {isReady ? (
-              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-command-nominal" />
             ) : (
-              <Cpu className="w-4 h-4 animate-pulse text-cyan-400" />
+              <Cpu className="w-3.5 h-3.5 text-command-primary" />
             )}
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <span className="font-mono text-xs font-bold uppercase tracking-wider text-cyan-400">
-                {isReady ? 'DYNAMIC RETASKING READY' : 'AI RETASKING ENGINE ACTIVE'}
+              <span className="font-mono text-xs font-bold uppercase tracking-wider text-command-primary">
+                {isReady ? 'DYNAMIC RETASKING READY' : 'RETASKING ENGINE ACTIVE'}
               </span>
-              <span className="text-[10px] text-ops-text-muted">|</span>
-              <span className="text-xs text-slate-300 truncate max-w-sm">
+              <span className="text-[10px] text-command-muted">/</span>
+              <span className="text-xs text-command-muted truncate max-w-sm">
                 {retaskProgress.message || 'Evaluating mission constraints & sensor streams...'}
               </span>
             </div>
           </div>
         </div>
 
-        {/* Live Elapsed Time Pill */}
-        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-ops-surface-base border border-ops-border text-xs font-mono text-cyan-300 shrink-0">
-          <Sparkles className="w-3 h-3 text-cyan-400" />
-          <span className="text-[10px] text-ops-text-muted">Elapsed:</span>
+        {/* Live Elapsed Time */}
+        <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-[1px] bg-command-bg border border-command-border text-xs font-mono text-command-heading shrink-0 tabular-nums">
+          <span className="text-[10px] text-command-muted">ELAPSED:</span>
           <span className="font-bold">{(retaskProgress.elapsedMs / 1000).toFixed(1)}s</span>
         </div>
       </div>
 
       {/* 4-Step Progressive Pipeline */}
-      <div className="grid grid-cols-4 gap-2 relative">
+      <div className="grid grid-cols-4 gap-1.5 relative">
         {STAGES.map((s, idx) => {
           const isDone = isReady || activeIndex > idx;
           const isCurrent = !isReady && activeIndex === idx;
@@ -93,33 +92,33 @@ export const ReplanProgressIndicator: React.FC = () => {
           return (
             <div
               key={s.key}
-              className={`flex flex-col items-center justify-center p-2 rounded border transition-all ${
+              className={`flex flex-col items-center justify-center p-1.5 rounded-[1px] border ${
                 isDone
-                  ? 'bg-emerald-950/30 border-emerald-500/40 text-emerald-300'
+                  ? 'bg-command-nominal-bg border-command-nominal-border text-command-nominal'
                   : isCurrent
-                  ? 'bg-cyan-950/50 border-cyan-400 shadow-sm shadow-cyan-500/30 text-cyan-200'
-                  : 'bg-ops-surface-base/50 border-ops-border/40 text-slate-500'
+                  ? 'bg-command-raised border-command-primary text-command-primary'
+                  : 'bg-command-bg border-command-border text-command-subdued'
               }`}
             >
-              <div className="flex items-center gap-1.5 text-xs font-mono font-medium mb-1">
+              <div className="flex items-center gap-1 text-[11px] font-mono font-medium mb-1">
                 {isDone ? (
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                  <CheckCircle2 className="w-3 h-3 text-command-nominal shrink-0" />
                 ) : isCurrent ? (
-                  <Loader2 className="w-3.5 h-3.5 text-cyan-400 animate-spin shrink-0" />
+                  <Loader2 className="w-3 h-3 text-command-primary animate-spin shrink-0" />
                 ) : (
-                  <div className="w-3.5 h-3.5 rounded-full border border-slate-600 flex items-center justify-center text-[9px] text-slate-500">
+                  <div className="w-3 h-3 rounded-[1px] border border-command-border flex items-center justify-center text-[8px] text-command-subdued">
                     {idx + 1}
                   </div>
                 )}
-                <span className="text-[11px] truncate">{s.label}</span>
+                <span className="truncate">{s.label}</span>
               </div>
               <div
-                className={`w-full h-1 rounded-full overflow-hidden ${
+                className={`w-full h-1 rounded-[1px] overflow-hidden ${
                   isDone
-                    ? 'bg-emerald-500'
+                    ? 'bg-command-nominal'
                     : isCurrent
-                    ? 'bg-cyan-500 animate-pulse'
-                    : 'bg-slate-800'
+                    ? 'bg-command-primary'
+                    : 'bg-command-border'
                 }`}
               />
             </div>

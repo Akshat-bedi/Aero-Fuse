@@ -96,7 +96,7 @@ export const AircraftReadinessTab: React.FC<AircraftReadinessTabProps> = ({
       label: 'Airframe Type',
       sortable: true,
       render: (row) => (
-        <span className="px-1.5 py-0.5 rounded bg-command-bg border border-command-border/60 text-[10px] font-mono font-semibold text-command-text">
+        <span className="px-1.5 py-0.5 rounded-[1px] bg-command-bg border border-command-border/60 text-[10px] font-mono font-semibold text-command-text">
           {row.type}
         </span>
       ),
@@ -197,7 +197,7 @@ export const AircraftReadinessTab: React.FC<AircraftReadinessTabProps> = ({
             {row.weaponLoad.map((w, idx) => (
               <span
                 key={idx}
-                className="px-1 py-0.5 rounded bg-command-panel text-[10px] font-mono border border-command-border/50 text-command-text"
+                className="px-1 py-0.5 rounded-[1px] bg-command-panel text-[10px] font-mono border border-command-border/50 text-command-text"
               >
                 {w.quantity}x {w.weaponType.replace('GENERIC-', '')}
               </span>
@@ -264,7 +264,7 @@ export const AircraftReadinessTab: React.FC<AircraftReadinessTabProps> = ({
 
       {/* 2. Visualizations Grid (ECharts Donut & Per-Base Stacked Bar) */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-3">
-        <div className="lg:col-span-5 p-3 rounded bg-command-panel/90 border border-command-border/80 shadow-md">
+        <div className="lg:col-span-5 p-3 rounded-[1px] bg-command-panel border border-command-border">
           <div className="flex items-center gap-2 pb-2 border-b border-command-border/50">
             <Radio className="w-3.5 h-3.5 text-command-primary" />
             <span className="font-mono font-bold text-xs text-command-heading uppercase">
@@ -274,7 +274,7 @@ export const AircraftReadinessTab: React.FC<AircraftReadinessTabProps> = ({
           <FleetStatusDonut aircraft={aircraftList} />
         </div>
 
-        <div className="lg:col-span-7 p-3 rounded bg-command-panel/90 border border-command-border/80 shadow-md">
+        <div className="lg:col-span-7 p-3 rounded-[1px] bg-command-panel border border-command-border">
           <div className="flex items-center gap-2 pb-2 border-b border-command-border/50">
             <Layers className="w-3.5 h-3.5 text-command-secondary" />
             <span className="font-mono font-bold text-xs text-command-heading uppercase">
@@ -286,10 +286,10 @@ export const AircraftReadinessTab: React.FC<AircraftReadinessTabProps> = ({
       </div>
 
       {/* 3. Filter Controls Bar */}
-      <div className="p-3 rounded bg-command-panel/85 border border-command-border/70 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+      <div className="p-2.5 rounded-[1px] bg-command-panel border border-command-border flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
         <div className="flex flex-wrap items-center gap-2">
           {/* Base Filter */}
-          <div className="flex items-center gap-1.5 bg-command-bg px-2 py-1 rounded border border-command-border">
+          <div className="flex items-center gap-1.5 bg-command-bg px-2 py-1 rounded-[1px] border border-command-border">
             <span className="text-[10px] text-command-muted uppercase">Base:</span>
             <select
               aria-label="Filter by base"
@@ -307,7 +307,7 @@ export const AircraftReadinessTab: React.FC<AircraftReadinessTabProps> = ({
           </div>
 
           {/* Type Filter */}
-          <div className="flex items-center gap-1.5 bg-command-bg px-2 py-1 rounded border border-command-border">
+          <div className="flex items-center gap-1.5 bg-command-bg px-2 py-1 rounded-[1px] border border-command-border">
             <span className="text-[10px] text-command-muted uppercase">Type:</span>
             <select
               aria-label="Filter by type"
@@ -327,7 +327,7 @@ export const AircraftReadinessTab: React.FC<AircraftReadinessTabProps> = ({
           </div>
 
           {/* Status Filter */}
-          <div className="flex items-center gap-1.5 bg-command-bg px-2 py-1 rounded border border-command-border">
+          <div className="flex items-center gap-1.5 bg-command-bg px-2 py-1 rounded-[1px] border border-command-border">
             <span className="text-[10px] text-command-muted uppercase">Status:</span>
             <select
               aria-label="Filter by status"
@@ -355,13 +355,13 @@ export const AircraftReadinessTab: React.FC<AircraftReadinessTabProps> = ({
             placeholder="Search tail, callsign, ID..."
             value={filters.search}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-            className="w-full pl-8 pr-3 py-1 bg-command-bg border border-command-border rounded text-command-text placeholder-command-subdued focus:outline-none focus:border-command-primary text-xs"
+            className="w-full pl-8 pr-3 py-1 bg-command-bg border border-command-border rounded-[1px] text-command-text placeholder-command-subdued focus:outline-none focus:border-command-primary text-xs"
           />
         </div>
       </div>
 
       {/* 4. Interactive Sortable Data Table */}
-      <div className="bg-command-panel/90 rounded border border-command-border shadow-md overflow-hidden">
+      <div className="bg-command-panel rounded-[1px] border border-command-border overflow-hidden">
         <DataTable<Aircraft>
           columns={columns}
           data={filteredAircraft}

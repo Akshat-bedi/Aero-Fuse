@@ -39,47 +39,47 @@ export const ImpactBanner: React.FC = () => {
   return (
     <aside
       aria-label="Operational Impact Advisory"
-      className="absolute top-16 left-1/2 -translate-x-1/2 z-30 w-11/12 max-w-4xl animate-in fade-in slide-in-from-top-4 duration-300 pointer-events-auto"
+      className="absolute top-12 left-1/2 -translate-x-1/2 z-30 w-11/12 max-w-4xl pointer-events-auto"
     >
-      <div className="bg-ops-surface-base/95 backdrop-blur-md border border-red-500/60 shadow-2xl shadow-red-950/40 rounded-lg p-3 text-white flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
+      <div className="bg-command-panel border border-command-critical-border rounded-[2px] p-2.5 text-command-text flex flex-col md:flex-row items-start md:items-center justify-between gap-2.5">
         {/* Left: Icon & Impact details */}
-        <div className="flex items-start md:items-center gap-3">
-          <div className="w-9 h-9 rounded-md bg-red-950/80 border border-red-500/80 flex items-center justify-center shrink-0 animate-pulse text-red-400">
-            <AlertTriangle className="w-5 h-5" />
+        <div className="flex items-start md:items-center gap-2.5">
+          <div className="w-8 h-8 rounded-[1px] bg-command-critical-bg border border-command-critical-border flex items-center justify-center shrink-0 text-command-critical">
+            <AlertTriangle className="w-4 h-4" />
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-mono text-xs font-bold uppercase tracking-wider text-red-400 flex items-center gap-1">
+              <span className="font-mono text-xs font-bold uppercase tracking-wider text-command-critical flex items-center gap-1">
                 <ShieldAlert className="w-3.5 h-3.5" />
                 TACTICAL IMPACT ALERT
               </span>
-              <span className="text-xs text-ops-text-muted">|</span>
-              <span className="text-xs font-medium text-slate-200">
+              <span className="text-xs text-command-muted">/</span>
+              <span className="text-xs font-medium text-command-heading font-mono">
                 {activeImpact?.impactedMissionIds.length || impactedMissionIds.length} mission(s) at risk
               </span>
             </div>
-            <div className="text-sm font-semibold text-slate-100 mt-0.5 flex items-center gap-2 flex-wrap">
+            <div className="text-xs font-semibold text-command-heading mt-0.5 flex items-center gap-2 flex-wrap font-mono">
               {impactedList.length > 0 ? (
                 impactedList.map((m) => (
                   <span
                     key={m.id}
                     onClick={() => selectMission(m.id)}
-                    className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-900/40 hover:bg-red-800/60 border border-red-500/40 cursor-pointer font-mono text-xs text-red-200 transition-colors"
+                    className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-[1px] bg-command-raised hover:bg-command-raised-hover border border-command-border cursor-pointer text-xs text-command-critical"
                     title={`Click to inspect ${m.name}`}
                   >
                     <span>{m.id}</span>
-                    <span className="text-slate-300 font-sans font-normal">({m.name} - P{m.priority})</span>
-                    <ChevronRight className="w-3 h-3 text-red-400" />
+                    <span className="text-command-muted font-mono font-normal">({m.name} - P{m.priority})</span>
+                    <ChevronRight className="w-3 h-3 text-command-muted" />
                   </span>
                 ))
               ) : (
-                <span className="text-xs text-slate-300">
+                <span className="text-xs text-command-muted">
                   {impactedMissionIds.join(', ')}
                 </span>
               )}
             </div>
             {activeImpact?.reasons && activeImpact.reasons.length > 0 && (
-              <p className="text-xs text-slate-300 mt-1 max-w-xl truncate">
+              <p className="text-[11px] text-command-muted mt-0.5 max-w-xl truncate font-mono">
                 {activeImpact.reasons[0]}
               </p>
             )}
@@ -87,21 +87,21 @@ export const ImpactBanner: React.FC = () => {
         </div>
 
         {/* Right: Countdown Timer & Actions */}
-        <div className="flex items-center gap-3 self-end md:self-center shrink-0">
-          <div className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-ops-surface-panel border border-amber-500/40 text-amber-300 font-mono text-xs">
-            <Clock className="w-3.5 h-3.5 animate-spin-slow" />
-            <span className="text-[10px] uppercase text-ops-text-muted font-sans font-medium">Decision Window:</span>
-            <span className="font-bold text-amber-400 text-sm tracking-wider">{timerFormatted}</span>
+        <div className="flex items-center gap-2 self-end md:self-center shrink-0">
+          <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-[1px] bg-command-bg border border-command-warning-border text-command-warning font-mono text-xs">
+            <Clock className="w-3 h-3" />
+            <span className="text-[9px] uppercase text-command-muted font-mono">DECISION:</span>
+            <span className="font-bold text-command-warning text-xs tracking-wider tabular-nums">{timerFormatted}</span>
           </div>
 
           <Button
             variant="ghost"
             size="sm"
             onClick={clearImpact}
-            className="text-ops-text-muted hover:text-white p-1 h-8 w-8"
+            className="text-command-muted hover:text-command-heading p-1 h-7 w-7"
             title="Acknowledge & Dismiss Banner"
           >
-            <X className="w-4 h-4" />
+            <X className="w-3.5 h-3.5" />
           </Button>
         </div>
       </div>

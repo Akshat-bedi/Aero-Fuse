@@ -43,38 +43,45 @@ export const MISSION_TYPE_CONFIG: Record<
   MissionType,
   {
     label: string;
+    code: string;
     icon: React.ComponentType<{ className?: string }>;
     color: string;
   }
 > = {
   CAP: {
     label: 'Combat Air Patrol',
+    code: 'CAP',
     icon: Shield,
-    color: 'text-cyan-400 bg-cyan-950/60 border-cyan-800/60',
+    color: 'text-command-text bg-command-bg border-command-border',
   },
   strike: {
     label: 'Precision Strike',
+    code: 'STK',
     icon: Crosshair,
-    color: 'text-rose-400 bg-rose-950/60 border-rose-800/60',
+    color: 'text-command-text bg-command-bg border-command-border',
   },
   recon: {
     label: 'Reconnaissance',
+    code: 'RCN',
     icon: Eye,
-    color: 'text-emerald-400 bg-emerald-950/60 border-emerald-800/60',
+    color: 'text-command-text bg-command-bg border-command-border',
   },
   airlift: {
     label: 'Tactical Airlift',
+    code: 'ALF',
     icon: Package,
-    color: 'text-amber-400 bg-amber-950/60 border-amber-800/60',
+    color: 'text-command-text bg-command-bg border-command-border',
   },
   SAR: {
     label: 'Search & Rescue',
+    code: 'SAR',
     icon: LifeBuoy,
-    color: 'text-orange-400 bg-orange-950/60 border-orange-800/60',
+    color: 'text-command-text bg-command-bg border-command-border',
   },
   escort: {
     label: 'Air Escort',
+    code: 'ESC',
     icon: Plane,
-    color: 'text-indigo-400 bg-indigo-950/60 border-indigo-800/60',
+    color: 'text-command-text bg-command-bg border-command-border',
   },
 };

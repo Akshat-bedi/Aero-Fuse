@@ -37,21 +37,21 @@ export const KeyValue: React.FC<KeyValueProps> = ({
   return (
     <div
       className={cn(
-        'flex items-center justify-between py-1.5 px-2 border-b border-command-border/40 text-xs hover:bg-command-raised/30 transition-colors',
+        'flex items-center justify-between py-1 px-2 border-b border-command-border text-xs hover:bg-command-raised/50 font-mono',
         copyable && 'cursor-pointer',
         className,
       )}
       onClick={handleCopy}
       title={copyable ? 'Click to copy' : undefined}
     >
-      <div className="flex items-center gap-1.5 text-command-muted uppercase text-[11px] font-medium tracking-wide">
+      <div className="flex items-center gap-1.5 text-command-muted uppercase text-[10px] tracking-wider">
         {icon}
         <span>{label}</span>
       </div>
       <div
         className={cn(
-          'text-right font-medium',
-          isMono && 'font-mono text-xs',
+          'text-right font-medium text-xs tabular-nums',
+          isMono && 'font-mono',
           colorClasses[statusColor],
         )}
       >
@@ -68,7 +68,7 @@ export const KeyValueList: React.FC<{
   return (
     <div
       className={cn(
-        'divide-y divide-command-border/40 border border-command-border/60 rounded bg-command-bg/40',
+        'divide-y divide-command-border border border-command-border rounded-[1px] bg-command-bg',
         className,
       )}
     >

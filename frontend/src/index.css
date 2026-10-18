@@ -8,103 +8,103 @@
 
 :root,
 .dark {
-  /* Near-black layered surfaces: base, panel, raised */
-  --color-bg-base: #080b11;
-  --color-bg-panel: #0e1422;
-  --color-bg-raised: #151e32;
-  --color-bg-raised-hover: #1c2842;
+  /* Restrained tactical palette: charcoal & graphite layered surfaces */
+  --color-bg-base: #0c0f0e;
+  --color-bg-panel: #141917;
+  --color-bg-raised: #1c2320;
+  --color-bg-raised-hover: #232c28;
 
-  /* Borders & Grid dividers */
-  --color-border: #1d2a44;
-  --color-border-subtle: #131c2e;
-  --color-border-strong: #2c3e64;
+  /* Olive drab & steel-grey borders */
+  --color-border: #2a3630;
+  --color-border-subtle: #1c2420;
+  --color-border-strong: #3d4e46;
 
-  /* Typography */
-  --color-text-base: #e2e8f0;
-  --color-text-heading: #f8fafc;
-  --color-text-muted: #94a3b8;
-  --color-text-subdued: #64748b;
+  /* Tactical off-white typography */
+  --color-text-base: #d7dcd4;
+  --color-text-heading: #eef2ec;
+  --color-text-muted: #8a9990;
+  --color-text-subdued: #5c6861;
 
-  /* Primary accent: muted cyan/teal */
-  --color-primary: #06b6d4;
-  --color-primary-hover: #22d3ee;
-  --color-primary-dim: rgba(6, 182, 212, 0.14);
+  /* Single accent for focus, selection & active states: amber (#d9a521) */
+  --color-primary: #d9a521;
+  --color-primary-hover: #e5b338;
+  --color-primary-dim: rgba(217, 165, 33, 0.15);
 
-  /* Secondary accent: amber for caution */
-  --color-secondary: #f59e0b;
-  --color-secondary-hover: #fbbf24;
-  --color-secondary-dim: rgba(245, 158, 11, 0.14);
+  /* Secondary accent: tactical steel/olive */
+  --color-secondary: #8fa394;
+  --color-secondary-hover: #a3b8a8;
+  --color-secondary-dim: rgba(143, 163, 148, 0.15);
 
-  /* Semantic status colours (with matching backgrounds and borders) */
+  /* Semantic status colours (desaturated with matching text & borders) */
   /* Serviceable / Nominal = green */
-  --color-status-nominal: #10b981;
-  --color-status-nominal-bg: rgba(16, 185, 129, 0.15);
-  --color-status-nominal-border: rgba(16, 185, 129, 0.35);
+  --color-status-nominal: #48a972;
+  --color-status-nominal-bg: rgba(72, 169, 114, 0.12);
+  --color-status-nominal-border: #2e6345;
 
   /* Caution / Degraded = amber */
-  --color-status-warning: #f59e0b;
-  --color-status-warning-bg: rgba(245, 158, 11, 0.15);
-  --color-status-warning-border: rgba(245, 158, 11, 0.35);
+  --color-status-warning: #d9a521;
+  --color-status-warning-bg: rgba(217, 165, 33, 0.12);
+  --color-status-warning-border: #785b13;
 
   /* Critical / Unserviceable / Threat = red */
-  --color-status-critical: #ef4444;
-  --color-status-critical-bg: rgba(239, 68, 68, 0.15);
-  --color-status-critical-border: rgba(239, 68, 68, 0.35);
+  --color-status-critical: #c93b3b;
+  --color-status-critical-bg: rgba(201, 59, 59, 0.12);
+  --color-status-critical-border: #7a2424;
 
-  /* Pending / Info = blue */
-  --color-status-info: #3b82f6;
-  --color-status-info-bg: rgba(59, 130, 246, 0.15);
-  --color-status-info-border: rgba(59, 130, 246, 0.35);
+  /* Pending / Info = steel-blue */
+  --color-status-info: #5b8ec2;
+  --color-status-info-bg: rgba(91, 142, 194, 0.12);
+  --color-status-info-border: #2f5478;
 
   /* Inactive = grey */
-  --color-status-inactive: #64748b;
-  --color-status-inactive-bg: rgba(100, 116, 139, 0.15);
-  --color-status-inactive-border: rgba(100, 116, 139, 0.35);
+  --color-status-inactive: #64746e;
+  --color-status-inactive-bg: rgba(100, 116, 110, 0.12);
+  --color-status-inactive-border: #3b4440;
 }
 
 /* Red-shifted, low-lumen military tactical ops lighting ("Night Mode") */
 .night-mode {
-  --color-bg-base: #060203;
-  --color-bg-panel: #110507;
-  --color-bg-raised: #1c080b;
-  --color-bg-raised-hover: #290c10;
+  --color-bg-base: #0a0404;
+  --color-bg-panel: #140809;
+  --color-bg-raised: #1e0c0e;
+  --color-bg-raised-hover: #2a1215;
 
-  --color-border: #3b1116;
-  --color-border-subtle: #240a0e;
-  --color-border-strong: #5c1820;
+  --color-border: #3a1619;
+  --color-border-subtle: #220c0e;
+  --color-border-strong: #542024;
 
-  --color-text-base: #fca5a5;
-  --color-text-heading: #fee2e2;
-  --color-text-muted: #e05d68;
-  --color-text-subdued: #992934;
+  --color-text-base: #dca8a8;
+  --color-text-heading: #f2cccc;
+  --color-text-muted: #99666a;
+  --color-text-subdued: #664044;
 
-  --color-primary: #ff4d61;
-  --color-primary-hover: #ff7081;
-  --color-primary-dim: rgba(255, 77, 97, 0.15);
+  --color-primary: #e05555;
+  --color-primary-hover: #f06868;
+  --color-primary-dim: rgba(224, 85, 85, 0.15);
 
-  --color-secondary: #f87171;
-  --color-secondary-hover: #fca5a5;
-  --color-secondary-dim: rgba(248, 113, 113, 0.15);
+  --color-secondary: #c06065;
+  --color-secondary-hover: #d07075;
+  --color-secondary-dim: rgba(192, 96, 101, 0.15);
 
-  --color-status-nominal: #ff9988;
-  --color-status-nominal-bg: rgba(255, 153, 136, 0.15);
-  --color-status-nominal-border: rgba(255, 153, 136, 0.4);
+  --color-status-nominal: #e08888;
+  --color-status-nominal-bg: rgba(224, 136, 136, 0.15);
+  --color-status-nominal-border: #6a2428;
 
-  --color-status-warning: #ffaa55;
-  --color-status-warning-bg: rgba(255, 170, 85, 0.15);
-  --color-status-warning-border: rgba(255, 170, 85, 0.4);
+  --color-status-warning: #ea9550;
+  --color-status-warning-bg: rgba(234, 149, 80, 0.15);
+  --color-status-warning-border: #7a3a18;
 
-  --color-status-critical: #ff2233;
-  --color-status-critical-bg: rgba(255, 34, 51, 0.2);
-  --color-status-critical-border: rgba(255, 34, 51, 0.5);
+  --color-status-critical: #ff3344;
+  --color-status-critical-bg: rgba(255, 51, 68, 0.2);
+  --color-status-critical-border: #991122;
 
-  --color-status-info: #dd6677;
-  --color-status-info-bg: rgba(221, 102, 119, 0.15);
-  --color-status-info-border: rgba(221, 102, 119, 0.4);
+  --color-status-info: #bb5566;
+  --color-status-info-bg: rgba(187, 85, 102, 0.15);
+  --color-status-info-border: #551822;
 
-  --color-status-inactive: #6b262f;
-  --color-status-inactive-bg: rgba(107, 38, 47, 0.15);
-  --color-status-inactive-border: rgba(107, 38, 47, 0.4);
+  --color-status-inactive: #552026;
+  --color-status-inactive-bg: rgba(85, 32, 38, 0.15);
+  --color-status-inactive-border: #331015;
 }
 
 body {
@@ -124,17 +124,17 @@ code, kbd, samp, pre, .font-mono {
   font-family: 'JetBrains Mono', monospace;
 }
 
-/* Custom Tactical Scrollbars for individual panels */
+/* Custom Tactical Scrollbars - flat, rectangular */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 4px;
+  height: 4px;
 }
 ::-webkit-scrollbar-track {
   background: var(--color-bg-base);
 }
 ::-webkit-scrollbar-thumb {
   background: var(--color-border);
-  border-radius: 2px;
+  border-radius: 0px;
 }
 ::-webkit-scrollbar-thumb:hover {
   background: var(--color-border-strong);
@@ -146,13 +146,13 @@ code, kbd, samp, pre, .font-mono {
   outline-offset: 1px;
 }
 
-/* MapLibre Tactical Dark Theme Customizations */
+/* MapLibre Tactical C2 Dark Theme Customizations - flat, no glow, 1px border */
 .maplibregl-popup-content {
   background-color: var(--color-bg-panel) !important;
   color: var(--color-text-base) !important;
   border: 1px solid var(--color-border) !important;
-  border-radius: 4px !important;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.7), 0 8px 10px -6px rgba(0, 0, 0, 0.7) !important;
+  border-radius: 2px !important;
+  box-shadow: none !important;
   padding: 0 !important;
 }
 
@@ -171,8 +171,8 @@ code, kbd, samp, pre, .font-mono {
 
 .maplibregl-popup-close-button {
   color: var(--color-text-muted) !important;
-  padding: 4px 8px !important;
-  font-size: 16px !important;
+  padding: 2px 6px !important;
+  font-size: 14px !important;
 }
 .maplibregl-popup-close-button:hover {
   color: var(--color-primary) !important;
@@ -182,7 +182,8 @@ code, kbd, samp, pre, .font-mono {
 .maplibregl-ctrl-group {
   background-color: var(--color-bg-panel) !important;
   border: 1px solid var(--color-border) !important;
-  border-radius: 4px !important;
+  border-radius: 2px !important;
+  box-shadow: none !important;
 }
 .maplibregl-ctrl-group button {
   border-bottom: 1px solid var(--color-border) !important;
@@ -194,14 +195,26 @@ code, kbd, samp, pre, .font-mono {
   background-color: var(--color-bg-raised) !important;
 }
 .maplibregl-ctrl-icon {
-  filter: invert(0.8) hue-rotate(160deg);
+  filter: invert(0.8) hue-rotate(40deg);
 }
 
 .maplibregl-ctrl-scale {
-  background-color: rgba(14, 20, 34, 0.85) !important;
+  background-color: var(--color-bg-panel) !important;
   border: 1px solid var(--color-border) !important;
-  color: var(--color-primary) !important;
+  color: var(--color-text-base) !important;
   font-family: 'JetBrains Mono', monospace !important;
   font-size: 10px !important;
-  padding: 2px 5px !important;
+  padding: 2px 4px !important;
+  box-shadow: none !important;
+  border-radius: 1px !important;
+}
+
+/* Motion reduction support */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

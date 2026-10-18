@@ -131,7 +131,7 @@ export const CrewStatusTab: React.FC<CrewStatusTabProps> = ({ crew, bases }) => 
               {isNearLimit && (
                 <AlertTriangle
                   className={`w-3.5 h-3.5 ${
-                    isOverLimit ? 'text-command-critical animate-pulse' : 'text-command-warning'
+                    isOverLimit ? 'text-command-critical' : 'text-command-warning'
                   }`}
                 />
               )}
@@ -147,7 +147,7 @@ export const CrewStatusTab: React.FC<CrewStatusTabProps> = ({ crew, bases }) => 
                 {row.dutyHoursLast24h}h / 12h
               </span>
             </div>
-            <div className="w-16 h-1 bg-command-bg rounded-full overflow-hidden">
+            <div className="w-16 h-1 bg-command-bg rounded-[1px] overflow-hidden">
               <div
                 className={`h-full ${
                   isOverLimit
@@ -262,10 +262,10 @@ export const CrewStatusTab: React.FC<CrewStatusTabProps> = ({ crew, bases }) => 
       </div>
 
       {/* 2. Fatigue Chart by Airbase / Squadron */}
-      <div className="p-3.5 rounded bg-command-panel/90 border border-command-border/80 shadow-md">
+      <div className="p-3.5 rounded-[1px] bg-command-panel border border-command-border">
         <div className="flex items-center justify-between pb-2 border-b border-command-border/50">
           <div className="flex items-center gap-2">
-            <Activity className="w-3.5 h-3.5 text-cyan-400" />
+            <Activity className="w-3.5 h-3.5 text-command-primary" />
             <span className="font-mono font-bold text-xs text-command-heading uppercase">
               Crew Fatigue Index & Peak Duty Hours by Airbase (24h Horizon)
             </span>
@@ -278,10 +278,10 @@ export const CrewStatusTab: React.FC<CrewStatusTabProps> = ({ crew, bases }) => 
       </div>
 
       {/* 3. Filter Controls Bar */}
-      <div className="p-3 rounded bg-command-panel/85 border border-command-border/70 flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
+      <div className="p-2.5 rounded-[1px] bg-command-panel border border-command-border flex flex-wrap items-center justify-between gap-3 text-xs font-mono">
         <div className="flex flex-wrap items-center gap-2">
           {/* Base Filter */}
-          <div className="flex items-center gap-1.5 bg-command-bg px-2 py-1 rounded border border-command-border">
+          <div className="flex items-center gap-1.5 bg-command-bg px-2 py-1 rounded-[1px] border border-command-border">
             <span className="text-[10px] text-command-muted uppercase">Base:</span>
             <select
               value={filters.base}
@@ -298,7 +298,7 @@ export const CrewStatusTab: React.FC<CrewStatusTabProps> = ({ crew, bases }) => 
           </div>
 
           {/* Role Filter */}
-          <div className="flex items-center gap-1.5 bg-command-bg px-2 py-1 rounded border border-command-border">
+          <div className="flex items-center gap-1.5 bg-command-bg px-2 py-1 rounded-[1px] border border-command-border">
             <span className="text-[10px] text-command-muted uppercase">Role:</span>
             <select
               value={filters.role}
@@ -314,7 +314,7 @@ export const CrewStatusTab: React.FC<CrewStatusTabProps> = ({ crew, bases }) => 
           </div>
 
           {/* Status Filter */}
-          <div className="flex items-center gap-1.5 bg-command-bg px-2 py-1 rounded border border-command-border">
+          <div className="flex items-center gap-1.5 bg-command-bg px-2 py-1 rounded-[1px] border border-command-border">
             <span className="text-[10px] text-command-muted uppercase">Status:</span>
             <select
               value={filters.status}
@@ -333,13 +333,13 @@ export const CrewStatusTab: React.FC<CrewStatusTabProps> = ({ crew, bases }) => 
           <button
             type="button"
             onClick={() => setFilters({ ...filters, nearingLimitsOnly: !filters.nearingLimitsOnly })}
-            className={`px-2.5 py-1 rounded border text-xs font-mono font-bold flex items-center gap-1.5 transition-colors ${
+            className={`px-2.5 py-1 rounded-[1px] border text-xs font-mono font-bold flex items-center gap-1.5 transition-colors ${
               filters.nearingLimitsOnly
-                ? 'bg-amber-950/80 border-amber-500 text-amber-300'
+                ? 'bg-command-warning-bg border-command-warning-border text-command-warning'
                 : 'bg-command-bg border-command-border text-command-muted hover:text-command-text'
             }`}
           >
-            <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+            <AlertTriangle className="w-3.5 h-3.5 text-command-warning" />
             <span>Nearing Limits Only ({summary.nearingLimit})</span>
           </button>
         </div>
@@ -352,13 +352,13 @@ export const CrewStatusTab: React.FC<CrewStatusTabProps> = ({ crew, bases }) => 
             placeholder="Search callsign, qualification..."
             value={filters.search}
             onChange={(e) => setFilters({ ...filters, search: e.target.value })}
-            className="w-full pl-8 pr-3 py-1 bg-command-bg border border-command-border rounded text-command-text placeholder-command-subdued focus:outline-none focus:border-command-primary text-xs"
+            className="w-full pl-8 pr-3 py-1 bg-command-bg border border-command-border rounded-[1px] text-command-text placeholder-command-subdued focus:outline-none focus:border-command-primary text-xs"
           />
         </div>
       </div>
 
       {/* 4. Crew Data Table */}
-      <div className="bg-command-panel/90 rounded border border-command-border shadow-md overflow-hidden">
+      <div className="bg-command-panel rounded-[1px] border border-command-border overflow-hidden">
         <DataTable<Crew>
           columns={columns}
           data={filteredCrew}

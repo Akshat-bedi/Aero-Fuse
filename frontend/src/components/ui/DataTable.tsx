@@ -77,24 +77,24 @@ export function DataTable<T>({
 
   if (data.length === 0) {
     return (
-      <div className="p-8 border border-command-border/50 rounded-md bg-command-panel/40">
+      <div className="p-6 border border-command-border rounded-[2px] bg-command-panel">
         <EmptyState title={emptyTitle} description={emptyDescription} />
       </div>
     );
   }
 
   return (
-    <div className={cn('w-full overflow-x-auto border border-command-border rounded-md', className)}>
+    <div className={cn('w-full overflow-x-auto border border-command-border rounded-[2px]', className)}>
       <table className="w-full text-left border-collapse select-none">
-        <thead>
-          <tr className="bg-command-bg border-b border-command-border text-[11px] font-semibold text-command-muted uppercase tracking-wider">
+        <thead className="sticky top-0 z-10">
+          <tr className="bg-command-bg border-b border-command-border text-[10px] font-mono font-semibold text-command-muted uppercase tracking-wider">
             {columns.map((col) => (
               <th
                 key={col.key}
                 style={{ width: col.width }}
                 className={cn(
-                  'px-3.5 py-2.5 font-medium',
-                  col.sortable && 'cursor-pointer hover:text-command-primary transition-colors',
+                  'px-2.5 py-1.5 font-medium',
+                  col.sortable && 'cursor-pointer hover:text-command-primary',
                   col.align === 'center' && 'text-center',
                   col.align === 'right' && 'text-right',
                 )}
@@ -112,9 +112,9 @@ export function DataTable<T>({
                     <span className="text-command-subdued">
                       {sortKey === col.key ? (
                         sortDirection === 'asc' ? (
-                          <ArrowUp className="w-3.5 h-3.5 text-command-primary" />
+                          <ArrowUp className="w-3 h-3 text-command-primary" />
                         ) : (
-                          <ArrowDown className="w-3.5 h-3.5 text-command-primary" />
+                          <ArrowDown className="w-3 h-3 text-command-primary" />
                         )
                       ) : (
                         <ArrowUpDown className="w-3 h-3 opacity-40" />
@@ -126,7 +126,7 @@ export function DataTable<T>({
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-command-border/50 text-xs">
+        <tbody className="divide-y divide-command-border/40 text-xs font-mono tabular-nums">
           {sortedData.map((row, index) => {
             const rowId = keyExtractor(row);
             const isSelected = selectedId === rowId;
@@ -136,10 +136,10 @@ export function DataTable<T>({
                 key={rowId}
                 onClick={() => onRowClick?.(row)}
                 className={cn(
-                  'transition-colors duration-100',
+                  'transition-none',
                   isSelected
-                    ? 'bg-command-raised border-l-2 border-l-command-primary text-command-heading'
-                    : 'bg-command-panel/60 hover:bg-command-raised/60 text-command-text',
+                    ? 'bg-command-raised border-l-[3px] border-l-command-primary text-command-heading'
+                    : 'bg-command-panel/70 hover:bg-command-raised/50 text-command-text',
                   onRowClick && 'cursor-pointer',
                 )}
               >
@@ -147,7 +147,7 @@ export function DataTable<T>({
                   <td
                     key={col.key}
                     className={cn(
-                      isCompact ? 'px-3 py-1.5' : 'px-3.5 py-2.5',
+                      isCompact ? 'px-2 py-1' : 'px-2.5 py-1.5',
                       col.align === 'center' && 'text-center',
                       col.align === 'right' && 'text-right',
                     )}
@@ -155,7 +155,7 @@ export function DataTable<T>({
                     {col.render ? (
                       col.render(row, index)
                     ) : (
-                      <span className="font-mono text-xs">
+                      <span className="text-xs">
                         {String((row as Record<string, unknown>)[col.key] ?? '—')}
                       </span>
                     )}

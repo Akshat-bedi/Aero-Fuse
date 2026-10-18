@@ -81,77 +81,77 @@ export const MissionTableView: React.FC<MissionTableViewProps> = ({
 
   return (
     <div
-      className="rounded-lg border border-slate-800 bg-command-panel/90 overflow-hidden shadow-lg"
+      className="rounded-[1px] border border-command-border bg-command-panel overflow-hidden"
       data-testid="mission-table-view"
     >
-      <div className="overflow-x-auto">
-        <table className="w-full text-left text-xs border-collapse">
-          <thead>
-            <tr className="bg-command-base/80 border-b border-slate-800 text-slate-300 font-mono uppercase text-[11px] tracking-wider select-none">
+      <div className="overflow-x-auto max-h-[calc(100vh-280px)]">
+        <table className="w-full text-left text-xs border-collapse font-mono">
+          <thead className="sticky top-0 z-10">
+            <tr className="bg-command-raised border-b border-command-border text-command-muted font-mono uppercase text-[10px] tracking-wider select-none">
               <th
-                className="py-3 px-3 cursor-pointer hover:text-cyan-400"
+                className="py-2 px-2.5 cursor-pointer hover:text-command-heading"
                 onClick={() => handleSort('priority')}
               >
                 <div className="flex items-center gap-1">
                   <span>Priority</span>
-                  <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                  <ArrowUpDown className="w-3 h-3 text-command-muted" />
                 </div>
               </th>
               <th
-                className="py-3 px-3 cursor-pointer hover:text-cyan-400"
+                className="py-2 px-2.5 cursor-pointer hover:text-command-heading"
                 onClick={() => handleSort('id')}
               >
                 <div className="flex items-center gap-1">
                   <span>ID / Name</span>
-                  <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                  <ArrowUpDown className="w-3 h-3 text-command-muted" />
                 </div>
               </th>
               <th
-                className="py-3 px-3 cursor-pointer hover:text-cyan-400"
+                className="py-2 px-2.5 cursor-pointer hover:text-command-heading"
                 onClick={() => handleSort('type')}
               >
                 <div className="flex items-center gap-1">
                   <span>Type</span>
-                  <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                  <ArrowUpDown className="w-3 h-3 text-command-muted" />
                 </div>
               </th>
               <th
-                className="py-3 px-3 cursor-pointer hover:text-cyan-400"
+                className="py-2 px-2.5 cursor-pointer hover:text-command-heading"
                 onClick={() => handleSort('status')}
               >
                 <div className="flex items-center gap-1">
                   <span>Status</span>
-                  <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                  <ArrowUpDown className="w-3 h-3 text-command-muted" />
                 </div>
               </th>
               <th
-                className="py-3 px-3 cursor-pointer hover:text-cyan-400"
+                className="py-2 px-2.5 cursor-pointer hover:text-command-heading"
                 onClick={() => handleSort('base')}
               >
                 <div className="flex items-center gap-1">
                   <span>Base</span>
-                  <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                  <ArrowUpDown className="w-3 h-3 text-command-muted" />
                 </div>
               </th>
               <th
-                className="py-3 px-3 cursor-pointer hover:text-cyan-400"
+                className="py-2 px-2.5 cursor-pointer hover:text-command-heading"
                 onClick={() => handleSort('windowStart')}
               >
                 <div className="flex items-center gap-1">
                   <span>Sortie Window</span>
-                  <ArrowUpDown className="w-3 h-3 text-slate-400" />
+                  <ArrowUpDown className="w-3 h-3 text-command-muted" />
                 </div>
               </th>
-              <th className="py-3 px-3">Assigned Aircraft</th>
-              <th className="py-3 px-3">Assigned Crew</th>
-              <th className="py-3 px-3">Conflicts / Safety</th>
-              <th className="py-3 px-3 text-right">Action</th>
+              <th className="py-2 px-2.5">Assigned Aircraft</th>
+              <th className="py-2 px-2.5">Assigned Crew</th>
+              <th className="py-2 px-2.5">Conflicts / Safety</th>
+              <th className="py-2 px-2.5 text-right">Action</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-slate-800/60 font-sans">
+          <tbody className="divide-y divide-command-border/50 text-xs">
             {sortedMissions.length === 0 ? (
               <tr>
-                <td colSpan={10} className="py-12 text-center text-slate-400 font-mono">
+                <td colSpan={10} className="py-8 text-center text-command-muted font-mono">
                   No operational missions match current filters.
                 </td>
               </tr>
@@ -182,46 +182,41 @@ export const MissionTableView: React.FC<MissionTableViewProps> = ({
                     key={m.id}
                     onClick={() => onSelectMission(m.id)}
                     className={cn(
-                      'transition-colors cursor-pointer',
+                      'transition-none cursor-pointer',
                       isSelected
-                        ? 'bg-cyan-950/40 border-l-2 border-cyan-400'
+                        ? 'bg-command-raised border-l-[3px] border-l-command-primary'
                         : m.status === 'at-risk'
-                        ? 'bg-red-950/20 hover:bg-red-950/30'
-                        : 'hover:bg-slate-800/40',
+                        ? 'bg-command-critical-bg/10 hover:bg-command-critical-bg/20'
+                        : 'hover:bg-command-raised/50',
                     )}
                   >
                     {/* Priority */}
-                    <td className="py-3 px-3 whitespace-nowrap">
+                    <td className="py-2 px-2.5 whitespace-nowrap">
                       <PriorityTag priority={m.priority} size="sm" showDescription={false} />
                     </td>
 
                     {/* ID / Name */}
-                    <td className="py-3 px-3">
+                    <td className="py-2 px-2.5">
                       <div className="flex flex-col">
-                        <span className="font-mono text-cyan-400 font-bold text-[11px]">
+                        <span className="font-mono text-command-primary font-bold text-[11px]">
                           {m.id}
                         </span>
-                        <span className="text-slate-100 font-medium line-clamp-1">
+                        <span className="text-command-heading font-medium line-clamp-1">
                           {m.name}
                         </span>
                       </div>
                     </td>
 
                     {/* Type */}
-                    <td className="py-3 px-3 whitespace-nowrap">
-                      <span
-                        className={cn(
-                          'inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border uppercase tracking-wider',
-                          typeConfig.color,
-                        )}
-                      >
-                        <TypeIcon className="w-3 h-3" />
-                        <span>{m.type}</span>
+                    <td className="py-2 px-2.5 whitespace-nowrap">
+                      <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-[1px] text-[10px] font-mono border border-command-border bg-command-bg text-command-text uppercase">
+                        <TypeIcon className="w-3 h-3 text-command-muted" />
+                        <span>{typeConfig.code || m.type}</span>
                       </span>
                     </td>
 
                     {/* Status */}
-                    <td className="py-3 px-3 whitespace-nowrap">
+                    <td className="py-2 px-2.5 whitespace-nowrap">
                       <StatusBadge
                         status={
                           m.status === 'in-progress'
@@ -236,29 +231,29 @@ export const MissionTableView: React.FC<MissionTableViewProps> = ({
                         }
                         label={m.status}
                         size="sm"
-                        pulse={m.status === 'in-progress'}
+                        pulse={false}
                       />
                     </td>
 
                     {/* Base */}
-                    <td className="py-3 px-3 whitespace-nowrap font-mono text-slate-300">
+                    <td className="py-2 px-2.5 whitespace-nowrap font-mono text-command-text">
                       {bases[m.launchBaseId]?.name || m.launchBaseId}
                     </td>
 
                     {/* Sortie Window */}
-                    <td className="py-3 px-3 whitespace-nowrap font-mono text-slate-300">
+                    <td className="py-2 px-2.5 whitespace-nowrap font-mono text-command-text tabular-nums">
                       <div>
                         {formatTimeZulu(m.windowStart)} - {formatTimeZulu(m.windowEnd)}
                       </div>
-                      <div className="text-[10px] text-slate-400">
+                      <div className="text-[10px] text-command-muted">
                         Duration: {durationHours}h
                       </div>
                     </td>
 
                     {/* Assigned Aircraft */}
-                    <td className="py-3 px-3 whitespace-nowrap font-mono text-slate-300">
+                    <td className="py-2 px-2.5 whitespace-nowrap font-mono text-command-text">
                       <div className="flex items-center gap-1.5">
-                        <Plane className="w-3.5 h-3.5 text-cyan-400" />
+                        <Plane className="w-3.5 h-3.5 text-command-muted" />
                         <span>
                           {assignedAc.map((a) => a.tailNumber).join(', ') || 'Unassigned'}
                         </span>
@@ -266,9 +261,9 @@ export const MissionTableView: React.FC<MissionTableViewProps> = ({
                     </td>
 
                     {/* Assigned Crew */}
-                    <td className="py-3 px-3 whitespace-nowrap font-mono text-slate-300">
+                    <td className="py-2 px-2.5 whitespace-nowrap font-mono text-command-text">
                       <div className="flex items-center gap-1.5">
-                        <Users className="w-3.5 h-3.5 text-indigo-400" />
+                        <Users className="w-3.5 h-3.5 text-command-muted" />
                         <span>
                           {assignedCr.map((c) => c.callsign).join(', ') || 'Unassigned'}
                         </span>
@@ -276,16 +271,16 @@ export const MissionTableView: React.FC<MissionTableViewProps> = ({
                     </td>
 
                     {/* Conflicts / Safety */}
-                    <td className="py-3 px-3 whitespace-nowrap">
+                    <td className="py-2 px-2.5 whitespace-nowrap">
                       {conflicts.length > 0 ? (
                         <span
                           className={cn(
-                            'inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono border font-semibold animate-pulse',
+                            'inline-flex items-center gap-1 px-1.5 py-0.2 rounded-[1px] text-[10px] font-mono border font-semibold',
                             hasCritical
-                              ? 'bg-red-950/80 text-red-300 border-red-600/70'
+                              ? 'bg-command-critical-bg text-command-critical border-command-critical-border'
                               : hasWarning
-                              ? 'bg-amber-950/80 text-amber-300 border-amber-600/70'
-                              : 'bg-slate-800 text-slate-300 border-slate-700',
+                              ? 'bg-command-warning-bg text-command-warning border-command-warning-border'
+                              : 'bg-command-bg text-command-text border-command-border',
                           )}
                           title={conflicts.map((c) => c.title).join(' • ')}
                         >
@@ -295,7 +290,7 @@ export const MissionTableView: React.FC<MissionTableViewProps> = ({
                           </span>
                         </span>
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-mono text-emerald-400 bg-emerald-950/40 border border-emerald-800/40">
+                        <span className="inline-flex items-center gap-1 px-1.5 py-0.2 rounded-[1px] text-[10px] font-mono text-command-nominal bg-command-nominal-bg/20 border border-command-nominal-border">
                           <CheckCircle2 className="w-3 h-3" />
                           <span>Nominal</span>
                         </span>
@@ -303,7 +298,7 @@ export const MissionTableView: React.FC<MissionTableViewProps> = ({
                     </td>
 
                     {/* Action */}
-                    <td className="py-3 px-3 text-right whitespace-nowrap">
+                    <td className="py-2 px-2.5 text-right whitespace-nowrap">
                       <Button
                         variant={isSelected ? 'primary' : 'ghost'}
                         size="sm"

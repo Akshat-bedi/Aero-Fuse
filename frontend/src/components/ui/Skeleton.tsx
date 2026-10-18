@@ -23,7 +23,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
             key={idx}
             className={cn(
               baseClasses,
-              'h-3.5 rounded',
+              'h-3.5 rounded-[1px]',
               idx === lines - 1 && lines > 1 ? 'w-3/4' : 'w-full',
               className,
             )}
@@ -36,7 +36,7 @@ export const Skeleton: React.FC<SkeletonProps> = ({
   if (variant === 'circular') {
     return (
       <div
-        className={cn(baseClasses, 'w-8 h-8 rounded-full flex-shrink-0', className)}
+        className={cn(baseClasses, 'w-8 h-8 rounded-[1px] flex-shrink-0', className)}
       />
     );
   }
@@ -46,20 +46,20 @@ export const Skeleton: React.FC<SkeletonProps> = ({
       <div
         className={cn(
           baseClasses,
-          'p-4 rounded-md space-y-3 w-full',
+          'p-4 rounded-[1px] space-y-3 w-full',
           className,
         )}
       >
-        <div className="h-4 bg-command-border/70 rounded w-1/3" />
-        <div className="h-3 bg-command-border/50 rounded w-full" />
-        <div className="h-3 bg-command-border/50 rounded w-4/5" />
+        <div className="h-4 bg-command-border/70 rounded-[1px] w-1/3" />
+        <div className="h-3 bg-command-border/50 rounded-[1px] w-full" />
+        <div className="h-3 bg-command-border/50 rounded-[1px] w-4/5" />
       </div>
     );
   }
 
   return (
     <div
-      className={cn(baseClasses, 'h-9 w-full rounded', className)}
+      className={cn(baseClasses, 'h-9 w-full rounded-[1px]', className)}
     />
   );
 };

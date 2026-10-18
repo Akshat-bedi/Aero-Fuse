@@ -265,44 +265,44 @@ export const ScenarioControlPanel: React.FC = () => {
   return (
     <aside
       aria-label="Simulation controls"
-      className="fixed inset-y-0 right-0 z-40 w-full sm:w-[480px] bg-ops-surface-base/95 backdrop-blur-xl border-l border-ops-border shadow-2xl text-white flex flex-col animate-in slide-in-from-right duration-300 pointer-events-auto"
+      className="fixed inset-y-0 right-0 z-40 w-full sm:w-[480px] bg-command-panel border-l border-command-border text-command-text flex flex-col pointer-events-auto font-mono text-xs"
     >
       {/* Top Header */}
-      <div className="flex items-center justify-between px-5 py-4 border-b border-ops-border/80 bg-ops-surface-panel/60">
-        <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-md bg-ops-accent/10 border border-ops-accent/40 flex items-center justify-center text-ops-accent">
-            <Sliders className="w-4 h-4" />
+      <div className="flex items-center justify-between px-3 py-2 border-b border-command-border bg-command-raised">
+        <div className="flex items-center gap-2">
+          <div className="w-6 h-6 rounded-[1px] bg-command-bg border border-command-border flex items-center justify-center text-command-primary">
+            <Sliders className="w-3.5 h-3.5" />
           </div>
           <div>
-            <h2 className="text-sm font-bold tracking-wide uppercase text-slate-100 flex items-center gap-2">
+            <h2 className="text-xs font-bold uppercase tracking-wider text-command-heading flex items-center gap-2">
               <span>Simulation Controls</span>
-              <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-cyan-950 text-cyan-400 border border-cyan-800">
+              <span className="text-[9px] font-mono px-1 py-0.2 rounded-[1px] bg-command-bg text-command-primary border border-command-border">
                 STAGE 6
               </span>
             </h2>
-            <p className="text-xs text-ops-text-muted">Dynamic Retasking & Event Injection Engine</p>
+            <p className="text-[10px] text-command-muted font-mono">Dynamic Retasking & Event Injection Engine</p>
           </div>
         </div>
 
         <button
           type="button"
           onClick={() => toggleScenarioControl(false)}
-          className="text-ops-text-muted hover:text-white p-1 rounded-md hover:bg-slate-800/80 transition-colors"
+          className="text-command-muted hover:text-command-heading p-1 rounded-[1px] hover:bg-command-panel transition-none"
           title="Close Panel"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-ops-border/60 bg-ops-surface-panel/40 px-3 pt-2 gap-1 font-mono text-xs">
+      <div className="flex border-b border-command-border bg-command-bg px-2 pt-1 gap-1 font-mono text-xs">
         <button
           type="button"
           onClick={() => setActiveTab('single')}
-          className={`flex items-center gap-1.5 px-3 py-2 border-b-2 transition-all ${
+          className={`flex items-center gap-1.5 px-2.5 py-1.5 border-b-2 transition-none uppercase text-xs ${
             activeTab === 'single'
-              ? 'border-cyan-400 text-cyan-300 font-bold bg-ops-surface-base/80'
-              : 'border-transparent text-ops-text-muted hover:text-slate-200'
+              ? 'border-command-primary text-command-primary font-bold bg-command-raised/40'
+              : 'border-transparent text-command-muted hover:text-command-text'
           }`}
         >
           <Sliders className="w-3.5 h-3.5" />
@@ -312,10 +312,10 @@ export const ScenarioControlPanel: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveTab('scripts')}
-          className={`flex items-center gap-1.5 px-3 py-2 border-b-2 transition-all ${
+          className={`flex items-center gap-1.5 px-2.5 py-1.5 border-b-2 transition-none uppercase text-xs ${
             activeTab === 'scripts'
-              ? 'border-cyan-400 text-cyan-300 font-bold bg-ops-surface-base/80'
-              : 'border-transparent text-ops-text-muted hover:text-slate-200'
+              ? 'border-command-primary text-command-primary font-bold bg-command-raised/40'
+              : 'border-transparent text-command-muted hover:text-command-text'
           }`}
         >
           <FileCode className="w-3.5 h-3.5" />
@@ -327,8 +327,8 @@ export const ScenarioControlPanel: React.FC = () => {
           onClick={() => setActiveTab('history')}
           className={`flex items-center gap-1.5 px-3 py-2 border-b-2 transition-all ${
             activeTab === 'history'
-              ? 'border-cyan-400 text-cyan-300 font-bold bg-ops-surface-base/80'
-              : 'border-transparent text-ops-text-muted hover:text-slate-200'
+              ? 'border-command-primary text-command-primary font-bold bg-command-raised'
+              : 'border-transparent text-command-text-muted hover:text-command-text'
           }`}
         >
           <History className="w-3.5 h-3.5" />
@@ -337,13 +337,13 @@ export const ScenarioControlPanel: React.FC = () => {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 overflow-y-auto p-5 space-y-5">
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
         {/* TAB 1: SINGLE EVENT INJECTION */}
         {activeTab === 'single' && (
           <div className="space-y-4">
             {/* Event Category Selector */}
             <div>
-              <label className="block text-xs font-mono uppercase text-ops-text-muted mb-2">
+              <label className="block text-xs font-mono uppercase text-command-text-muted mb-2">
                 Select Operational Disruption Event
               </label>
               <div className="grid grid-cols-2 gap-2 text-xs font-mono">
@@ -362,13 +362,13 @@ export const ScenarioControlPanel: React.FC = () => {
                       key={item.id}
                       type="button"
                       onClick={() => setSelectedEventType(item.id as typeof selectedEventType)}
-                      className={`flex items-center gap-2 p-2.5 rounded border text-left transition-all ${
+                      className={`flex items-center gap-2 p-2.5 rounded-[1px] border text-left transition-all ${
                         isSelected
-                          ? 'bg-cyan-950/70 border-cyan-400 text-cyan-200 shadow-sm shadow-cyan-950/50'
-                          : 'bg-ops-surface-panel/40 border-ops-border text-slate-300 hover:border-slate-500'
+                          ? 'bg-command-raised border-command-primary text-command-primary'
+                          : 'bg-command-bg border-command-border text-command-text-muted hover:text-command-text hover:border-command-border'
                       }`}
                     >
-                      <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-cyan-400' : 'text-slate-400'}`} />
+                      <Icon className={`w-4 h-4 shrink-0 ${isSelected ? 'text-command-primary' : 'text-command-text-muted'}`} />
                       <span className="text-[11px] leading-tight font-medium">{item.label}</span>
                     </button>
                   );
@@ -377,36 +377,36 @@ export const ScenarioControlPanel: React.FC = () => {
             </div>
 
             {/* Event Form Container */}
-            <div className="bg-ops-surface-panel/60 p-4 rounded-lg border border-ops-border space-y-3.5">
+            <div className="bg-command-panel p-3.5 rounded-[1px] border border-command-border space-y-3">
               {/* 1. THREAT DETECTED */}
               {selectedEventType === 'THREAT_DETECTED' && (
                 <>
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-mono font-bold text-slate-200 flex items-center gap-1.5">
-                      <ShieldAlert className="w-4 h-4 text-red-400" />
+                    <span className="text-xs font-mono font-bold text-command-text flex items-center gap-1.5">
+                      <ShieldAlert className="w-4 h-4 text-command-critical" />
                       Hostile Threat Contact Parameters
                     </span>
                     <button
                       type="button"
                       onClick={() => setMapPlacementMode(mapPlacementMode === 'threat' ? null : 'threat')}
-                      className={`flex items-center gap-1 px-2.5 py-1 rounded text-xs font-mono border transition-all ${
+                      className={`flex items-center gap-1 px-2.5 py-1 rounded-[1px] text-xs font-mono border transition-all ${
                         mapPlacementMode === 'threat'
-                          ? 'bg-red-900 border-red-400 text-white animate-pulse'
-                          : 'bg-ops-surface-base border-ops-border text-slate-300 hover:border-slate-400'
+                          ? 'bg-command-critical-bg border-command-critical text-command-critical font-bold'
+                          : 'bg-command-bg border-command-border text-command-text-muted hover:text-command-text'
                       }`}
                     >
-                      <Crosshair className="w-3.5 h-3.5 text-red-400" />
+                      <Crosshair className="w-3.5 h-3.5 text-command-critical" />
                       <span>{mapPlacementMode === 'threat' ? 'Click Map Now...' : 'Click Map to Place'}</span>
                     </button>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <div>
-                      <label className="block text-ops-text-muted mb-1 font-mono">Threat Classification</label>
+                      <label className="block text-command-text-muted mb-1 font-mono">Threat Classification</label>
                       <select
                         value={threatType}
                         onChange={(e) => setThreatType(e.target.value as typeof threatType)}
-                        className="w-full bg-ops-surface-base border border-ops-border rounded p-2 text-slate-100 font-mono text-xs focus:border-cyan-400 focus:outline-none"
+                        className="w-full bg-command-bg border border-command-border rounded-[1px] p-2 text-command-text font-mono text-xs focus:border-command-primary focus:outline-none cursor-pointer"
                       >
                         <option value="SAM">SAM (Surface-to-Air)</option>
                         <option value="Fighter">Hostile Fighter Sweep</option>
@@ -416,7 +416,7 @@ export const ScenarioControlPanel: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-ops-text-muted mb-1 font-mono">Engagement Radius</label>
+                      <label className="block text-command-text-muted mb-1 font-mono">Engagement Radius</label>
                       <div className="flex items-center gap-2">
                         <input
                           type="range"
@@ -425,7 +425,7 @@ export const ScenarioControlPanel: React.FC = () => {
                           step="5"
                           value={threatRangeKm}
                           onChange={(e) => setThreatRangeKm(+e.target.value)}
-                          className="w-full accent-cyan-400"
+                          className="w-full accent-command-primary"
                         />
                         <span className="font-mono text-xs w-12 text-right">{threatRangeKm}km</span>
                       </div>
@@ -440,23 +440,23 @@ export const ScenarioControlPanel: React.FC = () => {
                         step="0.1"
                         value={threatLat}
                         onChange={(e) => setThreatLat(+e.target.value)}
-                        className="w-full bg-ops-surface-base border border-ops-border rounded p-2 text-slate-100 font-mono text-xs"
+                        className="w-full bg-command-bg border border-command-border rounded-[1px] p-2 text-command-text font-mono text-xs focus:border-command-primary focus:outline-none"
                       />
                     </div>
                     <div>
-                      <label className="block text-ops-text-muted mb-1 font-mono">Longitude (°E)</label>
+                      <label className="block text-command-text-muted mb-1 font-mono">Longitude (°E)</label>
                       <input
                         type="number"
                         step="0.1"
                         value={threatLng}
                         onChange={(e) => setThreatLng(+e.target.value)}
-                        className="w-full bg-ops-surface-base border border-ops-border rounded p-2 text-slate-100 font-mono text-xs"
+                        className="w-full bg-command-bg border border-command-border rounded-[1px] p-2 text-command-text font-mono text-xs focus:border-command-primary focus:outline-none"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-ops-text-muted mb-1 font-mono text-xs">
+                    <label className="block text-command-text-muted mb-1 font-mono text-xs">
                       Radar Detection Confidence: {(threatConfidence * 100).toFixed(0)}%
                     </label>
                     <input
@@ -466,7 +466,7 @@ export const ScenarioControlPanel: React.FC = () => {
                       step="0.05"
                       value={threatConfidence}
                       onChange={(e) => setThreatConfidence(+e.target.value)}
-                      className="w-full accent-cyan-400"
+                      className="w-full accent-command-primary"
                     />
                   </div>
                 </>
@@ -475,17 +475,17 @@ export const ScenarioControlPanel: React.FC = () => {
               {/* 2. AIRCRAFT UNSERVICEABLE */}
               {selectedEventType === 'AIRCRAFT_UNSERVICEABLE' && (
                 <>
-                  <div className="text-xs font-mono font-bold text-slate-200 flex items-center gap-1.5">
-                    <Plane className="w-4 h-4 text-amber-400" />
+                  <div className="text-xs font-mono font-bold text-command-heading flex items-center gap-1.5">
+                    <Plane className="w-4 h-4 text-command-warning" />
                     Airframe Grounding / Maintenance Fault
                   </div>
                   <div className="space-y-3 text-xs">
                     <div>
-                      <label className="block text-ops-text-muted mb-1 font-mono">Select Airframe</label>
+                      <label className="block text-command-text-muted mb-1 font-mono">Select Airframe</label>
                       <select
                         value={selectedAircraftId}
                         onChange={(e) => setSelectedAircraftId(e.target.value)}
-                        className="w-full bg-ops-surface-base border border-ops-border rounded p-2 text-slate-100 font-mono text-xs focus:border-cyan-400 focus:outline-none"
+                        className="w-full bg-command-bg border border-command-border rounded-[1px] p-2 text-command-text font-mono text-xs focus:border-command-primary focus:outline-none cursor-pointer"
                       >
                         {Object.values(aircraft).map((ac) => (
                           <option key={ac.id} value={ac.id}>
@@ -496,12 +496,12 @@ export const ScenarioControlPanel: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-ops-text-muted mb-1 font-mono">Disruption Reason</label>
+                      <label className="block text-command-text-muted mb-1 font-mono">Disruption Reason</label>
                       <input
                         type="text"
                         value={aircraftReason}
                         onChange={(e) => setAircraftReason(e.target.value)}
-                        className="w-full bg-ops-surface-base border border-ops-border rounded p-2 text-slate-100 font-mono text-xs"
+                        className="w-full bg-command-bg border border-command-border rounded-[1px] p-2 text-command-text font-mono text-xs focus:border-command-primary focus:outline-none"
                       />
                     </div>
                   </div>
@@ -511,17 +511,17 @@ export const ScenarioControlPanel: React.FC = () => {
               {/* 3. BASE CLOSED */}
               {selectedEventType === 'BASE_CLOSED' && (
                 <>
-                  <div className="text-xs font-mono font-bold text-slate-200 flex items-center gap-1.5">
-                    <Building className="w-4 h-4 text-red-400" />
+                  <div className="text-xs font-mono font-bold text-command-heading flex items-center gap-1.5">
+                    <Building className="w-4 h-4 text-command-critical" />
                     Airbase Runway Closure / Cratering
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <div>
-                      <label className="block text-ops-text-muted mb-1 font-mono">Target Airbase</label>
+                      <label className="block text-command-text-muted mb-1 font-mono">Target Airbase</label>
                       <select
                         value={selectedBaseId}
                         onChange={(e) => setSelectedBaseId(e.target.value)}
-                        className="w-full bg-ops-surface-base border border-ops-border rounded p-2 text-slate-100 font-mono text-xs"
+                        className="w-full bg-command-bg border border-command-border rounded-[1px] p-2 text-command-text font-mono text-xs focus:border-command-primary focus:outline-none cursor-pointer"
                       >
                         {Object.values(bases).map((b) => (
                           <option key={b.id} value={b.id}>
@@ -531,11 +531,11 @@ export const ScenarioControlPanel: React.FC = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-ops-text-muted mb-1 font-mono">Runway Status</label>
+                      <label className="block text-command-text-muted mb-1 font-mono">Runway Status</label>
                       <select
                         value={runwayStatus}
                         onChange={(e) => setRunwayStatus(e.target.value as 'closed' | 'degraded')}
-                        className="w-full bg-ops-surface-base border border-ops-border rounded p-2 text-slate-100 font-mono text-xs"
+                        className="w-full bg-command-bg border border-command-border rounded-[1px] p-2 text-command-text font-mono text-xs focus:border-command-primary focus:outline-none cursor-pointer"
                       >
                         <option value="closed">Closed (Emergency Cratering)</option>
                         <option value="degraded">Degraded (Arresting Gear)</option>
@@ -543,7 +543,7 @@ export const ScenarioControlPanel: React.FC = () => {
                     </div>
                   </div>
                   <div>
-                    <label className="block text-ops-text-muted mb-1 font-mono text-xs">
+                    <label className="block text-command-text-muted mb-1 font-mono text-xs">
                       Expected Outage: {runwayDuration} Hours
                     </label>
                     <input
@@ -553,7 +553,7 @@ export const ScenarioControlPanel: React.FC = () => {
                       step="2"
                       value={runwayDuration}
                       onChange={(e) => setRunwayDuration(+e.target.value)}
-                      className="w-full accent-cyan-400"
+                      className="w-full accent-command-primary"
                     />
                   </div>
                 </>
@@ -562,17 +562,17 @@ export const ScenarioControlPanel: React.FC = () => {
               {/* 4. WEATHER DEGRADED */}
               {selectedEventType === 'WEATHER_DEGRADED' && (
                 <>
-                  <div className="text-xs font-mono font-bold text-slate-200 flex items-center gap-1.5">
-                    <CloudRain className="w-4 h-4 text-blue-400" />
+                  <div className="text-xs font-mono font-bold text-command-heading flex items-center gap-1.5">
+                    <CloudRain className="w-4 h-4 text-command-secondary" />
                     Severe Weather Front Incursion
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <div>
-                      <label className="block text-ops-text-muted mb-1 font-mono">Sector / Base</label>
+                      <label className="block text-command-text-muted mb-1 font-mono">Sector / Base</label>
                       <select
                         value={weatherBaseId}
                         onChange={(e) => setWeatherBaseId(e.target.value)}
-                        className="w-full bg-ops-surface-base border border-ops-border rounded p-2 text-slate-100 font-mono text-xs"
+                        className="w-full bg-command-bg border border-command-border rounded-[1px] p-2 text-command-text font-mono text-xs focus:border-command-primary focus:outline-none cursor-pointer"
                       >
                         {Object.values(bases).map((b) => (
                           <option key={b.id} value={b.id}>
@@ -582,11 +582,11 @@ export const ScenarioControlPanel: React.FC = () => {
                       </select>
                     </div>
                     <div>
-                      <label className="block text-ops-text-muted mb-1 font-mono">Severity</label>
+                      <label className="block text-command-text-muted mb-1 font-mono">Severity</label>
                       <select
                         value={weatherSeverity}
                         onChange={(e) => setWeatherSeverity(e.target.value as 'caution' | 'severe')}
-                        className="w-full bg-ops-surface-base border border-ops-border rounded p-2 text-slate-100 font-mono text-xs"
+                        className="w-full bg-command-bg border border-command-border rounded-[1px] p-2 text-command-text font-mono text-xs focus:border-command-primary focus:outline-none cursor-pointer"
                       >
                         <option value="severe">Severe (Below Minima)</option>
                         <option value="caution">Caution (Marginal VFR)</option>
@@ -595,7 +595,7 @@ export const ScenarioControlPanel: React.FC = () => {
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <div>
-                      <label className="block text-ops-text-muted mb-1 font-mono">Crosswind: {windKts} kts</label>
+                      <label className="block text-command-text-muted mb-1 font-mono">Crosswind: {windKts} kts</label>
                       <input
                         type="range"
                         min="15"
@@ -603,11 +603,11 @@ export const ScenarioControlPanel: React.FC = () => {
                         step="1"
                         value={windKts}
                         onChange={(e) => setWindKts(+e.target.value)}
-                        className="w-full accent-cyan-400"
+                        className="w-full accent-command-primary"
                       />
                     </div>
                     <div>
-                      <label className="block text-ops-text-muted mb-1 font-mono">Visibility: {visibilityKm} km</label>
+                      <label className="block text-command-text-muted mb-1 font-mono">Visibility: {visibilityKm} km</label>
                       <input
                         type="range"
                         min="0.5"
@@ -615,7 +615,7 @@ export const ScenarioControlPanel: React.FC = () => {
                         step="0.5"
                         value={visibilityKm}
                         onChange={(e) => setVisibilityKm(+e.target.value)}
-                        className="w-full accent-cyan-400"
+                        className="w-full accent-command-primary"
                       />
                     </div>
                   </div>
@@ -625,26 +625,26 @@ export const ScenarioControlPanel: React.FC = () => {
               {/* 5. NEW PRIORITY MISSION */}
               {selectedEventType === 'NEW_PRIORITY_MISSION' && (
                 <>
-                  <div className="text-xs font-mono font-bold text-slate-200 flex items-center gap-1.5">
-                    <Target className="w-4 h-4 text-emerald-400" />
+                  <div className="text-xs font-mono font-bold text-command-heading flex items-center gap-1.5">
+                    <Target className="w-4 h-4 text-command-nominal" />
                     Urgent Preemptive Sortie Tasking
                   </div>
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <div>
-                      <label className="block text-ops-text-muted mb-1 font-mono">Mission Name</label>
+                      <label className="block text-command-text-muted mb-1 font-mono">Mission Name</label>
                       <input
                         type="text"
                         value={missionName}
                         onChange={(e) => setMissionName(e.target.value)}
-                        className="w-full bg-ops-surface-base border border-ops-border rounded p-2 text-slate-100 font-mono text-xs"
+                        className="w-full bg-command-bg border border-command-border rounded-[1px] p-2 text-command-text font-mono text-xs focus:border-command-primary focus:outline-none"
                       />
                     </div>
                     <div>
-                      <label className="block text-ops-text-muted mb-1 font-mono">Sortie Type</label>
+                      <label className="block text-command-text-muted mb-1 font-mono">Sortie Type</label>
                       <select
                         value={missionType}
                         onChange={(e) => setMissionType(e.target.value as typeof missionType)}
-                        className="w-full bg-ops-surface-base border border-ops-border rounded p-2 text-slate-100 font-mono text-xs"
+                        className="w-full bg-command-bg border border-command-border rounded-[1px] p-2 text-command-text font-mono text-xs focus:border-command-primary focus:outline-none cursor-pointer"
                       >
                         <option value="CAP">CAP (Air Patrol)</option>
                         <option value="strike">Precision Strike</option>
@@ -658,22 +658,22 @@ export const ScenarioControlPanel: React.FC = () => {
 
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <div>
-                      <label className="block text-ops-text-muted mb-1 font-mono">Priority</label>
+                      <label className="block text-command-text-muted mb-1 font-mono">Priority</label>
                       <select
                         value={missionPriority}
                         onChange={(e) => setMissionPriority(+e.target.value as 1 | 2)}
-                        className="w-full bg-ops-surface-base border border-ops-border rounded p-2 text-slate-100 font-mono text-xs"
+                        className="w-full bg-command-bg border border-command-border rounded-[1px] p-2 text-command-text font-mono text-xs focus:border-command-primary focus:outline-none cursor-pointer"
                       >
                         <option value={1}>P1 - Urgent Flash</option>
                         <option value={2}>P2 - High Priority</option>
                       </select>
                     </div>
                     <div>
-                      <label className="block text-ops-text-muted mb-1 font-mono">Launch Base</label>
+                      <label className="block text-command-text-muted mb-1 font-mono">Launch Base</label>
                       <select
                         value={missionBase}
                         onChange={(e) => setMissionBase(e.target.value)}
-                        className="w-full bg-ops-surface-base border border-ops-border rounded p-2 text-slate-100 font-mono text-xs"
+                        className="w-full bg-command-bg border border-command-border rounded-[1px] p-2 text-command-text font-mono text-xs focus:border-command-primary focus:outline-none cursor-pointer"
                       >
                         {Object.values(bases).map((b) => (
                           <option key={b.id} value={b.id}>
@@ -686,14 +686,14 @@ export const ScenarioControlPanel: React.FC = () => {
 
                   <div className="grid grid-cols-2 gap-3 text-xs">
                     <div>
-                      <label className="block text-ops-text-muted mb-1 font-mono">Target Coordinates</label>
+                      <label className="block text-command-text-muted mb-1 font-mono">Target Coordinates</label>
                       <div className="flex gap-1 font-mono">
                         <input
                           type="number"
                           step="0.1"
                           value={missionLat}
                           onChange={(e) => setMissionLat(+e.target.value)}
-                          className="w-1/2 bg-ops-surface-base border border-ops-border rounded p-1.5 text-xs"
+                          className="w-1/2 bg-command-bg border border-command-border rounded-[1px] p-1.5 text-xs text-command-text focus:border-command-primary focus:outline-none"
                           placeholder="Lat"
                         />
                         <input
@@ -701,17 +701,17 @@ export const ScenarioControlPanel: React.FC = () => {
                           step="0.1"
                           value={missionLng}
                           onChange={(e) => setMissionLng(+e.target.value)}
-                          className="w-1/2 bg-ops-surface-base border border-ops-border rounded p-1.5 text-xs"
+                          className="w-1/2 bg-command-bg border border-command-border rounded-[1px] p-1.5 text-xs text-command-text focus:border-command-primary focus:outline-none"
                           placeholder="Lng"
                         />
                       </div>
                     </div>
                     <div>
-                      <label className="block text-ops-text-muted mb-1 font-mono">Required Airframe</label>
+                      <label className="block text-command-text-muted mb-1 font-mono">Required Airframe</label>
                       <select
                         value={missionAircraftType}
                         onChange={(e) => setMissionAircraftType(e.target.value)}
-                        className="w-full bg-ops-surface-base border border-ops-border rounded p-2 text-slate-100 font-mono text-xs"
+                        className="w-full bg-command-bg border border-command-border rounded-[1px] p-2 text-command-text font-mono text-xs focus:border-command-primary focus:outline-none cursor-pointer"
                       >
                         <option value="Fighter-A">Fighter-A</option>
                         <option value="Strike-B">Strike-B</option>
@@ -727,17 +727,17 @@ export const ScenarioControlPanel: React.FC = () => {
               {/* 6. CREW UNAVAILABLE */}
               {selectedEventType === 'CREW_UNAVAILABLE' && (
                 <>
-                  <div className="text-xs font-mono font-bold text-slate-200 flex items-center gap-1.5">
-                    <Users className="w-4 h-4 text-purple-400" />
+                  <div className="text-xs font-mono font-bold text-command-heading flex items-center gap-1.5">
+                    <Users className="w-4 h-4 text-command-primary" />
                     Aircrew Medical Hold / Duty Limit Exceeded
                   </div>
                   <div className="space-y-3 text-xs">
                     <div>
-                      <label className="block text-ops-text-muted mb-1 font-mono">Select Aircrew Member</label>
+                      <label className="block text-command-text-muted mb-1 font-mono">Select Aircrew Member</label>
                       <select
                         value={selectedCrewId}
                         onChange={(e) => setSelectedCrewId(e.target.value)}
-                        className="w-full bg-ops-surface-base border border-ops-border rounded p-2 text-slate-100 font-mono text-xs"
+                        className="w-full bg-command-bg border border-command-border rounded-[1px] p-2 text-command-text font-mono text-xs focus:border-command-primary focus:outline-none cursor-pointer"
                       >
                         {Object.values(crew).map((c) => (
                           <option key={c.id} value={c.id}>
@@ -748,12 +748,12 @@ export const ScenarioControlPanel: React.FC = () => {
                     </div>
 
                     <div>
-                      <label className="block text-ops-text-muted mb-1 font-mono">Reason for Grounding</label>
+                      <label className="block text-command-text-muted mb-1 font-mono">Reason for Grounding</label>
                       <input
                         type="text"
                         value={crewReason}
                         onChange={(e) => setCrewReason(e.target.value)}
-                        className="w-full bg-ops-surface-base border border-ops-border rounded p-2 text-slate-100 font-mono text-xs"
+                        className="w-full bg-command-bg border border-command-border rounded-[1px] p-2 text-command-text font-mono text-xs focus:border-command-primary focus:outline-none"
                       />
                     </div>
                   </div>
@@ -779,25 +779,25 @@ export const ScenarioControlPanel: React.FC = () => {
         {activeTab === 'scripts' && (
           <div className="space-y-4">
             <div>
-              <h3 className="text-xs font-mono uppercase tracking-wider text-ops-text-muted mb-2">
+              <h3 className="text-xs font-mono uppercase tracking-wider text-command-text-muted mb-2">
                 Prebuilt Retasking Demonstration Scripts
               </h3>
-              <p className="text-xs text-slate-300 mb-3">
+              <p className="text-xs text-command-text-muted mb-3">
                 Execute end-to-end tactical scenarios from the clean baseline. Demonstrates real-time multi-objective replanning within 2 seconds.
               </p>
             </div>
 
             {/* Demo 1 Card */}
-            <div className="bg-ops-surface-panel/70 p-4 rounded-lg border border-ops-border space-y-2.5">
+            <div className="bg-command-panel p-3.5 rounded-[1px] border border-command-border space-y-2.5">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-bold text-cyan-300">DEMO SCRIPT 1</span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-red-950 text-red-300 border border-red-800">
+                <span className="font-mono text-xs font-bold text-command-primary">DEMO SCRIPT 1</span>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-[1px] bg-command-critical-bg text-command-critical border border-command-critical-border">
                   SAM THREAT
                 </span>
               </div>
-              <h4 className="text-sm font-semibold text-white">SAM Site on Route B (M-04 Bypass)</h4>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Detects a high-threat SAM site (<code className="text-red-400">THR-02</code>, 85km radius at 4.8°N 7.5°E) intersecting Central Precision Strike (<code className="text-cyan-400">M-04</code>). The AI replanning engine automatically computes a safe Route C southern dogleg bypass.
+              <h4 className="text-sm font-semibold text-command-heading">SAM Site on Route B (M-04 Bypass)</h4>
+              <p className="text-xs text-command-text leading-relaxed font-sans">
+                Detects a high-threat SAM site (<code className="text-command-critical">THR-02</code>, 85km radius at 4.8°N 7.5°E) intersecting Central Precision Strike (<code className="text-command-primary">M-04</code>). The AI replanning engine automatically computes a safe Route C southern dogleg bypass.
               </p>
               <Button
                 variant="primary"
@@ -812,16 +812,16 @@ export const ScenarioControlPanel: React.FC = () => {
             </div>
 
             {/* Demo 2 Card */}
-            <div className="bg-ops-surface-panel/70 p-4 rounded-lg border border-ops-border space-y-2.5">
+            <div className="bg-command-panel p-3.5 rounded-[1px] border border-command-border space-y-2.5">
               <div className="flex items-center justify-between">
-                <span className="font-mono text-xs font-bold text-amber-300">DEMO SCRIPT 2</span>
-                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded bg-amber-950 text-amber-300 border border-amber-800">
+                <span className="font-mono text-xs font-bold text-command-warning">DEMO SCRIPT 2</span>
+                <span className="text-[10px] font-mono px-1.5 py-0.5 rounded-[1px] bg-command-warning-bg text-command-warning border border-command-warning-border">
                   COMPOUND DISRUPTION
                 </span>
               </div>
-              <h4 className="text-sm font-semibold text-white">Runway Closure + Aircraft AOG</h4>
-              <p className="text-xs text-slate-300 leading-relaxed">
-                Emergency runway cratering at <code className="text-amber-300">BASE-B</code> combined with airframe <code className="text-red-400">AC-07</code> hydraulic failure. The engine diverts active sorties to Sector Alpha and swaps available airframes.
+              <h4 className="text-sm font-semibold text-command-heading">Runway Closure + Aircraft AOG</h4>
+              <p className="text-xs text-command-text leading-relaxed font-sans">
+                Emergency runway cratering at <code className="text-command-warning">BASE-B</code> combined with airframe <code className="text-command-critical">AC-07</code> hydraulic failure. The engine diverts active sorties to Sector Alpha and swaps available airframes.
               </p>
               <Button
                 variant="primary"
@@ -836,18 +836,18 @@ export const ScenarioControlPanel: React.FC = () => {
             </div>
 
             {/* Custom JSON Script Replayer */}
-            <div className="pt-3 border-t border-ops-border/60">
+            <div className="pt-3 border-t border-command-border">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-mono uppercase tracking-wider text-ops-text-muted">
+                <span className="text-xs font-mono uppercase tracking-wider text-command-text-muted">
                   Custom JSON Script Replayer
                 </span>
-                <span className="text-[10px] font-mono text-slate-400">Timed Event Array</span>
+                <span className="text-[10px] font-mono text-command-text-muted">Timed Event Array</span>
               </div>
               <textarea
                 rows={6}
                 value={customScriptJson}
                 onChange={(e) => setCustomScriptJson(e.target.value)}
-                className="w-full bg-ops-surface-base border border-ops-border rounded p-2.5 font-mono text-[11px] text-cyan-300 focus:outline-none focus:border-cyan-400"
+                className="w-full bg-command-bg border border-command-border rounded-[1px] p-2.5 font-mono text-[11px] text-command-primary focus:outline-none focus:border-command-primary"
               />
               <Button
                 variant="secondary"
@@ -867,13 +867,13 @@ export const ScenarioControlPanel: React.FC = () => {
         {activeTab === 'history' && (
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <span className="text-xs font-mono uppercase tracking-wider text-ops-text-muted">
+              <span className="text-xs font-mono uppercase tracking-wider text-command-text-muted">
                 Audit Timeline ({events.length} Events Logged)
               </span>
             </div>
 
             {events.length === 0 ? (
-              <div className="text-center py-8 text-ops-text-muted text-xs font-mono">
+              <div className="text-center py-8 text-command-text-muted text-xs font-mono">
                 No events injected in current operational session.
               </div>
             ) : (
@@ -881,23 +881,23 @@ export const ScenarioControlPanel: React.FC = () => {
                 {events.map((ev) => (
                   <div
                     key={ev.id}
-                    className="p-3 rounded bg-ops-surface-panel/70 border border-ops-border text-xs font-mono space-y-1"
+                    className="p-3 rounded-[1px] bg-command-panel border border-command-border text-xs font-mono space-y-1"
                   >
                     <div className="flex items-center justify-between">
-                      <span className="font-bold text-cyan-300">{ev.id}</span>
-                      <span className="text-ops-text-muted text-[10px]">{ev.timestamp.slice(11, 19)}Z</span>
+                      <span className="font-bold text-command-primary">{ev.id}</span>
+                      <span className="text-command-text-muted text-[10px]">{ev.timestamp.slice(11, 19)}Z</span>
                     </div>
-                    <div className="flex items-center gap-1.5 font-semibold text-slate-200">
-                      <span className="px-1.5 py-0.5 rounded bg-slate-800 text-[10px] uppercase text-cyan-400 border border-slate-700">
+                    <div className="flex items-center gap-1.5 font-semibold text-command-heading">
+                      <span className="px-1.5 py-0.5 rounded-[1px] bg-command-raised text-[10px] uppercase text-command-primary border border-command-border">
                         {ev.type}
                       </span>
                     </div>
-                    <p className="text-slate-300 font-sans text-xs pt-1">
+                    <p className="text-command-text font-sans text-xs pt-1">
                       {ev.description || JSON.stringify(ev.payload)}
                     </p>
-                    <div className="flex items-center justify-between pt-1 text-[10px] text-ops-text-muted border-t border-ops-border/40 mt-1">
+                    <div className="flex items-center justify-between pt-1 text-[10px] text-command-text-muted border-t border-command-border/40 mt-1">
                       <span>Operator: {ev.operator || 'COMMANDER_OPS'}</span>
-                      <span className="flex items-center gap-1 text-emerald-400">
+                      <span className="flex items-center gap-1 text-command-nominal">
                         <CheckCircle2 className="w-3 h-3" />
                         <span>Committed</span>
                       </span>
@@ -911,15 +911,15 @@ export const ScenarioControlPanel: React.FC = () => {
       </div>
 
       {/* Footer Info Strip */}
-      <div className="p-3 bg-ops-surface-panel/90 border-t border-ops-border text-[11px] font-mono text-ops-text-muted flex items-center justify-between">
+      <div className="p-3 bg-command-panel border-t border-command-border text-[11px] font-mono text-command-text-muted flex items-center justify-between">
         <span className="flex items-center gap-1">
-          <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+          <AlertTriangle className="w-3.5 h-3.5 text-command-warning" />
           <span>Core Principle 1: Decision Support, Not Autonomy</span>
         </span>
         <button
           type="button"
           onClick={() => toggleScenarioControl(false)}
-          className="text-cyan-400 hover:underline"
+          className="text-command-primary hover:underline"
         >
           Close
         </button>

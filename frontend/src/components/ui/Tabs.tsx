@@ -35,7 +35,7 @@ export const Tabs: React.FC<TabsProps> = ({
     return (
       <div
         className={cn(
-          'inline-flex p-1 bg-command-bg border border-command-border rounded-md select-none',
+          'inline-flex p-0.5 bg-command-bg border border-command-border rounded-[2px] select-none',
           className,
         )}
         role="tablist"
@@ -50,11 +50,11 @@ export const Tabs: React.FC<TabsProps> = ({
               disabled={tab.disabled}
               onClick={() => onChange(tab.id)}
               className={cn(
-                'inline-flex items-center justify-center font-medium uppercase tracking-wider rounded transition-all duration-150',
+                'inline-flex items-center justify-center font-mono font-medium uppercase tracking-wider rounded-[1px] transition-none border',
                 sizeClasses[size],
                 isActive
-                  ? 'bg-command-raised text-command-primary shadow-sm font-semibold'
-                  : 'text-command-muted hover:text-command-text hover:bg-command-panel/40',
+                  ? 'bg-command-raised border-command-primary text-command-primary font-semibold'
+                  : 'border-transparent text-command-muted hover:text-command-text hover:bg-command-panel/40',
                 tab.disabled && 'opacity-40 cursor-not-allowed',
               )}
             >
@@ -63,10 +63,10 @@ export const Tabs: React.FC<TabsProps> = ({
               {tab.badge !== undefined && (
                 <span
                   className={cn(
-                    'ml-1 text-[10px] px-1.5 py-0.2 rounded-full font-mono',
+                    'ml-1 text-[9px] px-1 py-0.2 rounded-[1px] font-mono border',
                     isActive
-                      ? 'bg-command-primary/20 text-command-primary'
-                      : 'bg-command-raised text-command-muted',
+                      ? 'bg-command-primary/10 border-command-primary/30 text-command-primary'
+                      : 'bg-command-panel border-command-border text-command-muted',
                   )}
                 >
                   {tab.badge}
@@ -82,7 +82,7 @@ export const Tabs: React.FC<TabsProps> = ({
   return (
     <div
       className={cn(
-        'flex items-center border-b border-command-border/80 select-none overflow-x-auto',
+        'flex items-center border-b border-command-border select-none overflow-x-auto',
         className,
       )}
       role="tablist"
@@ -97,10 +97,10 @@ export const Tabs: React.FC<TabsProps> = ({
             disabled={tab.disabled}
             onClick={() => onChange(tab.id)}
             className={cn(
-              'inline-flex items-center justify-center font-semibold uppercase tracking-wider transition-colors duration-150 border-b-2 -mb-[2px] whitespace-nowrap focus-visible:outline-none focus-visible:text-command-primary',
+              'inline-flex items-center justify-center font-mono font-semibold uppercase tracking-wider transition-none border-b-2 -mb-[2px] whitespace-nowrap focus-visible:outline-none focus-visible:text-command-primary',
               sizeClasses[size],
               isActive
-                ? 'border-command-primary text-command-primary'
+                ? 'border-command-primary text-command-primary bg-command-raised/30'
                 : 'border-transparent text-command-muted hover:text-command-text hover:border-command-border-strong',
               tab.disabled && 'opacity-40 cursor-not-allowed pointer-events-none',
             )}
@@ -110,10 +110,10 @@ export const Tabs: React.FC<TabsProps> = ({
             {tab.badge !== undefined && (
               <span
                 className={cn(
-                  'ml-1.5 text-[10px] px-1.5 py-0.5 rounded font-mono',
+                  'ml-1.5 text-[9px] px-1 py-0.2 rounded-[1px] font-mono border',
                   isActive
-                    ? 'bg-command-primary/20 text-command-primary'
-                    : 'bg-command-raised text-command-muted',
+                    ? 'bg-command-primary/10 border-command-primary/30 text-command-primary'
+                    : 'bg-command-raised border-command-border text-command-muted',
                 )}
               >
                 {tab.badge}

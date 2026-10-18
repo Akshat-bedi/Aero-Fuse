@@ -55,14 +55,14 @@ export const Tooltip: React.FC<TooltipProps> = ({
           id="tactical-tooltip"
           role="tooltip"
           className={cn(
-            'absolute z-50 px-2.5 py-1 text-[11px] font-sans font-medium text-command-heading bg-command-raised border border-command-border-strong rounded shadow-lg whitespace-nowrap pointer-events-none select-none animate-in fade-in zoom-in-95 duration-100 flex items-center gap-1.5',
+            'absolute z-50 px-2 py-0.5 text-[10px] font-mono font-medium text-command-heading bg-command-raised border border-command-border rounded-[1px] whitespace-nowrap pointer-events-none select-none flex items-center gap-1.5',
             positionStyles[position],
             className,
           )}
         >
           <span>{content}</span>
           {shortcut && (
-            <kbd className="px-1 py-0.2 bg-command-bg/90 border border-command-border text-command-primary text-[10px] font-mono rounded">
+            <kbd className="px-1 py-0.2 bg-command-bg border border-command-border text-command-primary text-[9px] font-mono rounded-[1px]">
               {shortcut}
             </kbd>
           )}

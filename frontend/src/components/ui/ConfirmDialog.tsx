@@ -82,7 +82,7 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
         {riskWarning && (
           <div
             className={cn(
-              'p-2.5 rounded border text-xs leading-normal flex items-start gap-2',
+              'p-2 rounded-[1px] border text-xs leading-normal flex items-start gap-2 font-mono',
               severity === 'critical' &&
                 'bg-command-critical-bg text-red-200 border-command-critical-border',
               severity === 'warning' &&
@@ -91,13 +91,13 @@ export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
                 'bg-command-info-bg text-blue-200 border-command-info-border',
             )}
           >
-            <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
             <span className="font-medium">{riskWarning}</span>
           </div>
         )}
 
-        <div className="text-[11px] text-command-muted font-mono uppercase bg-command-bg/50 px-2 py-1 rounded border border-command-border/40">
-          COMMANDER DIRECTIVE REQUIRED · LOGGED IN AUDIT TRAIL
+        <div className="text-[10px] text-command-muted font-mono uppercase bg-command-bg px-2 py-1 rounded-[1px] border border-command-border">
+          COMMANDER DIRECTIVE REQUIRED // LOGGED IN AUDIT TRAIL
         </div>
       </div>
     </Modal>

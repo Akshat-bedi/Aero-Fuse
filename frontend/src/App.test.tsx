@@ -13,7 +13,7 @@ describe('App Shell & Navigation', () => {
     expect(screen.getAllByText(/DSS/i).length).toBeGreaterThan(0);
 
     // Simulated data classification banner
-    expect(screen.getByText(/EXERCISE \/ SIMULATED DATA/i)).toBeInTheDocument();
+    expect(screen.getByText(/EXERCISE \/\/ SIMULATED DATA/i)).toBeInTheDocument();
 
     // Live clock indicators
     expect(screen.getByText('ZULU')).toBeInTheDocument();

@@ -69,11 +69,11 @@ export const ReadinessStrip: React.FC<ReadinessStripProps> = ({
   return (
     <div
       data-testid="readiness-strip"
-      className={`flex flex-wrap items-center gap-2 sm:gap-3 px-3 py-1.5 bg-command-panel/90 backdrop-blur-md rounded border border-command-border/80 shadow-md font-mono text-xs ${className}`}
+      className={`flex flex-wrap items-center gap-2 sm:gap-3 px-2.5 py-1 bg-command-panel rounded-[1px] border border-command-border font-mono text-xs tabular-nums ${className}`}
     >
       {/* 1. Fleet Serviceable Readiness */}
-      <div className="flex items-center gap-1.5 pr-2.5 sm:border-r border-command-border/60">
-        <Plane className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
+      <div className="flex items-center gap-1.5 pr-2 sm:border-r border-command-border">
+        <Plane className="w-3.5 h-3.5 text-command-primary flex-shrink-0" />
         <span className="text-[10px] text-command-muted uppercase">FLEET:</span>
         <span
           className={`font-bold ${
@@ -94,7 +94,7 @@ export const ReadinessStrip: React.FC<ReadinessStripProps> = ({
       </div>
 
       {/* 2. Crew Availability & Duty Limit Alerts */}
-      <div className="flex items-center gap-1.5 pr-2.5 sm:border-r border-command-border/60">
+      <div className="flex items-center gap-1.5 pr-2 sm:border-r border-command-border">
         <Users className="w-3.5 h-3.5 text-command-primary flex-shrink-0" />
         <span className="text-[10px] text-command-muted uppercase">CREW:</span>
         <span
@@ -109,7 +109,7 @@ export const ReadinessStrip: React.FC<ReadinessStripProps> = ({
         {crewMetrics.nearLimit > 0 ? (
           <span className="flex items-center gap-0.5 text-[10px] text-command-warning font-semibold">
             <AlertTriangle className="w-3 h-3 text-command-warning" />
-            <span>{crewMetrics.nearLimit} NEAR LIMIT</span>
+            <span>{crewMetrics.nearLimit} LIMIT</span>
           </span>
         ) : (
           !isCompact && (
@@ -121,8 +121,8 @@ export const ReadinessStrip: React.FC<ReadinessStripProps> = ({
       </div>
 
       {/* 3. Munitions Logistics & Stock */}
-      <div className="flex items-center gap-1.5 pr-2.5 sm:border-r border-command-border/60">
-        <ShieldCheck className="w-3.5 h-3.5 text-command-secondary flex-shrink-0" />
+      <div className="flex items-center gap-1.5 pr-2 sm:border-r border-command-border">
+        <ShieldCheck className="w-3.5 h-3.5 text-command-primary flex-shrink-0" />
         <span className="text-[10px] text-command-muted uppercase">MUNITIONS:</span>
         <span
           className={`font-bold ${
@@ -133,7 +133,7 @@ export const ReadinessStrip: React.FC<ReadinessStripProps> = ({
               : 'text-command-nominal'
           }`}
         >
-          {weaponMetrics.totalQty.toLocaleString()} UNITS
+          {weaponMetrics.totalQty.toLocaleString()} U
         </span>
         {weaponMetrics.lowStockCount > 0 && !isCompact && (
           <span className="text-[10px] text-command-warning font-semibold hidden lg:inline">
@@ -150,7 +150,7 @@ export const ReadinessStrip: React.FC<ReadinessStripProps> = ({
               ? 'text-command-critical'
               : weatherMetrics.overallSeverity === 'caution'
               ? 'text-command-warning'
-              : 'text-emerald-400'
+              : 'text-command-nominal'
           }`}
         />
         <span className="text-[10px] text-command-muted uppercase">METAR:</span>
@@ -164,9 +164,9 @@ export const ReadinessStrip: React.FC<ReadinessStripProps> = ({
           }`}
         >
           {weatherMetrics.severeCount > 0
-            ? `${weatherMetrics.severeCount} SEVERE`
+            ? `${weatherMetrics.severeCount} SVR`
             : weatherMetrics.cautionCount > 0
-            ? `${weatherMetrics.cautionCount} CAUTION`
+            ? `${weatherMetrics.cautionCount} CAUT`
             : 'ALL NOMINAL'}
         </span>
         {!isCompact && (

@@ -157,8 +157,8 @@ export const ComponentGalleryPage: React.FC = () => {
             <h1 className="text-xl font-bold uppercase tracking-wider text-command-heading">
               UI Design System & Component Gallery
             </h1>
-            <span className="px-2 py-0.5 rounded font-mono text-[10px] bg-cyan-950 border border-cyan-500 text-cyan-300 font-bold">
-              STAGE 1
+            <span className="px-2 py-0.5 rounded-[1px] font-mono text-[10px] bg-command-raised border border-command-border text-command-primary font-bold">
+              C2 SYSTEM
             </span>
           </div>
           <p className="text-xs text-command-muted font-sans mt-0.5">
@@ -667,7 +667,7 @@ export const ComponentGalleryPage: React.FC = () => {
             unit="sec"
             status="info"
             trend={{ direction: 'down', value: '-0.4s optimization', isPositive: true }}
-            subtitle="Decision-support AI solver"
+            subtitle="Constraint satisfaction solver"
             icon={<Zap className="w-4 h-4" />}
           />
 

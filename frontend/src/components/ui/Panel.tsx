@@ -47,14 +47,14 @@ export const Panel: React.FC<PanelProps> = ({
 
   const variantStyles = {
     panel: 'bg-command-panel border-command-border',
-    raised: 'bg-command-raised border-command-border shadow-panel',
+    raised: 'bg-command-raised border-command-border',
     ghost: 'bg-transparent border-command-border-subtle',
   };
 
   return (
     <section
       className={cn(
-        'rounded-md border flex flex-col transition-all duration-150',
+        'rounded-[2px] border flex flex-col',
         variantStyles[variant],
         className,
       )}
@@ -62,7 +62,7 @@ export const Panel: React.FC<PanelProps> = ({
       {/* Panel Header */}
       <div
         className={cn(
-          'flex items-center justify-between px-3.5 py-2.5 border-b border-command-border/60 select-none min-h-[42px]',
+          'flex items-center justify-between px-2.5 py-1.5 border-b border-command-border select-none min-h-[32px] bg-command-panel/80',
           collapsible && 'cursor-pointer hover:bg-command-raised-hover/40',
           headerClassName,
         )}
@@ -77,26 +77,26 @@ export const Panel: React.FC<PanelProps> = ({
         }}
         aria-expanded={collapsible ? !isCollapsed : undefined}
       >
-        <div className="flex items-center gap-2.5 min-w-0">
+        <div className="flex items-center gap-2 min-w-0">
           {collapsible && (
-            <span className="text-command-muted hover:text-command-primary transition-colors">
+            <span className="text-command-muted hover:text-command-primary">
               {isCollapsed ? (
-                <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                <ChevronRight className="w-3.5 h-3.5" aria-hidden="true" />
               ) : (
-                <ChevronDown className="w-4 h-4" aria-hidden="true" />
+                <ChevronDown className="w-3.5 h-3.5" aria-hidden="true" />
               )}
             </span>
           )}
 
           <div className="flex flex-col min-w-0">
             <div className="flex items-center gap-2">
-              <h3 className="text-xs font-semibold uppercase tracking-wider text-command-heading truncate">
+              <h3 className="text-xs font-mono font-semibold uppercase tracking-wider text-command-heading truncate">
                 {title}
               </h3>
               {badge}
             </div>
             {subtitle && (
-              <span className="text-[10px] text-command-muted truncate">
+              <span className="text-[9px] font-mono text-command-muted truncate tracking-tight">
                 {subtitle}
               </span>
             )}
@@ -118,7 +118,7 @@ export const Panel: React.FC<PanelProps> = ({
         <div
           className={cn(
             'flex-1 min-h-0 overflow-auto',
-            !noPadding && 'p-3.5',
+            !noPadding && 'p-2.5',
           )}
         >
           {children}
