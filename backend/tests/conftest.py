@@ -7,7 +7,7 @@ from pathlib import Path
 from typing import Any, cast
 
 import pytest
-from app.config import get_settings
+from app.config import Settings, get_settings
 from app.domain import WireSnapshot
 from app.main import create_app
 from app.runtime import SimRuntime
@@ -18,6 +18,13 @@ _LOCAL_HOSTS = {"127.0.0.1", "::1", "localhost", "0.0.0.0", "::", None}
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 SEED_FILE = REPO_ROOT / "shared" / "seed" / "world.json"
+
+
+def test_settings() -> Settings:
+    """Environment settings with retask/demo delays removed for fast tests."""
+    return get_settings().model_copy(
+        update={"retask_min_stage_ms": 0, "demo_step_delay_s": 0.0}
+    )
 
 
 @pytest.fixture(scope="session")
@@ -36,13 +43,13 @@ def seed_snapshot(seed_raw: dict[str, Any]) -> WireSnapshot:
 @pytest.fixture()
 def runtime() -> SimRuntime:
     """A SimRuntime without the wall-clock loops (deterministic fast-forward)."""
-    return SimRuntime(get_settings())
+    return SimRuntime(test_settings())
 
 
 @pytest.fixture()
 def app_client() -> Iterator[tuple[TestClient, SimRuntime]]:
     """A TestClient whose lifespan builds a runtime with the sim loop stopped."""
-    application: FastAPI = create_app(autostart_sim=False)
+    application: FastAPI = create_app(autostart_sim=False, settings=test_settings())
     with TestClient(application) as client:
         yield client, cast(SimRuntime, application.state.runtime)
 

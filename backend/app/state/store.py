@@ -162,6 +162,17 @@ class StateStore:
             clone = StateStore(snapshot)
             return clone
 
+    def copy(self) -> StateStore:
+        """Deep copy of the canonical state for pure plan evaluation.
+
+        The embedded ``sim`` block of the copy is irrelevant: retask code never
+        reads it. Subscribers and locks are not shared with the copy.
+        """
+        with self._lock:
+            template = SimState(time="1970-01-01T00:00:00.000Z", speed=1, paused=True)
+            snapshot = self.wire_snapshot(template).model_copy(deep=True)
+            return StateStore(snapshot)
+
     # -------------------------------------------------------------- read side
 
     def wire_snapshot(self, sim: SimState) -> WireSnapshot:
@@ -215,6 +226,11 @@ class StateStore:
         with self._lock:
             known = {event.id: event for event in self.active_events}
             return _next_id("EV-", known, width=4)
+
+    def next_recommendation_id(self) -> str:
+        """Next free ``REC-nnnn`` id (alternative ids share the primary prefix)."""
+        with self._lock:
+            return _next_id("REC-", self.recommendations, width=4)
 
     # ------------------------------------------------------------- write side
 

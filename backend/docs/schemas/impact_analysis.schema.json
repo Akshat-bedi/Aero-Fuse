@@ -45,6 +45,18 @@
       "title": "Impactedmissionids",
       "type": "array"
     },
+    "mostUrgent": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Mosturgent"
+    },
     "reasons": {
       "items": {
         "type": "string"

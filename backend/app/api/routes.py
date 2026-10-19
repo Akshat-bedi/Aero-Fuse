@@ -1,8 +1,9 @@
-"""Operational REST endpoints implemented in B2.
+"""Operational REST endpoints implemented in B2 and extended in B6a.
 
-Endpoints: snapshot, event injection, sim control, audit listing and the demo
-script catalogue. Recommendations, scenarios, predictions and fusion status
-belong to later stages (B4-B8) and are intentionally absent.
+Endpoints: snapshot, event injection (with async retasking), sim control,
+recommendations, eligible resources, the demo script catalogue/runner and audit
+listing. Decisions, scenarios, predictions and fusion status belong to later
+stages (B4-B8) and are intentionally absent.
 """
 
 from __future__ import annotations
@@ -13,7 +14,16 @@ import orjson
 from fastapi import APIRouter, HTTPException, Request, Response
 from pydantic import model_validator
 
-from app.domain import AuditEntry, OpsEventRequest, WireModel, dump_wire
+from app.domain import (
+    AuditEntry,
+    EligibleResources,
+    OpsEventRequest,
+    Recommendation,
+    WireModel,
+    dump_wire,
+)
+from app.retask import eligibility
+from app.retask.demos import DEMO_SCRIPTS, DemoBusyError, UnknownDemoError
 from app.runtime import SimRuntime
 from app.state.store import UnknownEntityError
 
@@ -87,7 +97,58 @@ async def inject_event(body: OpsEventRequest, request: Request) -> Response:
             status_code=404,
             detail=f"unknown {exc.entity_type}: {exc.entity_id}",
         ) from exc
+    runtime.schedule_retask(event)
     return _json(dump_wire(event, exclude_none=True), status_code=201)
+
+
+@router.get(
+    "/recommendations",
+    response_model=list[Recommendation],
+    response_model_exclude_none=True,
+)
+async def list_recommendations(request: Request, status: str | None = None) -> list[Recommendation]:
+    """Pending/decided recommendations, optionally filtered by status."""
+    runtime = _runtime(request)
+    recommendations = list(runtime.store.recommendations.values())
+    if status is not None:
+        recommendations = [
+            recommendation
+            for recommendation in recommendations
+            if recommendation.status.value == status
+        ]
+    return recommendations
+
+
+@router.get(
+    "/recommendations/{recommendation_id}",
+    response_model=Recommendation,
+    response_model_exclude_none=True,
+)
+async def get_recommendation(
+    recommendation_id: str, request: Request
+) -> Recommendation:
+    """One recommendation by id (404 when unknown)."""
+    recommendation = _runtime(request).store.recommendations.get(recommendation_id)
+    if recommendation is None:
+        raise HTTPException(status_code=404, detail=f"unknown recommendation: {recommendation_id}")
+    return recommendation
+
+
+@router.get(
+    "/missions/{mission_id}/eligible-resources",
+    response_model=EligibleResources,
+    response_model_exclude_none=True,
+)
+async def get_eligible_resources(mission_id: str, request: Request) -> EligibleResources:
+    """Feasible aircraft/crew for the Modify dropdowns."""
+    runtime = _runtime(request)
+    mission = runtime.store.missions.get(mission_id)
+    if mission is None:
+        raise HTTPException(status_code=404, detail=f"unknown mission: {mission_id}")
+    return EligibleResources(
+        aircraft=eligibility.eligible_aircraft(runtime.store, mission),
+        crew=eligibility.eligible_crew(runtime.store, mission),
+    )
 
 
 @router.get("/audit", response_model=list[AuditEntry])
@@ -99,5 +160,24 @@ async def get_audit(request: Request) -> list[AuditEntry]:
 
 @router.get("/demo-scripts")
 async def get_demo_scripts() -> list[dict[str, str]]:
-    """Scripted event sequences land in B6a; the catalogue is empty until then."""
-    return []
+    """Catalogue of scripted demo event sequences."""
+    return list(DEMO_SCRIPTS)
+
+
+@router.post("/demo-scripts/{name}/run")
+async def run_demo_script(
+    name: str, request: Request, reset: bool = False
+) -> dict[str, Any]:
+    """Start a demo script in the background (optionally from a clean seed)."""
+    runtime = _runtime(request)
+    if reset:
+        runtime.control("reset", None)
+    try:
+        return runtime.demos.start(name)
+    except UnknownDemoError as exc:
+        raise HTTPException(status_code=404, detail=f"unknown demo script: {name}") from exc
+    except DemoBusyError as exc:
+        raise HTTPException(
+            status_code=409,
+            detail=f"demo script already running: {exc}",
+        ) from exc

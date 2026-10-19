@@ -28,6 +28,8 @@ from app.domain import (
     WireSnapshot,
     dump_wire,
 )
+from app.retask.demos import DemoRunner
+from app.retask.pipeline import RetaskPipeline
 from app.sim.clock import SimClock
 from app.sim.engine import SimEngine
 from app.state.seed import load_seed
@@ -48,6 +50,8 @@ class SimRuntime:
         )
         self.engine = SimEngine(self.store, self.clock)
         self.ws = ConnectionManager(max_queue=settings.ws_queue_size)
+        self.retask = RetaskPipeline(self)
+        self.demos = DemoRunner(self)
         self._unsubscribe = self.store.subscribe(self._on_store_change)
         self._tasks: list[asyncio.Task[None]] = []
 
@@ -60,16 +64,20 @@ class SimRuntime:
         event notifications can be driven from another thread deterministically.
         """
         self.ws.bind_loop(loop)
+        self.retask.start(loop)
+        self.demos.bind(loop)
 
     def start(self, loop: asyncio.AbstractEventLoop) -> None:
         """Start the async tick and heartbeat loops (called from lifespan)."""
-        self.ws.bind_loop(loop)
+        self.bind(loop)
         self._tasks = [
             loop.create_task(self._tick_loop()),
             loop.create_task(self._heartbeat_loop()),
         ]
 
     async def stop(self) -> None:
+        await self.demos.stop()
+        await self.retask.stop()
         for task in self._tasks:
             task.cancel()
         for task in self._tasks:
@@ -140,6 +148,8 @@ class SimRuntime:
         elif action == "speed" and speed is not None:
             self.clock.set_speed(speed)
         elif action == "reset":
+            self.demos.reset()
+            self.retask.reset()
             snapshot = load_seed(self.settings.seed_path)
             self.store.reset(snapshot)
             self.clock.reset(snapshot.sim.time)
@@ -160,8 +170,10 @@ class SimRuntime:
         """Register an event with a sim-clock timestamp and apply its effect.
 
         The store notification (raised inside ``apply_event``) broadcasts
-        ``EVENT_INJECTED`` followed by ``ENTITY_UPDATE``. Raises
-        ``UnknownEntityError`` for unknown referenced ids.
+        ``EVENT_INJECTED`` followed by ``ENTITY_UPDATE``. Callers schedule the
+        retasking pipeline separately via ``schedule_retask`` so the HTTP
+        response is not blocked by analysis. Raises ``UnknownEntityError`` for
+        unknown referenced ids.
         """
         event = OpsEvent(
             id=self.store.next_event_id(),
@@ -174,6 +186,10 @@ class SimRuntime:
         )
         self.store.apply_event(event)
         return event
+
+    def schedule_retask(self, event: OpsEvent) -> None:
+        """Queue the event for impact analysis and recommendation generation."""
+        self.retask.schedule(event)
 
     def _on_store_change(self, change: StateChange) -> None:
         if change.kind == "reset":

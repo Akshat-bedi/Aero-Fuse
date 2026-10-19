@@ -40,9 +40,13 @@ def test_ticks_do_not_bump_state_version(app_client: tuple[TestClient, SimRuntim
     assert runtime.store.version == version_before
 
 
-def test_audit_and_demo_scripts_are_empty_stubs(
+def test_audit_is_empty_and_demo_scripts_are_catalogued(
     app_client: tuple[TestClient, SimRuntime],
 ) -> None:
     client, _runtime = app_client
     assert client.get("/api/audit").json() == []
-    assert client.get("/api/demo-scripts").json() == []
+    scripts = client.get("/api/demo-scripts").json()
+    assert [script["name"] for script in scripts] == [
+        "sam-route-b",
+        "runway-closure-aog",
+    ]

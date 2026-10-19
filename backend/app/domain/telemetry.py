@@ -43,6 +43,7 @@ class ImpactAnalysis(WireModel):
     event_type: EventType | None = None
     impacted_mission_ids: list[str] = Field(default_factory=list)
     reasons: list[str] = Field(default_factory=list)
+    most_urgent: str | None = None
     time_to_decision_min: float = Field(ge=0)
 
 
