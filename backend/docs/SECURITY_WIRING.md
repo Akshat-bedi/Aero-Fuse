@@ -131,13 +131,17 @@ if outcome.apply_plan:
 | `ApprovalOutcome.denial` | Status |
 | :--- | :--- |
 | `NOT_COMMANDER` | `403` |
-| `STEP_UP_REQUIRED` | `427` |
+| `STEP_UP_REQUIRED` | `428` + RFC 7807 body |
 | `SEPARATION_OF_DUTIES` | `403` |
 | `ALREADY_DECIDED` | `409` |
 | `REASON_REQUIRED` | `422` |
 | `NOTHING_TO_REVOKE` | `409` |
 
-An accepted duplicate approval returns `None` and must not re-apply the plan.
+A step-up denial raises `StepUpRequiredError`; `install_security_context`
+registers the handler that renders
+`{"type": "https://airops.dss/errors/step-up-required", "title": "Precondition Required", "status": 428, "detail": "...", "instance": "..."}`.
+Clients may branch on the `428` status or the body `type`. An accepted duplicate
+approval returns `None` and must not re-apply the plan.
 
 ## 5. Operator resolution
 
@@ -292,14 +296,17 @@ The frontend currently has no auth flow. These are the exact touch points:
      storage; support logout.
    - Explain that the demo accounts are fictional.
 3. **Token on WebSocket**
-   - `frontend/src/services/wsClient.ts` must add the token to the URL or send
-     the `AUTH` first message before expecting `SNAPSHOT`.
+   - `frontend/src/services/wsClient.ts` must use the `bearer.<jwt>` subprotocol
+     or send the `AUTH` first message before expecting `SNAPSHOT` (not the query
+     string).
    - Reconnect with backoff must re-authenticate; a 4401 close must not loop.
 4. **Step-up dialog**
-   - When a decision returns `427`, ask for the demo PIN and call
+   - When a decision returns `428` (body `type`
+     `https://airops.dss/errors/step-up-required`), ask for the demo PIN and call
      `POST /api/auth/step-up`, then retry the decision once.
    - A wrong PIN from `/auth/step-up` is a `401`; keep the dialog open.
-   - Record `427` as the stable step-up signal in `docs/API_CONTRACT.md`.
+   - Record `428` + the body `type` as the stable step-up signal in
+     `docs/API_CONTRACT.md`.
 5. **Two-person approvals**
    - Display `approvalsRequired` and the `approvals` list.
    - After the first commander approval, show "awaiting second approver" rather
@@ -325,11 +332,12 @@ The frontend currently has no auth flow. These are the exact touch points:
 Raise `contract-change` issues for:
 
 - auth endpoints and `TokenResponse` / `UserView` shapes;
-- `401` / `403` / `409` / `422` / `423` / `427` error semantics and
+- `401` / `403` / `409` / `422` / `423` / `428` error semantics and
   `WWW-Authenticate` / `Retry-After` headers;
 - WebSocket `AUTH` first message, query token and subprotocol;
 - optional `Recommendation.approvalsRequired` and `Recommendation.approvals`;
-- step-up-required error code/type;
+- step-up-required error code (`428`) and RFC 7807 body `type`
+  (`https://airops.dss/errors/step-up-required`);
 - security audit action strings;
 - `/api/auth/users` role-management endpoint.
 

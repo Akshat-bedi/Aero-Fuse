@@ -81,11 +81,14 @@ Event injection is additionally restricted by `EventType` through
 | `409` | The recommendation was already decided, or there is no approval to revoke. |
 | `422` | Malformed body, unknown decision/sim action, or a missing rejection reason. |
 | `423` | Account temporarily locked (`Retry-After` seconds). |
-| `427` | Step-up PIN required for this decision (`STEP_UP_REQUIRED_STATUS`). |
+| `428` | Step-up PIN required for this decision. RFC 7807 body `type` is `https://airops.dss/errors/step-up-required`. |
 
 Decision handlers map `ApprovalOutcome` denials with
 `approval_denial_exception` from `deps.py`; it returns `None` for an accepted
-attempt and never applies the plan by itself.
+attempt and never applies the plan by itself. Step-up denials use
+`StepUpRequiredError`; `install_security_context` registers the handler that
+renders the RFC 7807 body (`type`, `title`, `status`, `detail`, `instance`), so
+clients can branch on the `428` status or the body `type`.
 
 Example:
 
