@@ -20,6 +20,7 @@ from typing import Annotated
 from fastapi import APIRouter, FastAPI, Header, HTTPException, Request, status
 
 from app.domain.enums import EventType
+from app.security.approvals import ApprovalOutcome, DenialReason
 from app.security.audit_events import (
     AuditSink,
     NullAuditSink,
@@ -297,6 +298,44 @@ def enforce_event_injection(
     raise HTTPException(
         status_code=status.HTTP_403_FORBIDDEN,
         detail="You may not inject this event type.",
+    )
+
+
+STEP_UP_REQUIRED_STATUS = 427
+"""Non-standard status the frontend contract uses for "step-up PIN required"."""
+
+_APPROVAL_DENIAL_STATUS: dict[DenialReason, int] = {
+    DenialReason.NOT_COMMANDER: status.HTTP_403_FORBIDDEN,
+    DenialReason.STEP_UP_REQUIRED: STEP_UP_REQUIRED_STATUS,
+    DenialReason.SEPARATION_OF_DUTIES: status.HTTP_403_FORBIDDEN,
+    DenialReason.ALREADY_DECIDED: status.HTTP_409_CONFLICT,
+    DenialReason.REASON_REQUIRED: status.HTTP_422_UNPROCESSABLE_CONTENT,
+    DenialReason.NOTHING_TO_REVOKE: status.HTTP_409_CONFLICT,
+}
+
+_APPROVAL_DENIAL_DETAIL: dict[DenialReason, str] = {
+    DenialReason.NOT_COMMANDER: "You do not have permission to perform this action.",
+    DenialReason.STEP_UP_REQUIRED: "Step-up PIN required.",
+    DenialReason.SEPARATION_OF_DUTIES: "You may not decide this recommendation.",
+    DenialReason.ALREADY_DECIDED: "This recommendation has already been decided.",
+    DenialReason.REASON_REQUIRED: "A reason is required to reject a recommendation.",
+    DenialReason.NOTHING_TO_REVOKE: "You have no approval to revoke.",
+}
+
+
+def approval_denial_exception(outcome: ApprovalOutcome) -> HTTPException | None:
+    """Map an approval outcome to the decision-route HTTP error.
+
+    Returns ``None`` when the attempt was accepted (including a duplicate
+    approval that did not apply the plan). The caller must not apply the plan
+    unless ``outcome.apply_plan`` is true.
+    """
+    if outcome.accepted:
+        return None
+    denial = outcome.denial or DenialReason.NOT_COMMANDER
+    return HTTPException(
+        status_code=_APPROVAL_DENIAL_STATUS.get(denial, status.HTTP_403_FORBIDDEN),
+        detail=_APPROVAL_DENIAL_DETAIL.get(denial, "Decision not permitted."),
     )
 
 

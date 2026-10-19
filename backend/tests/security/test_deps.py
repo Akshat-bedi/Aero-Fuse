@@ -6,11 +6,18 @@ from collections.abc import Iterator
 from typing import cast
 
 import pytest
+from app.security.approvals import (
+    ApprovalOutcome,
+    ApprovalState,
+    DenialReason,
+    evaluate_approval,
+)
 from app.security.audit_events import InMemoryAuditSink, SecurityAuditEvent
 from app.security.auth import LoginRequest
 from app.security.deps import (
     SecurityContext,
     Unauthenticated,
+    approval_denial_exception,
     create_auth_router,
     enforce_decision,
     enforce_sim_control,
@@ -21,6 +28,7 @@ from app.security.deps import (
     resolve_operator,
 )
 from app.security.policy import Identity, Permission, Role
+from app.security.settings import SecuritySettings
 from app.security.users import DEMO_PASSWORD
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.testclient import TestClient
@@ -378,6 +386,54 @@ def test_sim_control_permissions_are_action_level(auth_context: SecurityContext)
     with pytest.raises(HTTPException) as unknown:
         enforce_sim_control(auth_context, commander, "explode", path="/x")
     assert unknown.value.status_code == 422
+
+
+def test_approval_denials_map_to_contract_statuses() -> None:
+    assert (
+        approval_denial_exception(
+            ApprovalOutcome(ApprovalState(), True, False, detail="duplicate approval ignored")
+        )
+        is None
+    )
+
+    cases = {
+        DenialReason.NOT_COMMANDER: 403,
+        DenialReason.STEP_UP_REQUIRED: 427,
+        DenialReason.SEPARATION_OF_DUTIES: 403,
+        DenialReason.ALREADY_DECIDED: 409,
+        DenialReason.REASON_REQUIRED: 422,
+        DenialReason.NOTHING_TO_REVOKE: 409,
+    }
+    for denial, expected in cases.items():
+        exception = approval_denial_exception(
+            ApprovalOutcome(ApprovalState(), False, False, denial)
+        )
+        assert exception is not None
+        assert exception.status_code == expected
+
+
+def test_step_up_required_outcome_maps_to_427(
+    auth_context: SecurityContext, auth_settings: SecuritySettings
+) -> None:
+    commander = Identity(
+        user_id="USR-0005",
+        username="commander",
+        role=Role.COMMANDER,
+        display_name="COL. J. MERCER",
+    )
+    outcome = evaluate_approval(
+        ApprovalState(),
+        commander,
+        auth_context.clock(),
+        high_impact=False,
+        trigger_operator=None,
+        settings=auth_settings,
+        require_step_up=True,
+    )
+    assert outcome.denial is DenialReason.STEP_UP_REQUIRED
+    exception = approval_denial_exception(outcome)
+    assert exception is not None
+    assert exception.status_code == 427
 
 
 def _token_from_router(client: TestClient, username: str) -> str:

@@ -72,6 +72,21 @@ Event injection is additionally restricted by `EventType` through
   32 characters. The package reads the same env names as `app/config.py`; a
   test fails if their defaults diverge.
 
+### HTTP status semantics
+
+| Status | Meaning |
+| :--- | :--- |
+| `401` | Missing, malformed, expired or revoked credentials; wrong step-up PIN. |
+| `403` | Authenticated but the role/event type/action is not permitted. |
+| `409` | The recommendation was already decided, or there is no approval to revoke. |
+| `422` | Malformed body, unknown decision/sim action, or a missing rejection reason. |
+| `423` | Account temporarily locked (`Retry-After` seconds). |
+| `427` | Step-up PIN required for this decision (`STEP_UP_REQUIRED_STATUS`). |
+
+Decision handlers map `ApprovalOutcome` denials with
+`approval_denial_exception` from `deps.py`; it returns `None` for an accepted
+attempt and never applies the plan by itself.
+
 Example:
 
 ```powershell
@@ -169,13 +184,15 @@ never placed in event details.
 ## WebSocket
 
 `authenticate_websocket` owns the handshake and accepts the socket on success.
-Do **not** call `accept` again afterward. It supports:
+Do **not** call `accept` again afterward. The frontend contract uses:
 
-- `?token=<jwt>` (simple, but tokens can appear in logs);
-- `Sec-WebSocket-Protocol: bearer.<jwt>`;
-- first message `{"type": "AUTH", "token": "<jwt>"}` (or the token under
+- `Sec-WebSocket-Protocol: bearer.<jwt>` (preferred); or
+- a first message `{"type": "AUTH", "token": "<jwt>"}` (or the token under
   `payload.token`). The server accepts, reads that message, then continues or
   closes with `4401`.
+
+A `?token=<jwt>` query parameter is also accepted for tooling and tests, but it
+is **not part of the frontend contract** because tokens can leak into logs.
 
 No `SNAPSHOT` is sent before the identity is established. Observer and auditor
 may only send `PING`; other client messages close with `4403`.

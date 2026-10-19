@@ -117,6 +117,28 @@ Both raise `403` (and audit `ACCESS_DENIED`) or `422` for an unknown action.
 Only a commander can reach a decision permission; planners cannot reset the
 simulation.
 
+Approval outcomes map to statuses with the same request body:
+
+```python
+outcome = evaluate_approval(...)  # or evaluate_rejection / revoke_approval
+error = approval_denial_exception(outcome)
+if error is not None:
+    raise error
+if outcome.apply_plan:
+    apply_plan(...)
+```
+
+| `ApprovalOutcome.denial` | Status |
+| :--- | :--- |
+| `NOT_COMMANDER` | `403` |
+| `STEP_UP_REQUIRED` | `427` |
+| `SEPARATION_OF_DUTIES` | `403` |
+| `ALREADY_DECIDED` | `409` |
+| `REASON_REQUIRED` | `422` |
+| `NOTHING_TO_REVOKE` | `409` |
+
+An accepted duplicate approval returns `None` and must not re-apply the plan.
+
 ## 5. Operator resolution
 
 Replace every `body.operator` trust point with:
@@ -230,10 +252,13 @@ async def websocket_endpoint(websocket: WebSocket) -> None:
 
 The frontend must supply the token by one of:
 
-1. `ws://host/ws?token=<jwt>` (simplest; tokens can leak into logs),
-2. `Sec-WebSocket-Protocol: bearer.<jwt>` (preferred where supported), or
-3. a first message `{"type": "AUTH", "token": "<jwt>"}` (preferred; the server
-   accepts, authenticates, then starts the stream).
+1. `Sec-WebSocket-Protocol: bearer.<jwt>` (preferred), or
+2. a first message `{"type": "AUTH", "token": "<jwt>"}` (preferred where the
+   subprotocol is awkward for the client); the server accepts, authenticates,
+   then starts the stream.
+
+A `?token=<jwt>` query parameter still works for tooling and tests but is not
+part of the frontend contract (tokens can leak into logs).
 
 Observer and auditor may only send `PING`; any other client message closes with
 4403. No snapshot is sent before authentication.
@@ -271,10 +296,10 @@ The frontend currently has no auth flow. These are the exact touch points:
      the `AUTH` first message before expecting `SNAPSHOT`.
    - Reconnect with backoff must re-authenticate; a 4401 close must not loop.
 4. **Step-up dialog**
-   - When a decision is rejected with step-up required, ask for the demo PIN and
-     call `POST /api/auth/step-up`, then retry the decision once.
-   - The current error shape does not distinguish step-up from other 401s;
-     decide on a stable error code/type with the frontend (contract-change).
+   - When a decision returns `427`, ask for the demo PIN and call
+     `POST /api/auth/step-up`, then retry the decision once.
+   - A wrong PIN from `/auth/step-up` is a `401`; keep the dialog open.
+   - Record `427` as the stable step-up signal in `docs/API_CONTRACT.md`.
 5. **Two-person approvals**
    - Display `approvalsRequired` and the `approvals` list.
    - After the first commander approval, show "awaiting second approver" rather
@@ -300,7 +325,8 @@ The frontend currently has no auth flow. These are the exact touch points:
 Raise `contract-change` issues for:
 
 - auth endpoints and `TokenResponse` / `UserView` shapes;
-- `401` / `403` / `423` error semantics and `WWW-Authenticate` / `Retry-After`;
+- `401` / `403` / `409` / `422` / `423` / `427` error semantics and
+  `WWW-Authenticate` / `Retry-After` headers;
 - WebSocket `AUTH` first message, query token and subprotocol;
 - optional `Recommendation.approvalsRequired` and `Recommendation.approvals`;
 - step-up-required error code/type;
