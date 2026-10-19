@@ -4,10 +4,15 @@ import json
 import socket
 from collections.abc import Iterator
 from pathlib import Path
-from typing import Any
+from typing import Any, cast
 
 import pytest
+from app.config import get_settings
 from app.domain import WireSnapshot
+from app.main import create_app
+from app.runtime import SimRuntime
+from fastapi import FastAPI
+from fastapi.testclient import TestClient
 
 _LOCAL_HOSTS = {"127.0.0.1", "::1", "localhost", "0.0.0.0", "::", None}
 
@@ -27,6 +32,19 @@ def seed_snapshot(seed_raw: dict[str, Any]) -> WireSnapshot:
     """The seed parsed through the domain models."""
     return WireSnapshot.model_validate(seed_raw)
 
+
+@pytest.fixture()
+def runtime() -> SimRuntime:
+    """A SimRuntime without the wall-clock loops (deterministic fast-forward)."""
+    return SimRuntime(get_settings())
+
+
+@pytest.fixture()
+def app_client() -> Iterator[tuple[TestClient, SimRuntime]]:
+    """A TestClient whose lifespan builds a runtime with the sim loop stopped."""
+    application: FastAPI = create_app(autostart_sim=False)
+    with TestClient(application) as client:
+        yield client, cast(SimRuntime, application.state.runtime)
 
 
 def _host_of(address: Any) -> Any:

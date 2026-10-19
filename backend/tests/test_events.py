@@ -54,12 +54,18 @@ def test_threat_detected_normalises_aliases() -> None:
     )
     assert isinstance(parsed, ThreatDetectedPayload)
     assert parsed.threat_type is ThreatType.RADAR
-    assert ThreatDetectedPayload.model_validate(
-        {"threatType": "aaa", "position": {"lat": 4.0, "lng": 7.0}, "rangeKm": 30}
-    ).threat_type is ThreatType.AAA
-    assert ThreatDetectedPayload.model_validate(
-        {"threatType": "Fighter", "position": {"lat": 4.0, "lng": 7.0}, "rangeKm": 30}
-    ).threat_type is ThreatType.FIGHTER
+    assert (
+        ThreatDetectedPayload.model_validate(
+            {"threatType": "aaa", "position": {"lat": 4.0, "lng": 7.0}, "rangeKm": 30}
+        ).threat_type
+        is ThreatType.AAA
+    )
+    assert (
+        ThreatDetectedPayload.model_validate(
+            {"threatType": "Fighter", "position": {"lat": 4.0, "lng": 7.0}, "rangeKm": 30}
+        ).threat_type
+        is ThreatType.FIGHTER
+    )
     with pytest.raises(ValidationError):
         ThreatDetectedPayload.model_validate(
             {"threatType": "bogey", "position": {"lat": 4.0, "lng": 7.0}, "rangeKm": 30}
@@ -145,18 +151,14 @@ def test_ops_event_requires_id_and_timestamp() -> None:
     }
     with pytest.raises(ValidationError):
         OpsEvent.model_validate(base)
-    event = OpsEvent.model_validate(
-        {**base, "id": "EV-0001", "timestamp": "2026-10-17T12:00:00Z"}
-    )
+    event = OpsEvent.model_validate({**base, "id": "EV-0001", "timestamp": "2026-10-17T12:00:00Z"})
     dumped = dump_wire(event)
     assert dumped["payload"] == {"crewId": "CR-01", "reason": "fatigue"}
 
 
 def test_unknown_event_type_is_rejected() -> None:
     with pytest.raises(ValidationError):
-        OpsEventRequest.model_validate(
-            {"type": "ALIEN_INVASION", "payload": {"weird": True}}
-        )
+        OpsEventRequest.model_validate({"type": "ALIEN_INVASION", "payload": {"weird": True}})
 
 
 def test_parse_event_payload_helper() -> None:
