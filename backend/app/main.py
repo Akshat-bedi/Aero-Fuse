@@ -10,26 +10,30 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.health import router as health_router
 from app.api.routes import router as ops_router
 from app.api.ws import router as ws_router
-from app.config import get_settings
+from app.config import Settings, get_settings
 from app.errors import register_error_handlers
 from app.logging_setup import configure_logging
 from app.middleware import RequestIdMiddleware
 from app.runtime import SimRuntime
 
 
-def create_app(*, autostart_sim: bool = True) -> FastAPI:
+def create_app(
+    *, autostart_sim: bool = True, settings: Settings | None = None
+) -> FastAPI:
     """Build the FastAPI application from the current settings.
 
     ``autostart_sim=False`` (tests) builds the runtime and attaches it to
     ``app.state`` but does not start the wall-clock tick/heartbeat loops, so
     tests fast-forward deterministically via ``runtime.engine.tick()``.
+    ``settings`` overrides the cached environment settings (tests use zero
+    retask/demo delays).
     """
-    settings = get_settings()
-    configure_logging(settings.log_level)
+    resolved = settings or get_settings()
+    configure_logging(resolved.log_level)
 
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-        runtime = SimRuntime(settings)
+        runtime = SimRuntime(resolved)
         app.state.runtime = runtime
         if autostart_sim:
             runtime.start(asyncio.get_running_loop())
@@ -40,11 +44,13 @@ def create_app(*, autostart_sim: bool = True) -> FastAPI:
         finally:
             await runtime.stop()
 
-    app = FastAPI(title=settings.app_name, version=settings.app_version, lifespan=lifespan)
+    app = FastAPI(
+        title=resolved.app_name, version=resolved.app_version, lifespan=lifespan
+    )
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=settings.cors_origin_list,
+        allow_origins=resolved.cors_origin_list,
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],

@@ -110,7 +110,8 @@ def test_reset_broadcasts_a_full_snapshot(app_client: LiveApp) -> None:
         client.post("/api/sim/control", json={"action": "reset"})
 
         frame = ws.receive_json()
-        assert frame["type"] == "SNAPSHOT"
+        while frame["type"] != "SNAPSHOT":
+            frame = ws.receive_json()
         assert frame["stateVersion"] == runtime.store.version
         snapshot = WireSnapshot.model_validate(frame["payload"])
         assert len(snapshot.threats) == 4

@@ -53,6 +53,12 @@ class Settings(BaseSettings):
     ws_heartbeat_sec: float = 5.0
     ws_queue_size: int = 256
 
+    # B6a retasking slice: minimum wall-clock time per pipeline stage (keeps the
+    # demo animation readable; tests set this to 0) and the demos' step spacing
+    # expressed in sim seconds (scaled by the current sim speed).
+    retask_min_stage_ms: int = 600
+    demo_step_delay_s: float = 10.0
+
     @property
     def cors_origin_list(self) -> list[str]:
         """CORS origins as a list (``CORS_ORIGINS`` is comma-separated)."""
