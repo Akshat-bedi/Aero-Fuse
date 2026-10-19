@@ -1,0 +1,25 @@
+{
+  "description": "Payload of the ``CLOCK_TICK`` WebSocket message.",
+  "properties": {
+    "paused": {
+      "title": "Paused",
+      "type": "boolean"
+    },
+    "simTime": {
+      "title": "Simtime",
+      "type": "string"
+    },
+    "speed": {
+      "minimum": 0,
+      "title": "Speed",
+      "type": "number"
+    }
+  },
+  "required": [
+    "simTime",
+    "speed",
+    "paused"
+  ],
+  "title": "ClockTickPayload",
+  "type": "object"
+}

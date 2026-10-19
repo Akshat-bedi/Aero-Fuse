@@ -6,21 +6,31 @@ round-trip the wire payloads byte-for-byte (seed parity); the simulation clock
 is the single time source and domain code never calls ``datetime.now()``.
 """
 
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Annotated, Any
 
 from pydantic import BaseModel, BeforeValidator, ConfigDict
 from pydantic.alias_generators import to_camel
 
 
+def parse_timestamp(value: str) -> datetime:
+    """Parse an ISO 8601 timestamp (``Z`` or offset form) into an aware datetime."""
+    return datetime.fromisoformat(value.replace("Z", "+00:00"))
+
+
+def to_iso_z(moment: datetime) -> str:
+    """Format an aware datetime as the wire convention ``YYYY-MM-DDTHH:MM:SS.sssZ``."""
+    return moment.astimezone(UTC).isoformat(timespec="milliseconds").replace("+00:00", "Z")
+
+
 def parse_iso_timestamp(value: Any) -> str:
     """Validate an ISO 8601 timestamp string, preserving the original value."""
     if isinstance(value, datetime):
-        return value.isoformat()
+        return to_iso_z(value)
     if not isinstance(value, str) or not value.strip():
         raise ValueError("timestamp must be a non-empty ISO 8601 string")
     try:
-        datetime.fromisoformat(value.replace("Z", "+00:00"))
+        parse_timestamp(value)
     except ValueError as exc:
         raise ValueError(f"invalid ISO 8601 timestamp: {value!r}") from exc
     return value

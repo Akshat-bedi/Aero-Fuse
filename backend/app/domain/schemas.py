@@ -68,7 +68,14 @@ from app.domain.scenarios import (
     ScenarioUtilisationSeries,
 )
 from app.domain.snapshot import SimState, WireSnapshot
-from app.domain.telemetry import ImpactAnalysis, OperationalAlert, Prediction, RetaskProgress
+from app.domain.telemetry import (
+    ClockTickPayload,
+    ImpactAnalysis,
+    OperationalAlert,
+    PositionTickItem,
+    Prediction,
+    RetaskProgress,
+)
 
 SCHEMA_MODELS: dict[str, type[BaseModel]] = {
     # Entities
@@ -114,6 +121,8 @@ SCHEMA_MODELS: dict[str, type[BaseModel]] = {
     "operational_alert": OperationalAlert,
     "impact_analysis": ImpactAnalysis,
     "retask_progress": RetaskProgress,
+    "clock_tick_payload": ClockTickPayload,
+    "position_tick_item": PositionTickItem,
     # Audit
     "audit_entry": AuditEntry,
     # Scenarios

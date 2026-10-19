@@ -1,8 +1,9 @@
-"""Telemetry models: predictions, alerts, impact analysis and retask progress."""
+"""Telemetry models: predictions, alerts, impact analysis, retask progress and ticks."""
 
 from pydantic import Field
 
 from app.domain.base import IsoTimestamp, WireModel
+from app.domain.entities import LatLng
 from app.domain.enums import AlertSeverity, AlertType, EventType, RetaskStage
 
 
@@ -52,3 +53,21 @@ class RetaskProgress(WireModel):
     stage: RetaskStage | None = None
     elapsed_ms: float = Field(ge=0)
     message: str = ""
+
+
+class ClockTickPayload(WireModel):
+    """Payload of the ``CLOCK_TICK`` WebSocket message."""
+
+    sim_time: IsoTimestamp
+    speed: float = Field(ge=0)
+    paused: bool
+
+
+class PositionTickItem(WireModel):
+    """One aircraft entry inside the ``POSITION_TICK`` payload array."""
+
+    id: str = Field(min_length=1)
+    position: LatLng | None = None
+    heading: float | None = Field(default=None, ge=0, le=360)
+    speed: float | None = Field(default=None, ge=0)
+    fuel_pct: float | None = Field(default=None, ge=0, le=100)
