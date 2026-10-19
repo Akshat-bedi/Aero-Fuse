@@ -134,3 +134,14 @@ python tasks.py run              # uvicorn on :8000 with reload
 python tasks.py check            # ruff + mypy (strict) + pytest
 python scripts/ws_listen.py --duration 30   # print live WS frames
 ```
+
+## Measured performance (B2, dev laptop, single uvicorn worker)
+
+| Metric | Value |
+|---|---|
+| `GET /snapshot` over HTTP, 60 samples | median 4.4 ms, p95 6.6 ms (target < 200 ms) |
+| `GET /health` over HTTP, 60 samples | median 2.4 ms, p95 3.9 ms |
+| `engine.tick` (24 aircraft, 10 missions), 2000 samples | median 0.13 ms, p95 0.27 ms |
+| `runtime.broadcast_tick` with no clients, 2000 samples | median 0.21 ms, p95 0.42 ms |
+
+At the 1 Hz tick rate the sim loops cost well under 0.1 % of one core.
