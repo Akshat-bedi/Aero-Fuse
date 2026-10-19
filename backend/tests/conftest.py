@@ -1,12 +1,32 @@
 """Shared test fixtures, including the hard offline guard."""
 
+import json
 import socket
 from collections.abc import Iterator
+from pathlib import Path
 from typing import Any
 
 import pytest
+from app.domain import WireSnapshot
 
 _LOCAL_HOSTS = {"127.0.0.1", "::1", "localhost", "0.0.0.0", "::", None}
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+SEED_FILE = REPO_ROOT / "shared" / "seed" / "world.json"
+
+
+@pytest.fixture(scope="session")
+def seed_raw() -> dict[str, Any]:
+    """Raw ``shared/seed/world.json`` contents (authoritative seed)."""
+    loaded: dict[str, Any] = json.loads(SEED_FILE.read_text(encoding="utf-8"))
+    return loaded
+
+
+@pytest.fixture(scope="session")
+def seed_snapshot(seed_raw: dict[str, Any]) -> WireSnapshot:
+    """The seed parsed through the domain models."""
+    return WireSnapshot.model_validate(seed_raw)
+
 
 
 def _host_of(address: Any) -> Any:
