@@ -1,0 +1,1880 @@
+{
+  "$defs": {
+    "Aircraft": {
+      "properties": {
+        "assignedMissionId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Assignedmissionid"
+        },
+        "baseId": {
+          "title": "Baseid",
+          "type": "string"
+        },
+        "callsign": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Callsign"
+        },
+        "flightHoursToNextService": {
+          "minimum": 0,
+          "title": "Flighthourstonextservice",
+          "type": "number"
+        },
+        "fuelPct": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Fuelpct",
+          "type": "number"
+        },
+        "heading": {
+          "anyOf": [
+            {
+              "maximum": 360,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Heading"
+        },
+        "id": {
+          "pattern": "^AC-",
+          "title": "Id",
+          "type": "string"
+        },
+        "position": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LatLng"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "speed": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Speed"
+        },
+        "status": {
+          "$ref": "#/$defs/AircraftStatus"
+        },
+        "tailNumber": {
+          "minLength": 1,
+          "title": "Tailnumber",
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/AircraftType"
+        },
+        "weaponLoad": {
+          "items": {
+            "$ref": "#/$defs/WeaponLoad"
+          },
+          "title": "Weaponload",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "tailNumber",
+        "type",
+        "baseId",
+        "status",
+        "fuelPct",
+        "flightHoursToNextService"
+      ],
+      "title": "Aircraft",
+      "type": "object"
+    },
+    "AircraftStatus": {
+      "enum": [
+        "serviceable",
+        "maintenance",
+        "unserviceable",
+        "airborne",
+        "turnaround"
+      ],
+      "title": "AircraftStatus",
+      "type": "string"
+    },
+    "AircraftType": {
+      "enum": [
+        "Fighter-A",
+        "Strike-B",
+        "Transport-C",
+        "Recon-D",
+        "Helicopter-E"
+      ],
+      "title": "AircraftType",
+      "type": "string"
+    },
+    "AircraftUnserviceablePayload": {
+      "properties": {
+        "aircraftId": {
+          "minLength": 1,
+          "title": "Aircraftid",
+          "type": "string"
+        },
+        "etrHours": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Etrhours"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "aircraftId",
+        "reason"
+      ],
+      "title": "AircraftUnserviceablePayload",
+      "type": "object"
+    },
+    "Airspace": {
+      "properties": {
+        "activeFrom": {
+          "title": "Activefrom",
+          "type": "string"
+        },
+        "activeTo": {
+          "title": "Activeto",
+          "type": "string"
+        },
+        "ceilingFt": {
+          "minimum": 0,
+          "title": "Ceilingft",
+          "type": "number"
+        },
+        "floorFt": {
+          "minimum": 0,
+          "title": "Floorft",
+          "type": "number"
+        },
+        "id": {
+          "pattern": "^AS-",
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "polygon": {
+          "$ref": "#/$defs/AirspacePolygon"
+        },
+        "type": {
+          "$ref": "#/$defs/AirspaceType"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "polygon",
+        "type",
+        "activeFrom",
+        "activeTo",
+        "floorFt",
+        "ceilingFt"
+      ],
+      "title": "Airspace",
+      "type": "object"
+    },
+    "AirspacePolygon": {
+      "properties": {
+        "coordinates": {
+          "anyOf": [
+            {
+              "items": {
+                "items": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              "type": "array"
+            },
+            {
+              "items": {
+                "items": {
+                  "items": {
+                    "items": {
+                      "type": "number"
+                    },
+                    "type": "array"
+                  },
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Coordinates"
+        },
+        "type": {
+          "enum": [
+            "Polygon",
+            "MultiPolygon"
+          ],
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "AirspacePolygon",
+      "type": "object"
+    },
+    "AirspaceType": {
+      "enum": [
+        "restricted",
+        "corridor",
+        "no-fly",
+        "danger"
+      ],
+      "title": "AirspaceType",
+      "type": "string"
+    },
+    "AlertSeverity": {
+      "enum": [
+        "critical",
+        "warning",
+        "info"
+      ],
+      "title": "AlertSeverity",
+      "type": "string"
+    },
+    "AuditEntry": {
+      "properties": {
+        "action": {
+          "minLength": 1,
+          "title": "Action",
+          "type": "string"
+        },
+        "details": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "additionalProperties": true,
+              "type": "object"
+            }
+          ],
+          "title": "Details"
+        },
+        "hash": {
+          "minLength": 1,
+          "title": "Hash",
+          "type": "string"
+        },
+        "id": {
+          "pattern": "^AUD-",
+          "title": "Id",
+          "type": "string"
+        },
+        "operator": {
+          "minLength": 1,
+          "title": "Operator",
+          "type": "string"
+        },
+        "prevHash": {
+          "title": "Prevhash",
+          "type": "string"
+        },
+        "stateVersion": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stateversion"
+        },
+        "targetId": {
+          "minLength": 1,
+          "title": "Targetid",
+          "type": "string"
+        },
+        "timestamp": {
+          "title": "Timestamp",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "timestamp",
+        "operator",
+        "action",
+        "targetId",
+        "details",
+        "prevHash",
+        "hash"
+      ],
+      "title": "AuditEntry",
+      "type": "object"
+    },
+    "Base": {
+      "properties": {
+        "code": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Code"
+        },
+        "fuelStockPct": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Fuelstockpct",
+          "type": "number"
+        },
+        "id": {
+          "pattern": "^BASE-",
+          "title": "Id",
+          "type": "string"
+        },
+        "location": {
+          "$ref": "#/$defs/LatLng"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "runwayStatus": {
+          "$ref": "#/$defs/RunwayStatus"
+        },
+        "shelterCapacity": {
+          "minimum": 0,
+          "title": "Sheltercapacity",
+          "type": "integer"
+        },
+        "weather": {
+          "$ref": "#/$defs/WeatherState"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "location",
+        "runwayStatus",
+        "weather",
+        "fuelStockPct",
+        "shelterCapacity"
+      ],
+      "title": "Base",
+      "type": "object"
+    },
+    "BaseClosedPayload": {
+      "properties": {
+        "baseId": {
+          "minLength": 1,
+          "title": "Baseid",
+          "type": "string"
+        },
+        "durationHours": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Durationhours"
+        },
+        "runwayStatus": {
+          "$ref": "#/$defs/RunwayStatus",
+          "default": "closed"
+        }
+      },
+      "required": [
+        "baseId"
+      ],
+      "title": "BaseClosedPayload",
+      "type": "object"
+    },
+    "Change": {
+      "properties": {
+        "after": {
+          "default": null,
+          "title": "After"
+        },
+        "before": {
+          "default": null,
+          "title": "Before"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "entityId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entityid"
+        },
+        "entityType": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entitytype"
+        },
+        "fromValue": {
+          "default": null,
+          "title": "Fromvalue"
+        },
+        "kind": {
+          "$ref": "#/$defs/ChangeKind"
+        },
+        "missionId": {
+          "minLength": 1,
+          "title": "Missionid",
+          "type": "string"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "toValue": {
+          "default": null,
+          "title": "Tovalue"
+        },
+        "type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Type"
+        }
+      },
+      "required": [
+        "missionId",
+        "kind"
+      ],
+      "title": "Change",
+      "type": "object"
+    },
+    "ChangeKind": {
+      "enum": [
+        "aircraft_swap",
+        "crew_swap",
+        "reroute",
+        "delay",
+        "cancel",
+        "new_assignment"
+      ],
+      "title": "ChangeKind",
+      "type": "string"
+    },
+    "Crew": {
+      "properties": {
+        "baseId": {
+          "title": "Baseid",
+          "type": "string"
+        },
+        "callsign": {
+          "minLength": 1,
+          "title": "Callsign",
+          "type": "string"
+        },
+        "dutyHoursLast24h": {
+          "maximum": 24,
+          "minimum": 0,
+          "title": "Dutyhourslast24H",
+          "type": "number"
+        },
+        "fatigueIndex": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Fatigueindex",
+          "type": "number"
+        },
+        "id": {
+          "pattern": "^CR-",
+          "title": "Id",
+          "type": "string"
+        },
+        "qualifications": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Qualifications",
+          "type": "array"
+        },
+        "restHoursRemaining": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Resthoursremaining"
+        },
+        "role": {
+          "minLength": 1,
+          "title": "Role",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/CrewStatus"
+        }
+      },
+      "required": [
+        "id",
+        "callsign",
+        "role",
+        "baseId",
+        "fatigueIndex",
+        "dutyHoursLast24h",
+        "status"
+      ],
+      "title": "Crew",
+      "type": "object"
+    },
+    "CrewStatus": {
+      "enum": [
+        "available",
+        "resting",
+        "on-mission",
+        "unavailable"
+      ],
+      "title": "CrewStatus",
+      "type": "string"
+    },
+    "CrewUnavailablePayload": {
+      "properties": {
+        "crewId": {
+          "minLength": 1,
+          "title": "Crewid",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "crewId",
+        "reason"
+      ],
+      "title": "CrewUnavailablePayload",
+      "type": "object"
+    },
+    "EventType": {
+      "enum": [
+        "THREAT_DETECTED",
+        "AIRCRAFT_UNSERVICEABLE",
+        "BASE_CLOSED",
+        "WEATHER_DEGRADED",
+        "NEW_PRIORITY_MISSION",
+        "CREW_UNAVAILABLE"
+      ],
+      "title": "EventType",
+      "type": "string"
+    },
+    "LatLng": {
+      "description": "Point inside the fictional Republic of Veridia map bounds.",
+      "properties": {
+        "lat": {
+          "maximum": 10.0,
+          "minimum": 0.0,
+          "title": "Lat",
+          "type": "number"
+        },
+        "lng": {
+          "maximum": 12.0,
+          "minimum": 0.0,
+          "title": "Lng",
+          "type": "number"
+        }
+      },
+      "required": [
+        "lat",
+        "lng"
+      ],
+      "title": "LatLng",
+      "type": "object"
+    },
+    "MapBounds": {
+      "description": "Bounding box of the tactical map (lat 0-10, lng 0-12).",
+      "properties": {
+        "maxLat": {
+          "maximum": 10.0,
+          "minimum": 0.0,
+          "title": "Maxlat",
+          "type": "number"
+        },
+        "maxLng": {
+          "maximum": 12.0,
+          "minimum": 0.0,
+          "title": "Maxlng",
+          "type": "number"
+        },
+        "minLat": {
+          "maximum": 10.0,
+          "minimum": 0.0,
+          "title": "Minlat",
+          "type": "number"
+        },
+        "minLng": {
+          "maximum": 12.0,
+          "minimum": 0.0,
+          "title": "Minlng",
+          "type": "number"
+        }
+      },
+      "required": [
+        "minLat",
+        "maxLat",
+        "minLng",
+        "maxLng"
+      ],
+      "title": "MapBounds",
+      "type": "object"
+    },
+    "Mission": {
+      "properties": {
+        "assigned": {
+          "$ref": "#/$defs/MissionAssigned"
+        },
+        "currentWaypointIndex": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Currentwaypointindex"
+        },
+        "id": {
+          "pattern": "^M-",
+          "title": "Id",
+          "type": "string"
+        },
+        "launchBaseId": {
+          "title": "Launchbaseid",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "priority": {
+          "enum": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "title": "Priority",
+          "type": "integer"
+        },
+        "requiredAircraftType": {
+          "$ref": "#/$defs/AircraftType"
+        },
+        "requiredCrewQuals": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Requiredcrewquals",
+          "type": "array"
+        },
+        "requiredWeapons": {
+          "items": {
+            "$ref": "#/$defs/RequiredWeaponItem"
+          },
+          "title": "Requiredweapons",
+          "type": "array"
+        },
+        "route": {
+          "items": {
+            "$ref": "#/$defs/LatLng"
+          },
+          "title": "Route",
+          "type": "array"
+        },
+        "routeOptions": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/RouteOption"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Routeoptions"
+        },
+        "status": {
+          "$ref": "#/$defs/MissionStatus"
+        },
+        "target": {
+          "$ref": "#/$defs/MissionTarget"
+        },
+        "type": {
+          "$ref": "#/$defs/MissionType"
+        },
+        "windowEnd": {
+          "title": "Windowend",
+          "type": "string"
+        },
+        "windowStart": {
+          "title": "Windowstart",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "type",
+        "priority",
+        "status",
+        "launchBaseId",
+        "target",
+        "route",
+        "windowStart",
+        "windowEnd",
+        "requiredAircraftType"
+      ],
+      "title": "Mission",
+      "type": "object"
+    },
+    "MissionAssigned": {
+      "properties": {
+        "aircraftIds": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Aircraftids",
+          "type": "array"
+        },
+        "crewIds": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Crewids",
+          "type": "array"
+        }
+      },
+      "title": "MissionAssigned",
+      "type": "object"
+    },
+    "MissionStatus": {
+      "enum": [
+        "planned",
+        "approved",
+        "in-progress",
+        "completed",
+        "at-risk",
+        "cancelled"
+      ],
+      "title": "MissionStatus",
+      "type": "string"
+    },
+    "MissionTarget": {
+      "properties": {
+        "lat": {
+          "maximum": 10.0,
+          "minimum": 0.0,
+          "title": "Lat",
+          "type": "number"
+        },
+        "lng": {
+          "maximum": 12.0,
+          "minimum": 0.0,
+          "title": "Lng",
+          "type": "number"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "lat",
+        "lng",
+        "name"
+      ],
+      "title": "MissionTarget",
+      "type": "object"
+    },
+    "MissionType": {
+      "enum": [
+        "CAP",
+        "strike",
+        "recon",
+        "airlift",
+        "SAR",
+        "escort"
+      ],
+      "title": "MissionType",
+      "type": "string"
+    },
+    "NewPriorityMissionPayload": {
+      "description": "Flat shape the injector UI sends (not wrapped in ``mission``).",
+      "properties": {
+        "durationHours": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Durationhours"
+        },
+        "launchBaseId": {
+          "minLength": 1,
+          "title": "Launchbaseid",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "priority": {
+          "enum": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "title": "Priority",
+          "type": "integer"
+        },
+        "requiredAircraftType": {
+          "$ref": "#/$defs/AircraftType"
+        },
+        "targetCoordinates": {
+          "$ref": "#/$defs/LatLng"
+        },
+        "type": {
+          "$ref": "#/$defs/MissionType"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "priority",
+        "launchBaseId",
+        "targetCoordinates",
+        "requiredAircraftType"
+      ],
+      "title": "NewPriorityMissionPayload",
+      "type": "object"
+    },
+    "OpsEvent": {
+      "description": "Registered contingency event (id and timestamp assigned by the backend).",
+      "properties": {
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "id": {
+          "pattern": "^EV-",
+          "title": "Id",
+          "type": "string"
+        },
+        "operator": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Operator"
+        },
+        "payload": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ThreatDetectedPayload"
+            },
+            {
+              "$ref": "#/$defs/AircraftUnserviceablePayload"
+            },
+            {
+              "$ref": "#/$defs/BaseClosedPayload"
+            },
+            {
+              "$ref": "#/$defs/WeatherDegradedPayload"
+            },
+            {
+              "$ref": "#/$defs/NewPriorityMissionPayload"
+            },
+            {
+              "$ref": "#/$defs/CrewUnavailablePayload"
+            }
+          ],
+          "title": "Payload"
+        },
+        "severity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AlertSeverity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "timestamp": {
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/EventType"
+        }
+      },
+      "required": [
+        "type",
+        "payload",
+        "id",
+        "timestamp"
+      ],
+      "title": "OpsEvent",
+      "type": "object"
+    },
+    "Prediction": {
+      "properties": {
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "createdAt": {
+          "title": "Createdat",
+          "type": "string"
+        },
+        "entityId": {
+          "minLength": 1,
+          "title": "Entityid",
+          "type": "string"
+        },
+        "entityType": {
+          "minLength": 1,
+          "title": "Entitytype",
+          "type": "string"
+        },
+        "horizonMinutes": {
+          "minimum": 0,
+          "title": "Horizonminutes",
+          "type": "number"
+        },
+        "message": {
+          "minLength": 1,
+          "title": "Message",
+          "type": "string"
+        },
+        "metric": {
+          "minLength": 1,
+          "title": "Metric",
+          "type": "string"
+        },
+        "value": {
+          "title": "Value",
+          "type": "number"
+        }
+      },
+      "required": [
+        "entityType",
+        "entityId",
+        "metric",
+        "value",
+        "confidence",
+        "horizonMinutes",
+        "createdAt",
+        "message"
+      ],
+      "title": "Prediction",
+      "type": "object"
+    },
+    "Recommendation": {
+      "properties": {
+        "alternatives": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/Recommendation"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Alternatives"
+        },
+        "changes": {
+          "items": {
+            "$ref": "#/$defs/Change"
+          },
+          "title": "Changes",
+          "type": "array"
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "constraintsRelaxed": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Constraintsrelaxed",
+          "type": "array"
+        },
+        "constraintsSatisfied": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Constraintssatisfied",
+          "type": "array"
+        },
+        "createdAt": {
+          "title": "Createdat",
+          "type": "string"
+        },
+        "criteriaScores": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "maximum": 100,
+                "minimum": 0,
+                "type": "number"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Criteriascores"
+        },
+        "dataFreshnessSec": {
+          "minimum": 0,
+          "title": "Datafreshnesssec",
+          "type": "number"
+        },
+        "explanation": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Explanation",
+          "type": "array"
+        },
+        "id": {
+          "pattern": "^REC-",
+          "title": "Id",
+          "type": "string"
+        },
+        "impactedMissionIds": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Impactedmissionids",
+          "type": "array"
+        },
+        "modifications": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Modifications"
+        },
+        "score": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Score",
+          "type": "number"
+        },
+        "stateVersion": {
+          "minimum": 0,
+          "title": "Stateversion",
+          "type": "integer"
+        },
+        "status": {
+          "$ref": "#/$defs/RecommendationStatus"
+        },
+        "summary": {
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        },
+        "tradeoffs": {
+          "items": {
+            "$ref": "#/$defs/Tradeoff"
+          },
+          "title": "Tradeoffs",
+          "type": "array"
+        },
+        "triggerEventId": {
+          "minLength": 1,
+          "title": "Triggereventid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "triggerEventId",
+        "summary",
+        "score",
+        "status",
+        "createdAt",
+        "stateVersion",
+        "confidence",
+        "dataFreshnessSec"
+      ],
+      "title": "Recommendation",
+      "type": "object"
+    },
+    "RecommendationStatus": {
+      "enum": [
+        "pending",
+        "approved",
+        "rejected",
+        "modified",
+        "stale",
+        "expired"
+      ],
+      "title": "RecommendationStatus",
+      "type": "string"
+    },
+    "RequiredWeaponItem": {
+      "properties": {
+        "quantity": {
+          "minimum": 0,
+          "title": "Quantity",
+          "type": "integer"
+        },
+        "weaponType": {
+          "minLength": 1,
+          "title": "Weapontype",
+          "type": "string"
+        }
+      },
+      "required": [
+        "weaponType",
+        "quantity"
+      ],
+      "title": "RequiredWeaponItem",
+      "type": "object"
+    },
+    "RouteOption": {
+      "properties": {
+        "distanceKm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Distancekm"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "riskScore": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Riskscore"
+        },
+        "waypoints": {
+          "items": {
+            "$ref": "#/$defs/LatLng"
+          },
+          "title": "Waypoints",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "waypoints"
+      ],
+      "title": "RouteOption",
+      "type": "object"
+    },
+    "RunwayStatus": {
+      "enum": [
+        "open",
+        "degraded",
+        "closed"
+      ],
+      "title": "RunwayStatus",
+      "type": "string"
+    },
+    "Severity": {
+      "enum": [
+        "nominal",
+        "caution",
+        "severe"
+      ],
+      "title": "Severity",
+      "type": "string"
+    },
+    "SimState": {
+      "properties": {
+        "paused": {
+          "title": "Paused",
+          "type": "boolean"
+        },
+        "speed": {
+          "minimum": 0,
+          "title": "Speed",
+          "type": "number"
+        },
+        "time": {
+          "title": "Time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "time",
+        "speed",
+        "paused"
+      ],
+      "title": "SimState",
+      "type": "object"
+    },
+    "Threat": {
+      "properties": {
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "id": {
+          "pattern": "^THR-",
+          "title": "Id",
+          "type": "string"
+        },
+        "lastSeen": {
+          "title": "Lastseen",
+          "type": "string"
+        },
+        "position": {
+          "$ref": "#/$defs/LatLng"
+        },
+        "rangeKm": {
+          "minimum": 0,
+          "title": "Rangekm",
+          "type": "number"
+        },
+        "status": {
+          "$ref": "#/$defs/ThreatStatus"
+        },
+        "type": {
+          "$ref": "#/$defs/ThreatType"
+        }
+      },
+      "required": [
+        "id",
+        "type",
+        "position",
+        "rangeKm",
+        "confidence",
+        "lastSeen",
+        "status"
+      ],
+      "title": "Threat",
+      "type": "object"
+    },
+    "ThreatDetectedPayload": {
+      "properties": {
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Confidence"
+        },
+        "position": {
+          "$ref": "#/$defs/LatLng"
+        },
+        "rangeKm": {
+          "minimum": 0,
+          "title": "Rangekm",
+          "type": "number"
+        },
+        "status": {
+          "$ref": "#/$defs/ThreatStatus",
+          "default": "active"
+        },
+        "threatType": {
+          "$ref": "#/$defs/ThreatType"
+        }
+      },
+      "required": [
+        "threatType",
+        "position",
+        "rangeKm"
+      ],
+      "title": "ThreatDetectedPayload",
+      "type": "object"
+    },
+    "ThreatStatus": {
+      "enum": [
+        "active",
+        "suspected",
+        "neutralised"
+      ],
+      "title": "ThreatStatus",
+      "type": "string"
+    },
+    "ThreatType": {
+      "enum": [
+        "SAM",
+        "fighter",
+        "radar",
+        "AAA"
+      ],
+      "title": "ThreatType",
+      "type": "string"
+    },
+    "Tradeoff": {
+      "properties": {
+        "delta": {
+          "title": "Delta",
+          "type": "number"
+        },
+        "direction": {
+          "$ref": "#/$defs/TradeoffDirection"
+        },
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "delta",
+        "unit",
+        "direction"
+      ],
+      "title": "Tradeoff",
+      "type": "object"
+    },
+    "TradeoffDirection": {
+      "enum": [
+        "good",
+        "bad",
+        "neutral"
+      ],
+      "title": "TradeoffDirection",
+      "type": "string"
+    },
+    "WeaponLoad": {
+      "properties": {
+        "quantity": {
+          "minimum": 0,
+          "title": "Quantity",
+          "type": "integer"
+        },
+        "station": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Station"
+        },
+        "weaponType": {
+          "minLength": 1,
+          "title": "Weapontype",
+          "type": "string"
+        }
+      },
+      "required": [
+        "weaponType",
+        "quantity"
+      ],
+      "title": "WeaponLoad",
+      "type": "object"
+    },
+    "WeaponStock": {
+      "properties": {
+        "baseId": {
+          "title": "Baseid",
+          "type": "string"
+        },
+        "quantity": {
+          "minimum": 0,
+          "title": "Quantity",
+          "type": "integer"
+        },
+        "weaponType": {
+          "minLength": 1,
+          "title": "Weapontype",
+          "type": "string"
+        }
+      },
+      "required": [
+        "baseId",
+        "weaponType",
+        "quantity"
+      ],
+      "title": "WeaponStock",
+      "type": "object"
+    },
+    "WeatherDegradedPayload": {
+      "properties": {
+        "baseId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Baseid"
+        },
+        "durationHours": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Durationhours"
+        },
+        "region": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Region"
+        },
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        },
+        "visibilityKm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Visibilitykm"
+        },
+        "windKts": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Windkts"
+        }
+      },
+      "required": [
+        "severity"
+      ],
+      "title": "WeatherDegradedPayload",
+      "type": "object"
+    },
+    "WeatherForecastItem": {
+      "properties": {
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        },
+        "time": {
+          "title": "Time",
+          "type": "string"
+        },
+        "visibilityKm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Visibilitykm"
+        },
+        "windKts": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Windkts"
+        }
+      },
+      "required": [
+        "time",
+        "severity"
+      ],
+      "title": "WeatherForecastItem",
+      "type": "object"
+    },
+    "WeatherState": {
+      "properties": {
+        "baseId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Baseid"
+        },
+        "cloudBaseFt": {
+          "minimum": 0,
+          "title": "Cloudbaseft",
+          "type": "number"
+        },
+        "forecast": {
+          "items": {
+            "$ref": "#/$defs/WeatherForecastItem"
+          },
+          "title": "Forecast",
+          "type": "array"
+        },
+        "region": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Region"
+        },
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        },
+        "visibilityKm": {
+          "minimum": 0,
+          "title": "Visibilitykm",
+          "type": "number"
+        },
+        "windKts": {
+          "minimum": 0,
+          "title": "Windkts",
+          "type": "number"
+        }
+      },
+      "required": [
+        "visibilityKm",
+        "cloudBaseFt",
+        "windKts",
+        "severity"
+      ],
+      "title": "WeatherState",
+      "type": "object"
+    }
+  },
+  "description": "Complete canonical state.\n\nEntity collections are arrays on the wire; the frontend normalises them\ninto dictionaries. ``bounds`` is emitted (world.json includes it) even\nthough the frontend type omits it.",
+  "properties": {
+    "activeEvents": {
+      "items": {
+        "$ref": "#/$defs/OpsEvent"
+      },
+      "title": "Activeevents",
+      "type": "array"
+    },
+    "aircraft": {
+      "items": {
+        "$ref": "#/$defs/Aircraft"
+      },
+      "title": "Aircraft",
+      "type": "array"
+    },
+    "airspace": {
+      "items": {
+        "$ref": "#/$defs/Airspace"
+      },
+      "title": "Airspace",
+      "type": "array"
+    },
+    "auditLog": {
+      "items": {
+        "$ref": "#/$defs/AuditEntry"
+      },
+      "title": "Auditlog",
+      "type": "array"
+    },
+    "bases": {
+      "items": {
+        "$ref": "#/$defs/Base"
+      },
+      "title": "Bases",
+      "type": "array"
+    },
+    "bounds": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/MapBounds"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "crew": {
+      "items": {
+        "$ref": "#/$defs/Crew"
+      },
+      "title": "Crew",
+      "type": "array"
+    },
+    "missions": {
+      "items": {
+        "$ref": "#/$defs/Mission"
+      },
+      "title": "Missions",
+      "type": "array"
+    },
+    "predictions": {
+      "items": {
+        "$ref": "#/$defs/Prediction"
+      },
+      "title": "Predictions",
+      "type": "array"
+    },
+    "recommendations": {
+      "items": {
+        "$ref": "#/$defs/Recommendation"
+      },
+      "title": "Recommendations",
+      "type": "array"
+    },
+    "sim": {
+      "$ref": "#/$defs/SimState"
+    },
+    "stateVersion": {
+      "minimum": 0,
+      "title": "Stateversion",
+      "type": "integer"
+    },
+    "threats": {
+      "items": {
+        "$ref": "#/$defs/Threat"
+      },
+      "title": "Threats",
+      "type": "array"
+    },
+    "weaponStocks": {
+      "items": {
+        "$ref": "#/$defs/WeaponStock"
+      },
+      "title": "Weaponstocks",
+      "type": "array"
+    },
+    "weather": {
+      "items": {
+        "$ref": "#/$defs/WeatherState"
+      },
+      "title": "Weather",
+      "type": "array"
+    }
+  },
+  "required": [
+    "stateVersion",
+    "sim"
+  ],
+  "title": "WireSnapshot",
+  "type": "object"
+}

@@ -1,0 +1,20 @@
+{
+  "properties": {
+    "missionId": {
+      "minLength": 1,
+      "title": "Missionid",
+      "type": "string"
+    },
+    "reason": {
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    }
+  },
+  "required": [
+    "missionId",
+    "reason"
+  ],
+  "title": "ScenarioUnmetMission",
+  "type": "object"
+}

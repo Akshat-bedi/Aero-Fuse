@@ -1,0 +1,74 @@
+{
+  "properties": {
+    "action": {
+      "minLength": 1,
+      "title": "Action",
+      "type": "string"
+    },
+    "details": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "additionalProperties": true,
+          "type": "object"
+        }
+      ],
+      "title": "Details"
+    },
+    "hash": {
+      "minLength": 1,
+      "title": "Hash",
+      "type": "string"
+    },
+    "id": {
+      "pattern": "^AUD-",
+      "title": "Id",
+      "type": "string"
+    },
+    "operator": {
+      "minLength": 1,
+      "title": "Operator",
+      "type": "string"
+    },
+    "prevHash": {
+      "title": "Prevhash",
+      "type": "string"
+    },
+    "stateVersion": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Stateversion"
+    },
+    "targetId": {
+      "minLength": 1,
+      "title": "Targetid",
+      "type": "string"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "timestamp",
+    "operator",
+    "action",
+    "targetId",
+    "details",
+    "prevHash",
+    "hash"
+  ],
+  "title": "AuditEntry",
+  "type": "object"
+}

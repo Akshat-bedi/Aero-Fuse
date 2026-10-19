@@ -1,0 +1,20 @@
+{
+  "properties": {
+    "baseId": {
+      "minLength": 1,
+      "title": "Baseid",
+      "type": "string"
+    },
+    "hours": {
+      "minimum": 0,
+      "title": "Hours",
+      "type": "number"
+    }
+  },
+  "required": [
+    "baseId",
+    "hours"
+  ],
+  "title": "ScenarioBaseOutage",
+  "type": "object"
+}

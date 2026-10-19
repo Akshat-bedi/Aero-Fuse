@@ -1,0 +1,204 @@
+{
+  "$defs": {
+    "LatLng": {
+      "description": "Point inside the fictional Republic of Veridia map bounds.",
+      "properties": {
+        "lat": {
+          "maximum": 10.0,
+          "minimum": 0.0,
+          "title": "Lat",
+          "type": "number"
+        },
+        "lng": {
+          "maximum": 12.0,
+          "minimum": 0.0,
+          "title": "Lng",
+          "type": "number"
+        }
+      },
+      "required": [
+        "lat",
+        "lng"
+      ],
+      "title": "LatLng",
+      "type": "object"
+    },
+    "RunwayStatus": {
+      "enum": [
+        "open",
+        "degraded",
+        "closed"
+      ],
+      "title": "RunwayStatus",
+      "type": "string"
+    },
+    "Severity": {
+      "enum": [
+        "nominal",
+        "caution",
+        "severe"
+      ],
+      "title": "Severity",
+      "type": "string"
+    },
+    "WeatherForecastItem": {
+      "properties": {
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        },
+        "time": {
+          "title": "Time",
+          "type": "string"
+        },
+        "visibilityKm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Visibilitykm"
+        },
+        "windKts": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Windkts"
+        }
+      },
+      "required": [
+        "time",
+        "severity"
+      ],
+      "title": "WeatherForecastItem",
+      "type": "object"
+    },
+    "WeatherState": {
+      "properties": {
+        "baseId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Baseid"
+        },
+        "cloudBaseFt": {
+          "minimum": 0,
+          "title": "Cloudbaseft",
+          "type": "number"
+        },
+        "forecast": {
+          "items": {
+            "$ref": "#/$defs/WeatherForecastItem"
+          },
+          "title": "Forecast",
+          "type": "array"
+        },
+        "region": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Region"
+        },
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        },
+        "visibilityKm": {
+          "minimum": 0,
+          "title": "Visibilitykm",
+          "type": "number"
+        },
+        "windKts": {
+          "minimum": 0,
+          "title": "Windkts",
+          "type": "number"
+        }
+      },
+      "required": [
+        "visibilityKm",
+        "cloudBaseFt",
+        "windKts",
+        "severity"
+      ],
+      "title": "WeatherState",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "code": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Code"
+    },
+    "fuelStockPct": {
+      "maximum": 100,
+      "minimum": 0,
+      "title": "Fuelstockpct",
+      "type": "number"
+    },
+    "id": {
+      "pattern": "^BASE-",
+      "title": "Id",
+      "type": "string"
+    },
+    "location": {
+      "$ref": "#/$defs/LatLng"
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "runwayStatus": {
+      "$ref": "#/$defs/RunwayStatus"
+    },
+    "shelterCapacity": {
+      "minimum": 0,
+      "title": "Sheltercapacity",
+      "type": "integer"
+    },
+    "weather": {
+      "$ref": "#/$defs/WeatherState"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "location",
+    "runwayStatus",
+    "weather",
+    "fuelStockPct",
+    "shelterCapacity"
+  ],
+  "title": "Base",
+  "type": "object"
+}

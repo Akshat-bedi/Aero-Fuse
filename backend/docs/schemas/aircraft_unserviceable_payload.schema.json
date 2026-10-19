@@ -1,0 +1,33 @@
+{
+  "properties": {
+    "aircraftId": {
+      "minLength": 1,
+      "title": "Aircraftid",
+      "type": "string"
+    },
+    "etrHours": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Etrhours"
+    },
+    "reason": {
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    }
+  },
+  "required": [
+    "aircraftId",
+    "reason"
+  ],
+  "title": "AircraftUnserviceablePayload",
+  "type": "object"
+}

@@ -1,0 +1,80 @@
+{
+  "$defs": {
+    "LatLng": {
+      "description": "Point inside the fictional Republic of Veridia map bounds.",
+      "properties": {
+        "lat": {
+          "maximum": 10.0,
+          "minimum": 0.0,
+          "title": "Lat",
+          "type": "number"
+        },
+        "lng": {
+          "maximum": 12.0,
+          "minimum": 0.0,
+          "title": "Lng",
+          "type": "number"
+        }
+      },
+      "required": [
+        "lat",
+        "lng"
+      ],
+      "title": "LatLng",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "distanceKm": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Distancekm"
+    },
+    "id": {
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "riskScore": {
+      "anyOf": [
+        {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Riskscore"
+    },
+    "waypoints": {
+      "items": {
+        "$ref": "#/$defs/LatLng"
+      },
+      "title": "Waypoints",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "waypoints"
+  ],
+  "title": "RouteOption",
+  "type": "object"
+}

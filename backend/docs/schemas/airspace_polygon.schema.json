@@ -1,0 +1,50 @@
+{
+  "properties": {
+    "coordinates": {
+      "anyOf": [
+        {
+          "items": {
+            "items": {
+              "items": {
+                "type": "number"
+              },
+              "type": "array"
+            },
+            "type": "array"
+          },
+          "type": "array"
+        },
+        {
+          "items": {
+            "items": {
+              "items": {
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "type": "array"
+            },
+            "type": "array"
+          },
+          "type": "array"
+        }
+      ],
+      "title": "Coordinates"
+    },
+    "type": {
+      "enum": [
+        "Polygon",
+        "MultiPolygon"
+      ],
+      "title": "Type",
+      "type": "string"
+    }
+  },
+  "required": [
+    "type",
+    "coordinates"
+  ],
+  "title": "AirspacePolygon",
+  "type": "object"
+}

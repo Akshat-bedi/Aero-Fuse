@@ -1,0 +1,309 @@
+{
+  "$defs": {
+    "Change": {
+      "properties": {
+        "after": {
+          "default": null,
+          "title": "After"
+        },
+        "before": {
+          "default": null,
+          "title": "Before"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "entityId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entityid"
+        },
+        "entityType": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entitytype"
+        },
+        "fromValue": {
+          "default": null,
+          "title": "Fromvalue"
+        },
+        "kind": {
+          "$ref": "#/$defs/ChangeKind"
+        },
+        "missionId": {
+          "minLength": 1,
+          "title": "Missionid",
+          "type": "string"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "toValue": {
+          "default": null,
+          "title": "Tovalue"
+        },
+        "type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Type"
+        }
+      },
+      "required": [
+        "missionId",
+        "kind"
+      ],
+      "title": "Change",
+      "type": "object"
+    },
+    "ChangeKind": {
+      "enum": [
+        "aircraft_swap",
+        "crew_swap",
+        "reroute",
+        "delay",
+        "cancel",
+        "new_assignment"
+      ],
+      "title": "ChangeKind",
+      "type": "string"
+    },
+    "Recommendation": {
+      "properties": {
+        "alternatives": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/Recommendation"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Alternatives"
+        },
+        "changes": {
+          "items": {
+            "$ref": "#/$defs/Change"
+          },
+          "title": "Changes",
+          "type": "array"
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "constraintsRelaxed": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Constraintsrelaxed",
+          "type": "array"
+        },
+        "constraintsSatisfied": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Constraintssatisfied",
+          "type": "array"
+        },
+        "createdAt": {
+          "title": "Createdat",
+          "type": "string"
+        },
+        "criteriaScores": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "maximum": 100,
+                "minimum": 0,
+                "type": "number"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Criteriascores"
+        },
+        "dataFreshnessSec": {
+          "minimum": 0,
+          "title": "Datafreshnesssec",
+          "type": "number"
+        },
+        "explanation": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Explanation",
+          "type": "array"
+        },
+        "id": {
+          "pattern": "^REC-",
+          "title": "Id",
+          "type": "string"
+        },
+        "impactedMissionIds": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Impactedmissionids",
+          "type": "array"
+        },
+        "modifications": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Modifications"
+        },
+        "score": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Score",
+          "type": "number"
+        },
+        "stateVersion": {
+          "minimum": 0,
+          "title": "Stateversion",
+          "type": "integer"
+        },
+        "status": {
+          "$ref": "#/$defs/RecommendationStatus"
+        },
+        "summary": {
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        },
+        "tradeoffs": {
+          "items": {
+            "$ref": "#/$defs/Tradeoff"
+          },
+          "title": "Tradeoffs",
+          "type": "array"
+        },
+        "triggerEventId": {
+          "minLength": 1,
+          "title": "Triggereventid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "triggerEventId",
+        "summary",
+        "score",
+        "status",
+        "createdAt",
+        "stateVersion",
+        "confidence",
+        "dataFreshnessSec"
+      ],
+      "title": "Recommendation",
+      "type": "object"
+    },
+    "RecommendationStatus": {
+      "enum": [
+        "pending",
+        "approved",
+        "rejected",
+        "modified",
+        "stale",
+        "expired"
+      ],
+      "title": "RecommendationStatus",
+      "type": "string"
+    },
+    "Tradeoff": {
+      "properties": {
+        "delta": {
+          "title": "Delta",
+          "type": "number"
+        },
+        "direction": {
+          "$ref": "#/$defs/TradeoffDirection"
+        },
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "delta",
+        "unit",
+        "direction"
+      ],
+      "title": "Tradeoff",
+      "type": "object"
+    },
+    "TradeoffDirection": {
+      "enum": [
+        "good",
+        "bad",
+        "neutral"
+      ],
+      "title": "TradeoffDirection",
+      "type": "string"
+    }
+  },
+  "$ref": "#/$defs/Recommendation"
+}

@@ -1,0 +1,25 @@
+{
+  "properties": {
+    "baseId": {
+      "title": "Baseid",
+      "type": "string"
+    },
+    "quantity": {
+      "minimum": 0,
+      "title": "Quantity",
+      "type": "integer"
+    },
+    "weaponType": {
+      "minLength": 1,
+      "title": "Weapontype",
+      "type": "string"
+    }
+  },
+  "required": [
+    "baseId",
+    "weaponType",
+    "quantity"
+  ],
+  "title": "WeaponStock",
+  "type": "object"
+}

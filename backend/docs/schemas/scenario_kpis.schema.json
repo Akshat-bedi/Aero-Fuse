@@ -1,0 +1,50 @@
+{
+  "additionalProperties": true,
+  "description": "Scenario KPI block; extra keys are tolerated for forward compatibility.",
+  "properties": {
+    "aircraftUtilisationPct": {
+      "title": "Aircraftutilisationpct",
+      "type": "number"
+    },
+    "avgDelayMin": {
+      "title": "Avgdelaymin",
+      "type": "number"
+    },
+    "crewFatigueMax": {
+      "title": "Crewfatiguemax",
+      "type": "number"
+    },
+    "crewFatigueMean": {
+      "title": "Crewfatiguemean",
+      "type": "number"
+    },
+    "fuelConsumptionPct": {
+      "title": "Fuelconsumptionpct",
+      "type": "number"
+    },
+    "missionsFulfilledPct": {
+      "title": "Missionsfulfilledpct",
+      "type": "number"
+    },
+    "p1CoveragePct": {
+      "title": "P1Coveragepct",
+      "type": "number"
+    },
+    "weaponsConsumptionPct": {
+      "title": "Weaponsconsumptionpct",
+      "type": "number"
+    }
+  },
+  "required": [
+    "missionsFulfilledPct",
+    "p1CoveragePct",
+    "avgDelayMin",
+    "aircraftUtilisationPct",
+    "crewFatigueMean",
+    "crewFatigueMax",
+    "fuelConsumptionPct",
+    "weaponsConsumptionPct"
+  ],
+  "title": "ScenarioKpis",
+  "type": "object"
+}

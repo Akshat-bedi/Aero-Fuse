@@ -1,0 +1,24 @@
+{
+  "properties": {
+    "paused": {
+      "title": "Paused",
+      "type": "boolean"
+    },
+    "speed": {
+      "minimum": 0,
+      "title": "Speed",
+      "type": "number"
+    },
+    "time": {
+      "title": "Time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "time",
+    "speed",
+    "paused"
+  ],
+  "title": "SimState",
+  "type": "object"
+}

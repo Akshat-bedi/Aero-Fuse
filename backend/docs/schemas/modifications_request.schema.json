@@ -1,0 +1,131 @@
+{
+  "$defs": {
+    "AircraftSwapModification": {
+      "properties": {
+        "missionId": {
+          "minLength": 1,
+          "title": "Missionid",
+          "type": "string"
+        },
+        "newAircraftId": {
+          "minLength": 1,
+          "title": "Newaircraftid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "missionId",
+        "newAircraftId"
+      ],
+      "title": "AircraftSwapModification",
+      "type": "object"
+    },
+    "AssignmentModification": {
+      "description": "Contract-intent array entry: ``{missionId, aircraftIds?, crewIds?}``.",
+      "properties": {
+        "aircraftIds": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Aircraftids"
+        },
+        "crewIds": {
+          "anyOf": [
+            {
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Crewids"
+        },
+        "missionId": {
+          "minLength": 1,
+          "title": "Missionid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "missionId"
+      ],
+      "title": "AssignmentModification",
+      "type": "object"
+    },
+    "CrewSwapModification": {
+      "properties": {
+        "missionId": {
+          "minLength": 1,
+          "title": "Missionid",
+          "type": "string"
+        },
+        "newCrewId": {
+          "minLength": 1,
+          "title": "Newcrewid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "missionId",
+        "newCrewId"
+      ],
+      "title": "CrewSwapModification",
+      "type": "object"
+    }
+  },
+  "description": "Manual commander edits.\n\nThe Modify UI (``RecommendationCard``) sends ``{aircraftSwap, crewSwap}``\nobjects keyed by mission. The older contract intent was an array of\n``{missionId, aircraftIds?, crewIds?}`` entries; that shape is accepted and\npreserved under ``assignments`` so nothing is lost.",
+  "properties": {
+    "aircraftSwap": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AircraftSwapModification"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "assignments": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/AssignmentModification"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Assignments"
+    },
+    "crewSwap": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/CrewSwapModification"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "title": "ModificationsRequest",
+  "type": "object"
+}

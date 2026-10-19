@@ -1,0 +1,27 @@
+{
+  "properties": {
+    "baseline": {
+      "items": {
+        "type": "number"
+      },
+      "title": "Baseline",
+      "type": "array"
+    },
+    "scenario": {
+      "items": {
+        "type": "number"
+      },
+      "title": "Scenario",
+      "type": "array"
+    },
+    "time": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Time",
+      "type": "array"
+    }
+  },
+  "title": "ScenarioUtilisationSeries",
+  "type": "object"
+}

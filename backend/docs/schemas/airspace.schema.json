@@ -1,0 +1,112 @@
+{
+  "$defs": {
+    "AirspacePolygon": {
+      "properties": {
+        "coordinates": {
+          "anyOf": [
+            {
+              "items": {
+                "items": {
+                  "items": {
+                    "type": "number"
+                  },
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              "type": "array"
+            },
+            {
+              "items": {
+                "items": {
+                  "items": {
+                    "items": {
+                      "type": "number"
+                    },
+                    "type": "array"
+                  },
+                  "type": "array"
+                },
+                "type": "array"
+              },
+              "type": "array"
+            }
+          ],
+          "title": "Coordinates"
+        },
+        "type": {
+          "enum": [
+            "Polygon",
+            "MultiPolygon"
+          ],
+          "title": "Type",
+          "type": "string"
+        }
+      },
+      "required": [
+        "type",
+        "coordinates"
+      ],
+      "title": "AirspacePolygon",
+      "type": "object"
+    },
+    "AirspaceType": {
+      "enum": [
+        "restricted",
+        "corridor",
+        "no-fly",
+        "danger"
+      ],
+      "title": "AirspaceType",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "activeFrom": {
+      "title": "Activefrom",
+      "type": "string"
+    },
+    "activeTo": {
+      "title": "Activeto",
+      "type": "string"
+    },
+    "ceilingFt": {
+      "minimum": 0,
+      "title": "Ceilingft",
+      "type": "number"
+    },
+    "floorFt": {
+      "minimum": 0,
+      "title": "Floorft",
+      "type": "number"
+    },
+    "id": {
+      "pattern": "^AS-",
+      "title": "Id",
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "polygon": {
+      "$ref": "#/$defs/AirspacePolygon"
+    },
+    "type": {
+      "$ref": "#/$defs/AirspaceType"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "polygon",
+    "type",
+    "activeFrom",
+    "activeTo",
+    "floorFt",
+    "ceilingFt"
+  ],
+  "title": "Airspace",
+  "type": "object"
+}

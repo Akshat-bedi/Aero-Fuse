@@ -1,0 +1,86 @@
+{
+  "$defs": {
+    "Severity": {
+      "enum": [
+        "nominal",
+        "caution",
+        "severe"
+      ],
+      "title": "Severity",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "baseId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Baseid"
+    },
+    "durationHours": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Durationhours"
+    },
+    "region": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Region"
+    },
+    "severity": {
+      "$ref": "#/$defs/Severity"
+    },
+    "visibilityKm": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Visibilitykm"
+    },
+    "windKts": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Windkts"
+    }
+  },
+  "required": [
+    "severity"
+  ],
+  "title": "WeatherDegradedPayload",
+  "type": "object"
+}

@@ -1,0 +1,20 @@
+{
+  "properties": {
+    "aircraftIds": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Aircraftids",
+      "type": "array"
+    },
+    "crewIds": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Crewids",
+      "type": "array"
+    }
+  },
+  "title": "MissionAssigned",
+  "type": "object"
+}

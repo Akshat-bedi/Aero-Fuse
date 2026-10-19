@@ -1,0 +1,108 @@
+{
+  "$defs": {
+    "ChangeKind": {
+      "enum": [
+        "aircraft_swap",
+        "crew_swap",
+        "reroute",
+        "delay",
+        "cancel",
+        "new_assignment"
+      ],
+      "title": "ChangeKind",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "after": {
+      "default": null,
+      "title": "After"
+    },
+    "before": {
+      "default": null,
+      "title": "Before"
+    },
+    "description": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Description"
+    },
+    "entityId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Entityid"
+    },
+    "entityType": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Entitytype"
+    },
+    "fromValue": {
+      "default": null,
+      "title": "Fromvalue"
+    },
+    "kind": {
+      "$ref": "#/$defs/ChangeKind"
+    },
+    "missionId": {
+      "minLength": 1,
+      "title": "Missionid",
+      "type": "string"
+    },
+    "note": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Note"
+    },
+    "toValue": {
+      "default": null,
+      "title": "Tovalue"
+    },
+    "type": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Type"
+    }
+  },
+  "required": [
+    "missionId",
+    "kind"
+  ],
+  "title": "Change",
+  "type": "object"
+}

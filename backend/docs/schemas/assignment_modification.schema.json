@@ -1,0 +1,45 @@
+{
+  "description": "Contract-intent array entry: ``{missionId, aircraftIds?, crewIds?}``.",
+  "properties": {
+    "aircraftIds": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Aircraftids"
+    },
+    "crewIds": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Crewids"
+    },
+    "missionId": {
+      "minLength": 1,
+      "title": "Missionid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "missionId"
+  ],
+  "title": "AssignmentModification",
+  "type": "object"
+}

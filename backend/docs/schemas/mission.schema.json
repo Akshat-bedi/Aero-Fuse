@@ -1,0 +1,298 @@
+{
+  "$defs": {
+    "AircraftType": {
+      "enum": [
+        "Fighter-A",
+        "Strike-B",
+        "Transport-C",
+        "Recon-D",
+        "Helicopter-E"
+      ],
+      "title": "AircraftType",
+      "type": "string"
+    },
+    "LatLng": {
+      "description": "Point inside the fictional Republic of Veridia map bounds.",
+      "properties": {
+        "lat": {
+          "maximum": 10.0,
+          "minimum": 0.0,
+          "title": "Lat",
+          "type": "number"
+        },
+        "lng": {
+          "maximum": 12.0,
+          "minimum": 0.0,
+          "title": "Lng",
+          "type": "number"
+        }
+      },
+      "required": [
+        "lat",
+        "lng"
+      ],
+      "title": "LatLng",
+      "type": "object"
+    },
+    "MissionAssigned": {
+      "properties": {
+        "aircraftIds": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Aircraftids",
+          "type": "array"
+        },
+        "crewIds": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Crewids",
+          "type": "array"
+        }
+      },
+      "title": "MissionAssigned",
+      "type": "object"
+    },
+    "MissionStatus": {
+      "enum": [
+        "planned",
+        "approved",
+        "in-progress",
+        "completed",
+        "at-risk",
+        "cancelled"
+      ],
+      "title": "MissionStatus",
+      "type": "string"
+    },
+    "MissionTarget": {
+      "properties": {
+        "lat": {
+          "maximum": 10.0,
+          "minimum": 0.0,
+          "title": "Lat",
+          "type": "number"
+        },
+        "lng": {
+          "maximum": 12.0,
+          "minimum": 0.0,
+          "title": "Lng",
+          "type": "number"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        }
+      },
+      "required": [
+        "lat",
+        "lng",
+        "name"
+      ],
+      "title": "MissionTarget",
+      "type": "object"
+    },
+    "MissionType": {
+      "enum": [
+        "CAP",
+        "strike",
+        "recon",
+        "airlift",
+        "SAR",
+        "escort"
+      ],
+      "title": "MissionType",
+      "type": "string"
+    },
+    "RequiredWeaponItem": {
+      "properties": {
+        "quantity": {
+          "minimum": 0,
+          "title": "Quantity",
+          "type": "integer"
+        },
+        "weaponType": {
+          "minLength": 1,
+          "title": "Weapontype",
+          "type": "string"
+        }
+      },
+      "required": [
+        "weaponType",
+        "quantity"
+      ],
+      "title": "RequiredWeaponItem",
+      "type": "object"
+    },
+    "RouteOption": {
+      "properties": {
+        "distanceKm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Distancekm"
+        },
+        "id": {
+          "minLength": 1,
+          "title": "Id",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "riskScore": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Riskscore"
+        },
+        "waypoints": {
+          "items": {
+            "$ref": "#/$defs/LatLng"
+          },
+          "title": "Waypoints",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "waypoints"
+      ],
+      "title": "RouteOption",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "assigned": {
+      "$ref": "#/$defs/MissionAssigned"
+    },
+    "currentWaypointIndex": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Currentwaypointindex"
+    },
+    "id": {
+      "pattern": "^M-",
+      "title": "Id",
+      "type": "string"
+    },
+    "launchBaseId": {
+      "title": "Launchbaseid",
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "priority": {
+      "enum": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "title": "Priority",
+      "type": "integer"
+    },
+    "requiredAircraftType": {
+      "$ref": "#/$defs/AircraftType"
+    },
+    "requiredCrewQuals": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Requiredcrewquals",
+      "type": "array"
+    },
+    "requiredWeapons": {
+      "items": {
+        "$ref": "#/$defs/RequiredWeaponItem"
+      },
+      "title": "Requiredweapons",
+      "type": "array"
+    },
+    "route": {
+      "items": {
+        "$ref": "#/$defs/LatLng"
+      },
+      "title": "Route",
+      "type": "array"
+    },
+    "routeOptions": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/RouteOption"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Routeoptions"
+    },
+    "status": {
+      "$ref": "#/$defs/MissionStatus"
+    },
+    "target": {
+      "$ref": "#/$defs/MissionTarget"
+    },
+    "type": {
+      "$ref": "#/$defs/MissionType"
+    },
+    "windowEnd": {
+      "title": "Windowend",
+      "type": "string"
+    },
+    "windowStart": {
+      "title": "Windowstart",
+      "type": "string"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "type",
+    "priority",
+    "status",
+    "launchBaseId",
+    "target",
+    "route",
+    "windowStart",
+    "windowEnd",
+    "requiredAircraftType"
+  ],
+  "title": "Mission",
+  "type": "object"
+}

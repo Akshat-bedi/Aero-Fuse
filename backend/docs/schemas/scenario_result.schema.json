@@ -1,0 +1,1209 @@
+{
+  "$defs": {
+    "AircraftType": {
+      "enum": [
+        "Fighter-A",
+        "Strike-B",
+        "Transport-C",
+        "Recon-D",
+        "Helicopter-E"
+      ],
+      "title": "AircraftType",
+      "type": "string"
+    },
+    "AircraftUnserviceablePayload": {
+      "properties": {
+        "aircraftId": {
+          "minLength": 1,
+          "title": "Aircraftid",
+          "type": "string"
+        },
+        "etrHours": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Etrhours"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "aircraftId",
+        "reason"
+      ],
+      "title": "AircraftUnserviceablePayload",
+      "type": "object"
+    },
+    "AlertSeverity": {
+      "enum": [
+        "critical",
+        "warning",
+        "info"
+      ],
+      "title": "AlertSeverity",
+      "type": "string"
+    },
+    "BaseClosedPayload": {
+      "properties": {
+        "baseId": {
+          "minLength": 1,
+          "title": "Baseid",
+          "type": "string"
+        },
+        "durationHours": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Durationhours"
+        },
+        "runwayStatus": {
+          "$ref": "#/$defs/RunwayStatus",
+          "default": "closed"
+        }
+      },
+      "required": [
+        "baseId"
+      ],
+      "title": "BaseClosedPayload",
+      "type": "object"
+    },
+    "Change": {
+      "properties": {
+        "after": {
+          "default": null,
+          "title": "After"
+        },
+        "before": {
+          "default": null,
+          "title": "Before"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "entityId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entityid"
+        },
+        "entityType": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Entitytype"
+        },
+        "fromValue": {
+          "default": null,
+          "title": "Fromvalue"
+        },
+        "kind": {
+          "$ref": "#/$defs/ChangeKind"
+        },
+        "missionId": {
+          "minLength": 1,
+          "title": "Missionid",
+          "type": "string"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Note"
+        },
+        "toValue": {
+          "default": null,
+          "title": "Tovalue"
+        },
+        "type": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Type"
+        }
+      },
+      "required": [
+        "missionId",
+        "kind"
+      ],
+      "title": "Change",
+      "type": "object"
+    },
+    "ChangeKind": {
+      "enum": [
+        "aircraft_swap",
+        "crew_swap",
+        "reroute",
+        "delay",
+        "cancel",
+        "new_assignment"
+      ],
+      "title": "ChangeKind",
+      "type": "string"
+    },
+    "CrewUnavailablePayload": {
+      "properties": {
+        "crewId": {
+          "minLength": 1,
+          "title": "Crewid",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "crewId",
+        "reason"
+      ],
+      "title": "CrewUnavailablePayload",
+      "type": "object"
+    },
+    "EventType": {
+      "enum": [
+        "THREAT_DETECTED",
+        "AIRCRAFT_UNSERVICEABLE",
+        "BASE_CLOSED",
+        "WEATHER_DEGRADED",
+        "NEW_PRIORITY_MISSION",
+        "CREW_UNAVAILABLE"
+      ],
+      "title": "EventType",
+      "type": "string"
+    },
+    "LatLng": {
+      "description": "Point inside the fictional Republic of Veridia map bounds.",
+      "properties": {
+        "lat": {
+          "maximum": 10.0,
+          "minimum": 0.0,
+          "title": "Lat",
+          "type": "number"
+        },
+        "lng": {
+          "maximum": 12.0,
+          "minimum": 0.0,
+          "title": "Lng",
+          "type": "number"
+        }
+      },
+      "required": [
+        "lat",
+        "lng"
+      ],
+      "title": "LatLng",
+      "type": "object"
+    },
+    "MissionType": {
+      "enum": [
+        "CAP",
+        "strike",
+        "recon",
+        "airlift",
+        "SAR",
+        "escort"
+      ],
+      "title": "MissionType",
+      "type": "string"
+    },
+    "NewPriorityMissionPayload": {
+      "description": "Flat shape the injector UI sends (not wrapped in ``mission``).",
+      "properties": {
+        "durationHours": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Durationhours"
+        },
+        "launchBaseId": {
+          "minLength": 1,
+          "title": "Launchbaseid",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "priority": {
+          "enum": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "title": "Priority",
+          "type": "integer"
+        },
+        "requiredAircraftType": {
+          "$ref": "#/$defs/AircraftType"
+        },
+        "targetCoordinates": {
+          "$ref": "#/$defs/LatLng"
+        },
+        "type": {
+          "$ref": "#/$defs/MissionType"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "priority",
+        "launchBaseId",
+        "targetCoordinates",
+        "requiredAircraftType"
+      ],
+      "title": "NewPriorityMissionPayload",
+      "type": "object"
+    },
+    "OpsEventRequest": {
+      "description": "Request body for ``POST /api/events`` (id and timestamp filled server-side).",
+      "properties": {
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "operator": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Operator"
+        },
+        "payload": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ThreatDetectedPayload"
+            },
+            {
+              "$ref": "#/$defs/AircraftUnserviceablePayload"
+            },
+            {
+              "$ref": "#/$defs/BaseClosedPayload"
+            },
+            {
+              "$ref": "#/$defs/WeatherDegradedPayload"
+            },
+            {
+              "$ref": "#/$defs/NewPriorityMissionPayload"
+            },
+            {
+              "$ref": "#/$defs/CrewUnavailablePayload"
+            }
+          ],
+          "title": "Payload"
+        },
+        "severity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AlertSeverity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "type": {
+          "$ref": "#/$defs/EventType"
+        }
+      },
+      "required": [
+        "type",
+        "payload"
+      ],
+      "title": "OpsEventRequest",
+      "type": "object"
+    },
+    "Recommendation": {
+      "properties": {
+        "alternatives": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/Recommendation"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Alternatives"
+        },
+        "changes": {
+          "items": {
+            "$ref": "#/$defs/Change"
+          },
+          "title": "Changes",
+          "type": "array"
+        },
+        "confidence": {
+          "maximum": 1,
+          "minimum": 0,
+          "title": "Confidence",
+          "type": "number"
+        },
+        "constraintsRelaxed": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Constraintsrelaxed",
+          "type": "array"
+        },
+        "constraintsSatisfied": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Constraintssatisfied",
+          "type": "array"
+        },
+        "createdAt": {
+          "title": "Createdat",
+          "type": "string"
+        },
+        "criteriaScores": {
+          "anyOf": [
+            {
+              "additionalProperties": {
+                "maximum": 100,
+                "minimum": 0,
+                "type": "number"
+              },
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Criteriascores"
+        },
+        "dataFreshnessSec": {
+          "minimum": 0,
+          "title": "Datafreshnesssec",
+          "type": "number"
+        },
+        "explanation": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Explanation",
+          "type": "array"
+        },
+        "id": {
+          "pattern": "^REC-",
+          "title": "Id",
+          "type": "string"
+        },
+        "impactedMissionIds": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Impactedmissionids",
+          "type": "array"
+        },
+        "modifications": {
+          "anyOf": [
+            {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Modifications"
+        },
+        "score": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Score",
+          "type": "number"
+        },
+        "stateVersion": {
+          "minimum": 0,
+          "title": "Stateversion",
+          "type": "integer"
+        },
+        "status": {
+          "$ref": "#/$defs/RecommendationStatus"
+        },
+        "summary": {
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        },
+        "tradeoffs": {
+          "items": {
+            "$ref": "#/$defs/Tradeoff"
+          },
+          "title": "Tradeoffs",
+          "type": "array"
+        },
+        "triggerEventId": {
+          "minLength": 1,
+          "title": "Triggereventid",
+          "type": "string"
+        }
+      },
+      "required": [
+        "id",
+        "triggerEventId",
+        "summary",
+        "score",
+        "status",
+        "createdAt",
+        "stateVersion",
+        "confidence",
+        "dataFreshnessSec"
+      ],
+      "title": "Recommendation",
+      "type": "object"
+    },
+    "RecommendationStatus": {
+      "enum": [
+        "pending",
+        "approved",
+        "rejected",
+        "modified",
+        "stale",
+        "expired"
+      ],
+      "title": "RecommendationStatus",
+      "type": "string"
+    },
+    "RunwayStatus": {
+      "enum": [
+        "open",
+        "degraded",
+        "closed"
+      ],
+      "title": "RunwayStatus",
+      "type": "string"
+    },
+    "ScenarioAircraftLoss": {
+      "properties": {
+        "baseId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Baseid"
+        },
+        "count": {
+          "minimum": 0,
+          "title": "Count",
+          "type": "integer"
+        },
+        "type": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AircraftType"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "required": [
+        "count"
+      ],
+      "title": "ScenarioAircraftLoss",
+      "type": "object"
+    },
+    "ScenarioBaseOutage": {
+      "properties": {
+        "baseId": {
+          "minLength": 1,
+          "title": "Baseid",
+          "type": "string"
+        },
+        "hours": {
+          "minimum": 0,
+          "title": "Hours",
+          "type": "number"
+        }
+      },
+      "required": [
+        "baseId",
+        "hours"
+      ],
+      "title": "ScenarioBaseOutage",
+      "type": "object"
+    },
+    "ScenarioFailurePoint": {
+      "properties": {
+        "cause": {
+          "minLength": 1,
+          "title": "Cause",
+          "type": "string"
+        },
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "time": {
+          "minLength": 1,
+          "title": "Time",
+          "type": "string"
+        }
+      },
+      "required": [
+        "time",
+        "cause",
+        "description"
+      ],
+      "title": "ScenarioFailurePoint",
+      "type": "object"
+    },
+    "ScenarioKpis": {
+      "additionalProperties": true,
+      "description": "Scenario KPI block; extra keys are tolerated for forward compatibility.",
+      "properties": {
+        "aircraftUtilisationPct": {
+          "title": "Aircraftutilisationpct",
+          "type": "number"
+        },
+        "avgDelayMin": {
+          "title": "Avgdelaymin",
+          "type": "number"
+        },
+        "crewFatigueMax": {
+          "title": "Crewfatiguemax",
+          "type": "number"
+        },
+        "crewFatigueMean": {
+          "title": "Crewfatiguemean",
+          "type": "number"
+        },
+        "fuelConsumptionPct": {
+          "title": "Fuelconsumptionpct",
+          "type": "number"
+        },
+        "missionsFulfilledPct": {
+          "title": "Missionsfulfilledpct",
+          "type": "number"
+        },
+        "p1CoveragePct": {
+          "title": "P1Coveragepct",
+          "type": "number"
+        },
+        "weaponsConsumptionPct": {
+          "title": "Weaponsconsumptionpct",
+          "type": "number"
+        }
+      },
+      "required": [
+        "missionsFulfilledPct",
+        "p1CoveragePct",
+        "avgDelayMin",
+        "aircraftUtilisationPct",
+        "crewFatigueMean",
+        "crewFatigueMax",
+        "fuelConsumptionPct",
+        "weaponsConsumptionPct"
+      ],
+      "title": "ScenarioKpis",
+      "type": "object"
+    },
+    "ScenarioParams": {
+      "properties": {
+        "aircraftLoss": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/ScenarioAircraftLoss"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Aircraftloss"
+        },
+        "baseOutage": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ScenarioBaseOutage"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "crewAvailabilityReductionPct": {
+          "anyOf": [
+            {
+              "maximum": 100,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Crewavailabilityreductionpct"
+        },
+        "description": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Description"
+        },
+        "durationMinutes": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Durationminutes"
+        },
+        "horizonHours": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Horizonhours"
+        },
+        "injectedEvents": {
+          "anyOf": [
+            {
+              "items": {
+                "$ref": "#/$defs/OpsEventRequest"
+              },
+              "type": "array"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Injectedevents"
+        },
+        "name": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Name"
+        },
+        "surgeMissions": {
+          "anyOf": [
+            {
+              "maximum": 8,
+              "minimum": 0,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Surgemissions"
+        },
+        "threatLevel": {
+          "anyOf": [
+            {
+              "enum": [
+                "low",
+                "medium",
+                "high",
+                "critical"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Threatlevel"
+        },
+        "weatherSeverity": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/Severity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "ScenarioParams",
+      "type": "object"
+    },
+    "ScenarioUnmetMission": {
+      "properties": {
+        "missionId": {
+          "minLength": 1,
+          "title": "Missionid",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "missionId",
+        "reason"
+      ],
+      "title": "ScenarioUnmetMission",
+      "type": "object"
+    },
+    "ScenarioUtilisationSeries": {
+      "properties": {
+        "baseline": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Baseline",
+          "type": "array"
+        },
+        "scenario": {
+          "items": {
+            "type": "number"
+          },
+          "title": "Scenario",
+          "type": "array"
+        },
+        "time": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Time",
+          "type": "array"
+        }
+      },
+      "title": "ScenarioUtilisationSeries",
+      "type": "object"
+    },
+    "Severity": {
+      "enum": [
+        "nominal",
+        "caution",
+        "severe"
+      ],
+      "title": "Severity",
+      "type": "string"
+    },
+    "ThreatDetectedPayload": {
+      "properties": {
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Confidence"
+        },
+        "position": {
+          "$ref": "#/$defs/LatLng"
+        },
+        "rangeKm": {
+          "minimum": 0,
+          "title": "Rangekm",
+          "type": "number"
+        },
+        "status": {
+          "$ref": "#/$defs/ThreatStatus",
+          "default": "active"
+        },
+        "threatType": {
+          "$ref": "#/$defs/ThreatType"
+        }
+      },
+      "required": [
+        "threatType",
+        "position",
+        "rangeKm"
+      ],
+      "title": "ThreatDetectedPayload",
+      "type": "object"
+    },
+    "ThreatStatus": {
+      "enum": [
+        "active",
+        "suspected",
+        "neutralised"
+      ],
+      "title": "ThreatStatus",
+      "type": "string"
+    },
+    "ThreatType": {
+      "enum": [
+        "SAM",
+        "fighter",
+        "radar",
+        "AAA"
+      ],
+      "title": "ThreatType",
+      "type": "string"
+    },
+    "Tradeoff": {
+      "properties": {
+        "delta": {
+          "title": "Delta",
+          "type": "number"
+        },
+        "direction": {
+          "$ref": "#/$defs/TradeoffDirection"
+        },
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "delta",
+        "unit",
+        "direction"
+      ],
+      "title": "Tradeoff",
+      "type": "object"
+    },
+    "TradeoffDirection": {
+      "enum": [
+        "good",
+        "bad",
+        "neutral"
+      ],
+      "title": "TradeoffDirection",
+      "type": "string"
+    },
+    "WeatherDegradedPayload": {
+      "properties": {
+        "baseId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Baseid"
+        },
+        "durationHours": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Durationhours"
+        },
+        "region": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Region"
+        },
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        },
+        "visibilityKm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Visibilitykm"
+        },
+        "windKts": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Windkts"
+        }
+      },
+      "required": [
+        "severity"
+      ],
+      "title": "WeatherDegradedPayload",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "baselineKpis": {
+      "$ref": "#/$defs/ScenarioKpis"
+    },
+    "capped": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Capped"
+    },
+    "createdAt": {
+      "title": "Createdat",
+      "type": "string"
+    },
+    "firstFailure": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ScenarioFailurePoint"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "generatedRecommendations": {
+      "anyOf": [
+        {
+          "items": {
+            "$ref": "#/$defs/Recommendation"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Generatedrecommendations"
+    },
+    "id": {
+      "pattern": "^SCEN-",
+      "title": "Id",
+      "type": "string"
+    },
+    "impactedMissionIds": {
+      "anyOf": [
+        {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Impactedmissionids"
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "params": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ScenarioParams"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "scenarioId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Scenarioid"
+    },
+    "scenarioKpis": {
+      "$ref": "#/$defs/ScenarioKpis"
+    },
+    "series": {
+      "$ref": "#/$defs/ScenarioUtilisationSeries"
+    },
+    "successProbability": {
+      "anyOf": [
+        {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Successprobability"
+    },
+    "unmetMissions": {
+      "items": {
+        "$ref": "#/$defs/ScenarioUnmetMission"
+      },
+      "title": "Unmetmissions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "name",
+    "createdAt",
+    "baselineKpis",
+    "scenarioKpis",
+    "series"
+  ],
+  "title": "ScenarioResult",
+  "type": "object"
+}

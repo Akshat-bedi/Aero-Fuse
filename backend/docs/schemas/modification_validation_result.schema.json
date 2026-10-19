@@ -1,0 +1,82 @@
+{
+  "$defs": {
+    "Tradeoff": {
+      "properties": {
+        "delta": {
+          "title": "Delta",
+          "type": "number"
+        },
+        "direction": {
+          "$ref": "#/$defs/TradeoffDirection"
+        },
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "label",
+        "delta",
+        "unit",
+        "direction"
+      ],
+      "title": "Tradeoff",
+      "type": "object"
+    },
+    "TradeoffDirection": {
+      "enum": [
+        "good",
+        "bad",
+        "neutral"
+      ],
+      "title": "TradeoffDirection",
+      "type": "string"
+    }
+  },
+  "description": "Response for ``POST /api/recommendations/{id}/validate-modification``.",
+  "properties": {
+    "conflicts": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Conflicts",
+      "type": "array"
+    },
+    "score": {
+      "maximum": 100,
+      "minimum": 0,
+      "title": "Score",
+      "type": "number"
+    },
+    "tradeoffs": {
+      "items": {
+        "$ref": "#/$defs/Tradeoff"
+      },
+      "title": "Tradeoffs",
+      "type": "array"
+    },
+    "valid": {
+      "anyOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Valid"
+    }
+  },
+  "required": [
+    "score"
+  ],
+  "title": "ModificationValidationResult",
+  "type": "object"
+}

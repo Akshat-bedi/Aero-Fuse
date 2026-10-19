@@ -1,0 +1,50 @@
+{
+  "$defs": {
+    "AircraftType": {
+      "enum": [
+        "Fighter-A",
+        "Strike-B",
+        "Transport-C",
+        "Recon-D",
+        "Helicopter-E"
+      ],
+      "title": "AircraftType",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "baseId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Baseid"
+    },
+    "count": {
+      "minimum": 0,
+      "title": "Count",
+      "type": "integer"
+    },
+    "type": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AircraftType"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "count"
+  ],
+  "title": "ScenarioAircraftLoss",
+  "type": "object"
+}

@@ -1,0 +1,294 @@
+{
+  "$defs": {
+    "Aircraft": {
+      "properties": {
+        "assignedMissionId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Assignedmissionid"
+        },
+        "baseId": {
+          "title": "Baseid",
+          "type": "string"
+        },
+        "callsign": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Callsign"
+        },
+        "flightHoursToNextService": {
+          "minimum": 0,
+          "title": "Flighthourstonextservice",
+          "type": "number"
+        },
+        "fuelPct": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Fuelpct",
+          "type": "number"
+        },
+        "heading": {
+          "anyOf": [
+            {
+              "maximum": 360,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Heading"
+        },
+        "id": {
+          "pattern": "^AC-",
+          "title": "Id",
+          "type": "string"
+        },
+        "position": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/LatLng"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "speed": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Speed"
+        },
+        "status": {
+          "$ref": "#/$defs/AircraftStatus"
+        },
+        "tailNumber": {
+          "minLength": 1,
+          "title": "Tailnumber",
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/AircraftType"
+        },
+        "weaponLoad": {
+          "items": {
+            "$ref": "#/$defs/WeaponLoad"
+          },
+          "title": "Weaponload",
+          "type": "array"
+        }
+      },
+      "required": [
+        "id",
+        "tailNumber",
+        "type",
+        "baseId",
+        "status",
+        "fuelPct",
+        "flightHoursToNextService"
+      ],
+      "title": "Aircraft",
+      "type": "object"
+    },
+    "AircraftStatus": {
+      "enum": [
+        "serviceable",
+        "maintenance",
+        "unserviceable",
+        "airborne",
+        "turnaround"
+      ],
+      "title": "AircraftStatus",
+      "type": "string"
+    },
+    "AircraftType": {
+      "enum": [
+        "Fighter-A",
+        "Strike-B",
+        "Transport-C",
+        "Recon-D",
+        "Helicopter-E"
+      ],
+      "title": "AircraftType",
+      "type": "string"
+    },
+    "Crew": {
+      "properties": {
+        "baseId": {
+          "title": "Baseid",
+          "type": "string"
+        },
+        "callsign": {
+          "minLength": 1,
+          "title": "Callsign",
+          "type": "string"
+        },
+        "dutyHoursLast24h": {
+          "maximum": 24,
+          "minimum": 0,
+          "title": "Dutyhourslast24H",
+          "type": "number"
+        },
+        "fatigueIndex": {
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Fatigueindex",
+          "type": "number"
+        },
+        "id": {
+          "pattern": "^CR-",
+          "title": "Id",
+          "type": "string"
+        },
+        "qualifications": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Qualifications",
+          "type": "array"
+        },
+        "restHoursRemaining": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Resthoursremaining"
+        },
+        "role": {
+          "minLength": 1,
+          "title": "Role",
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/$defs/CrewStatus"
+        }
+      },
+      "required": [
+        "id",
+        "callsign",
+        "role",
+        "baseId",
+        "fatigueIndex",
+        "dutyHoursLast24h",
+        "status"
+      ],
+      "title": "Crew",
+      "type": "object"
+    },
+    "CrewStatus": {
+      "enum": [
+        "available",
+        "resting",
+        "on-mission",
+        "unavailable"
+      ],
+      "title": "CrewStatus",
+      "type": "string"
+    },
+    "LatLng": {
+      "description": "Point inside the fictional Republic of Veridia map bounds.",
+      "properties": {
+        "lat": {
+          "maximum": 10.0,
+          "minimum": 0.0,
+          "title": "Lat",
+          "type": "number"
+        },
+        "lng": {
+          "maximum": 12.0,
+          "minimum": 0.0,
+          "title": "Lng",
+          "type": "number"
+        }
+      },
+      "required": [
+        "lat",
+        "lng"
+      ],
+      "title": "LatLng",
+      "type": "object"
+    },
+    "WeaponLoad": {
+      "properties": {
+        "quantity": {
+          "minimum": 0,
+          "title": "Quantity",
+          "type": "integer"
+        },
+        "station": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Station"
+        },
+        "weaponType": {
+          "minLength": 1,
+          "title": "Weapontype",
+          "type": "string"
+        }
+      },
+      "required": [
+        "weaponType",
+        "quantity"
+      ],
+      "title": "WeaponLoad",
+      "type": "object"
+    }
+  },
+  "description": "Response for ``GET /api/missions/{id}/eligible-resources``.",
+  "properties": {
+    "aircraft": {
+      "items": {
+        "$ref": "#/$defs/Aircraft"
+      },
+      "title": "Aircraft",
+      "type": "array"
+    },
+    "crew": {
+      "items": {
+        "$ref": "#/$defs/Crew"
+      },
+      "title": "Crew",
+      "type": "array"
+    }
+  },
+  "title": "EligibleResources",
+  "type": "object"
+}

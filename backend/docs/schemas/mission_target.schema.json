@@ -1,0 +1,28 @@
+{
+  "properties": {
+    "lat": {
+      "maximum": 10.0,
+      "minimum": 0.0,
+      "title": "Lat",
+      "type": "number"
+    },
+    "lng": {
+      "maximum": 12.0,
+      "minimum": 0.0,
+      "title": "Lng",
+      "type": "number"
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    }
+  },
+  "required": [
+    "lat",
+    "lng",
+    "name"
+  ],
+  "title": "MissionTarget",
+  "type": "object"
+}

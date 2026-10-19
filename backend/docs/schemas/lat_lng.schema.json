@@ -1,0 +1,23 @@
+{
+  "description": "Point inside the fictional Republic of Veridia map bounds.",
+  "properties": {
+    "lat": {
+      "maximum": 10.0,
+      "minimum": 0.0,
+      "title": "Lat",
+      "type": "number"
+    },
+    "lng": {
+      "maximum": 12.0,
+      "minimum": 0.0,
+      "title": "Lng",
+      "type": "number"
+    }
+  },
+  "required": [
+    "lat",
+    "lng"
+  ],
+  "title": "LatLng",
+  "type": "object"
+}

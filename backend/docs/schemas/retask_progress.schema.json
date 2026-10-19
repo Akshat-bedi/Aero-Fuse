@@ -1,0 +1,49 @@
+{
+  "$defs": {
+    "RetaskStage": {
+      "enum": [
+        "fusing",
+        "constraints",
+        "optimising",
+        "ranking",
+        "ready"
+      ],
+      "title": "RetaskStage",
+      "type": "string"
+    }
+  },
+  "description": "Payload of the ``RETASK_PROGRESS`` WebSocket message.",
+  "properties": {
+    "elapsedMs": {
+      "minimum": 0,
+      "title": "Elapsedms",
+      "type": "number"
+    },
+    "isReplanActive": {
+      "title": "Isreplanactive",
+      "type": "boolean"
+    },
+    "message": {
+      "default": "",
+      "title": "Message",
+      "type": "string"
+    },
+    "stage": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/RetaskStage"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    }
+  },
+  "required": [
+    "isReplanActive",
+    "elapsedMs"
+  ],
+  "title": "RetaskProgress",
+  "type": "object"
+}

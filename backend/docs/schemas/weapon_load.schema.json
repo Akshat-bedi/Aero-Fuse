@@ -1,0 +1,32 @@
+{
+  "properties": {
+    "quantity": {
+      "minimum": 0,
+      "title": "Quantity",
+      "type": "integer"
+    },
+    "station": {
+      "anyOf": [
+        {
+          "type": "integer"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Station"
+    },
+    "weaponType": {
+      "minLength": 1,
+      "title": "Weapontype",
+      "type": "string"
+    }
+  },
+  "required": [
+    "weaponType",
+    "quantity"
+  ],
+  "title": "WeaponLoad",
+  "type": "object"
+}

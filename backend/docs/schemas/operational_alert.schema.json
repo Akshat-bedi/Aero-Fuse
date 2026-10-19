@@ -1,0 +1,116 @@
+{
+  "$defs": {
+    "AlertSeverity": {
+      "enum": [
+        "critical",
+        "warning",
+        "info"
+      ],
+      "title": "AlertSeverity",
+      "type": "string"
+    },
+    "AlertType": {
+      "enum": [
+        "threat",
+        "readiness",
+        "weather",
+        "crew",
+        "conflict",
+        "prediction",
+        "data-quality"
+      ],
+      "title": "AlertType",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "acknowledged": {
+      "default": false,
+      "title": "Acknowledged",
+      "type": "boolean"
+    },
+    "category": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Category"
+    },
+    "details": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Details"
+    },
+    "entityId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Entityid"
+    },
+    "id": {
+      "minLength": 1,
+      "title": "Id",
+      "type": "string"
+    },
+    "location": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Location"
+    },
+    "message": {
+      "minLength": 1,
+      "title": "Message",
+      "type": "string"
+    },
+    "severity": {
+      "$ref": "#/$defs/AlertSeverity"
+    },
+    "timestamp": {
+      "title": "Timestamp",
+      "type": "string"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    },
+    "type": {
+      "$ref": "#/$defs/AlertType"
+    }
+  },
+  "required": [
+    "id",
+    "title",
+    "message",
+    "severity",
+    "type",
+    "timestamp"
+  ],
+  "title": "OperationalAlert",
+  "type": "object"
+}

@@ -1,0 +1,434 @@
+{
+  "$defs": {
+    "AircraftType": {
+      "enum": [
+        "Fighter-A",
+        "Strike-B",
+        "Transport-C",
+        "Recon-D",
+        "Helicopter-E"
+      ],
+      "title": "AircraftType",
+      "type": "string"
+    },
+    "AircraftUnserviceablePayload": {
+      "properties": {
+        "aircraftId": {
+          "minLength": 1,
+          "title": "Aircraftid",
+          "type": "string"
+        },
+        "etrHours": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Etrhours"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "aircraftId",
+        "reason"
+      ],
+      "title": "AircraftUnserviceablePayload",
+      "type": "object"
+    },
+    "AlertSeverity": {
+      "enum": [
+        "critical",
+        "warning",
+        "info"
+      ],
+      "title": "AlertSeverity",
+      "type": "string"
+    },
+    "BaseClosedPayload": {
+      "properties": {
+        "baseId": {
+          "minLength": 1,
+          "title": "Baseid",
+          "type": "string"
+        },
+        "durationHours": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Durationhours"
+        },
+        "runwayStatus": {
+          "$ref": "#/$defs/RunwayStatus",
+          "default": "closed"
+        }
+      },
+      "required": [
+        "baseId"
+      ],
+      "title": "BaseClosedPayload",
+      "type": "object"
+    },
+    "CrewUnavailablePayload": {
+      "properties": {
+        "crewId": {
+          "minLength": 1,
+          "title": "Crewid",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "crewId",
+        "reason"
+      ],
+      "title": "CrewUnavailablePayload",
+      "type": "object"
+    },
+    "EventType": {
+      "enum": [
+        "THREAT_DETECTED",
+        "AIRCRAFT_UNSERVICEABLE",
+        "BASE_CLOSED",
+        "WEATHER_DEGRADED",
+        "NEW_PRIORITY_MISSION",
+        "CREW_UNAVAILABLE"
+      ],
+      "title": "EventType",
+      "type": "string"
+    },
+    "LatLng": {
+      "description": "Point inside the fictional Republic of Veridia map bounds.",
+      "properties": {
+        "lat": {
+          "maximum": 10.0,
+          "minimum": 0.0,
+          "title": "Lat",
+          "type": "number"
+        },
+        "lng": {
+          "maximum": 12.0,
+          "minimum": 0.0,
+          "title": "Lng",
+          "type": "number"
+        }
+      },
+      "required": [
+        "lat",
+        "lng"
+      ],
+      "title": "LatLng",
+      "type": "object"
+    },
+    "MissionType": {
+      "enum": [
+        "CAP",
+        "strike",
+        "recon",
+        "airlift",
+        "SAR",
+        "escort"
+      ],
+      "title": "MissionType",
+      "type": "string"
+    },
+    "NewPriorityMissionPayload": {
+      "description": "Flat shape the injector UI sends (not wrapped in ``mission``).",
+      "properties": {
+        "durationHours": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Durationhours"
+        },
+        "launchBaseId": {
+          "minLength": 1,
+          "title": "Launchbaseid",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "priority": {
+          "enum": [
+            1,
+            2,
+            3,
+            4
+          ],
+          "title": "Priority",
+          "type": "integer"
+        },
+        "requiredAircraftType": {
+          "$ref": "#/$defs/AircraftType"
+        },
+        "targetCoordinates": {
+          "$ref": "#/$defs/LatLng"
+        },
+        "type": {
+          "$ref": "#/$defs/MissionType"
+        }
+      },
+      "required": [
+        "name",
+        "type",
+        "priority",
+        "launchBaseId",
+        "targetCoordinates",
+        "requiredAircraftType"
+      ],
+      "title": "NewPriorityMissionPayload",
+      "type": "object"
+    },
+    "RunwayStatus": {
+      "enum": [
+        "open",
+        "degraded",
+        "closed"
+      ],
+      "title": "RunwayStatus",
+      "type": "string"
+    },
+    "Severity": {
+      "enum": [
+        "nominal",
+        "caution",
+        "severe"
+      ],
+      "title": "Severity",
+      "type": "string"
+    },
+    "ThreatDetectedPayload": {
+      "properties": {
+        "confidence": {
+          "anyOf": [
+            {
+              "maximum": 1,
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Confidence"
+        },
+        "position": {
+          "$ref": "#/$defs/LatLng"
+        },
+        "rangeKm": {
+          "minimum": 0,
+          "title": "Rangekm",
+          "type": "number"
+        },
+        "status": {
+          "$ref": "#/$defs/ThreatStatus",
+          "default": "active"
+        },
+        "threatType": {
+          "$ref": "#/$defs/ThreatType"
+        }
+      },
+      "required": [
+        "threatType",
+        "position",
+        "rangeKm"
+      ],
+      "title": "ThreatDetectedPayload",
+      "type": "object"
+    },
+    "ThreatStatus": {
+      "enum": [
+        "active",
+        "suspected",
+        "neutralised"
+      ],
+      "title": "ThreatStatus",
+      "type": "string"
+    },
+    "ThreatType": {
+      "enum": [
+        "SAM",
+        "fighter",
+        "radar",
+        "AAA"
+      ],
+      "title": "ThreatType",
+      "type": "string"
+    },
+    "WeatherDegradedPayload": {
+      "properties": {
+        "baseId": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Baseid"
+        },
+        "durationHours": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Durationhours"
+        },
+        "region": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Region"
+        },
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        },
+        "visibilityKm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Visibilitykm"
+        },
+        "windKts": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Windkts"
+        }
+      },
+      "required": [
+        "severity"
+      ],
+      "title": "WeatherDegradedPayload",
+      "type": "object"
+    }
+  },
+  "description": "Request body for ``POST /api/events`` (id and timestamp filled server-side).",
+  "properties": {
+    "description": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Description"
+    },
+    "operator": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Operator"
+    },
+    "payload": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ThreatDetectedPayload"
+        },
+        {
+          "$ref": "#/$defs/AircraftUnserviceablePayload"
+        },
+        {
+          "$ref": "#/$defs/BaseClosedPayload"
+        },
+        {
+          "$ref": "#/$defs/WeatherDegradedPayload"
+        },
+        {
+          "$ref": "#/$defs/NewPriorityMissionPayload"
+        },
+        {
+          "$ref": "#/$defs/CrewUnavailablePayload"
+        }
+      ],
+      "title": "Payload"
+    },
+    "severity": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/AlertSeverity"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "type": {
+      "$ref": "#/$defs/EventType"
+    }
+  },
+  "required": [
+    "type",
+    "payload"
+  ],
+  "title": "OpsEventRequest",
+  "type": "object"
+}

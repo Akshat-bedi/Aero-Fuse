@@ -1,0 +1,26 @@
+{
+  "properties": {
+    "cause": {
+      "minLength": 1,
+      "title": "Cause",
+      "type": "string"
+    },
+    "description": {
+      "minLength": 1,
+      "title": "Description",
+      "type": "string"
+    },
+    "time": {
+      "minLength": 1,
+      "title": "Time",
+      "type": "string"
+    }
+  },
+  "required": [
+    "time",
+    "cause",
+    "description"
+  ],
+  "title": "ScenarioFailurePoint",
+  "type": "object"
+}

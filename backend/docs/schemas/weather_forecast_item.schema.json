@@ -1,0 +1,54 @@
+{
+  "$defs": {
+    "Severity": {
+      "enum": [
+        "nominal",
+        "caution",
+        "severe"
+      ],
+      "title": "Severity",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "severity": {
+      "$ref": "#/$defs/Severity"
+    },
+    "time": {
+      "title": "Time",
+      "type": "string"
+    },
+    "visibilityKm": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Visibilitykm"
+    },
+    "windKts": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Windkts"
+    }
+  },
+  "required": [
+    "time",
+    "severity"
+  ],
+  "title": "WeatherForecastItem",
+  "type": "object"
+}

@@ -1,0 +1,20 @@
+{
+  "properties": {
+    "missionId": {
+      "minLength": 1,
+      "title": "Missionid",
+      "type": "string"
+    },
+    "newAircraftId": {
+      "minLength": 1,
+      "title": "Newaircraftid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "missionId",
+    "newAircraftId"
+  ],
+  "title": "AircraftSwapModification",
+  "type": "object"
+}

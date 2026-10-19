@@ -1,0 +1,37 @@
+{
+  "description": "Bounding box of the tactical map (lat 0-10, lng 0-12).",
+  "properties": {
+    "maxLat": {
+      "maximum": 10.0,
+      "minimum": 0.0,
+      "title": "Maxlat",
+      "type": "number"
+    },
+    "maxLng": {
+      "maximum": 12.0,
+      "minimum": 0.0,
+      "title": "Maxlng",
+      "type": "number"
+    },
+    "minLat": {
+      "maximum": 10.0,
+      "minimum": 0.0,
+      "title": "Minlat",
+      "type": "number"
+    },
+    "minLng": {
+      "maximum": 12.0,
+      "minimum": 0.0,
+      "title": "Minlng",
+      "type": "number"
+    }
+  },
+  "required": [
+    "minLat",
+    "maxLat",
+    "minLng",
+    "maxLng"
+  ],
+  "title": "MapBounds",
+  "type": "object"
+}

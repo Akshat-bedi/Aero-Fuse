@@ -1,0 +1,20 @@
+{
+  "properties": {
+    "crewId": {
+      "minLength": 1,
+      "title": "Crewid",
+      "type": "string"
+    },
+    "reason": {
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    }
+  },
+  "required": [
+    "crewId",
+    "reason"
+  ],
+  "title": "CrewUnavailablePayload",
+  "type": "object"
+}

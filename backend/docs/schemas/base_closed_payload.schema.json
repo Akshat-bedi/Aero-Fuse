@@ -1,0 +1,42 @@
+{
+  "$defs": {
+    "RunwayStatus": {
+      "enum": [
+        "open",
+        "degraded",
+        "closed"
+      ],
+      "title": "RunwayStatus",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "baseId": {
+      "minLength": 1,
+      "title": "Baseid",
+      "type": "string"
+    },
+    "durationHours": {
+      "anyOf": [
+        {
+          "minimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Durationhours"
+    },
+    "runwayStatus": {
+      "$ref": "#/$defs/RunwayStatus",
+      "default": "closed"
+    }
+  },
+  "required": [
+    "baseId"
+  ],
+  "title": "BaseClosedPayload",
+  "type": "object"
+}

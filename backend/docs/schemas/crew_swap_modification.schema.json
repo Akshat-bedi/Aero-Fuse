@@ -1,0 +1,20 @@
+{
+  "properties": {
+    "missionId": {
+      "minLength": 1,
+      "title": "Missionid",
+      "type": "string"
+    },
+    "newCrewId": {
+      "minLength": 1,
+      "title": "Newcrewid",
+      "type": "string"
+    }
+  },
+  "required": [
+    "missionId",
+    "newCrewId"
+  ],
+  "title": "CrewSwapModification",
+  "type": "object"
+}

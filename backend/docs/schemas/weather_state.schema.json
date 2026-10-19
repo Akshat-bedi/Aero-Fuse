@@ -1,0 +1,115 @@
+{
+  "$defs": {
+    "Severity": {
+      "enum": [
+        "nominal",
+        "caution",
+        "severe"
+      ],
+      "title": "Severity",
+      "type": "string"
+    },
+    "WeatherForecastItem": {
+      "properties": {
+        "severity": {
+          "$ref": "#/$defs/Severity"
+        },
+        "time": {
+          "title": "Time",
+          "type": "string"
+        },
+        "visibilityKm": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Visibilitykm"
+        },
+        "windKts": {
+          "anyOf": [
+            {
+              "minimum": 0,
+              "type": "number"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Windkts"
+        }
+      },
+      "required": [
+        "time",
+        "severity"
+      ],
+      "title": "WeatherForecastItem",
+      "type": "object"
+    }
+  },
+  "properties": {
+    "baseId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Baseid"
+    },
+    "cloudBaseFt": {
+      "minimum": 0,
+      "title": "Cloudbaseft",
+      "type": "number"
+    },
+    "forecast": {
+      "items": {
+        "$ref": "#/$defs/WeatherForecastItem"
+      },
+      "title": "Forecast",
+      "type": "array"
+    },
+    "region": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Region"
+    },
+    "severity": {
+      "$ref": "#/$defs/Severity"
+    },
+    "visibilityKm": {
+      "minimum": 0,
+      "title": "Visibilitykm",
+      "type": "number"
+    },
+    "windKts": {
+      "minimum": 0,
+      "title": "Windkts",
+      "type": "number"
+    }
+  },
+  "required": [
+    "visibilityKm",
+    "cloudBaseFt",
+    "windKts",
+    "severity"
+  ],
+  "title": "WeatherState",
+  "type": "object"
+}

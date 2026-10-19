@@ -1,0 +1,88 @@
+{
+  "$defs": {
+    "LatLng": {
+      "description": "Point inside the fictional Republic of Veridia map bounds.",
+      "properties": {
+        "lat": {
+          "maximum": 10.0,
+          "minimum": 0.0,
+          "title": "Lat",
+          "type": "number"
+        },
+        "lng": {
+          "maximum": 12.0,
+          "minimum": 0.0,
+          "title": "Lng",
+          "type": "number"
+        }
+      },
+      "required": [
+        "lat",
+        "lng"
+      ],
+      "title": "LatLng",
+      "type": "object"
+    },
+    "ThreatStatus": {
+      "enum": [
+        "active",
+        "suspected",
+        "neutralised"
+      ],
+      "title": "ThreatStatus",
+      "type": "string"
+    },
+    "ThreatType": {
+      "enum": [
+        "SAM",
+        "fighter",
+        "radar",
+        "AAA"
+      ],
+      "title": "ThreatType",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "confidence": {
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "id": {
+      "pattern": "^THR-",
+      "title": "Id",
+      "type": "string"
+    },
+    "lastSeen": {
+      "title": "Lastseen",
+      "type": "string"
+    },
+    "position": {
+      "$ref": "#/$defs/LatLng"
+    },
+    "rangeKm": {
+      "minimum": 0,
+      "title": "Rangekm",
+      "type": "number"
+    },
+    "status": {
+      "$ref": "#/$defs/ThreatStatus"
+    },
+    "type": {
+      "$ref": "#/$defs/ThreatType"
+    }
+  },
+  "required": [
+    "id",
+    "type",
+    "position",
+    "rangeKm",
+    "confidence",
+    "lastSeen",
+    "status"
+  ],
+  "title": "Threat",
+  "type": "object"
+}

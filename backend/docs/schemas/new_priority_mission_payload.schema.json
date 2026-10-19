@@ -1,0 +1,105 @@
+{
+  "$defs": {
+    "AircraftType": {
+      "enum": [
+        "Fighter-A",
+        "Strike-B",
+        "Transport-C",
+        "Recon-D",
+        "Helicopter-E"
+      ],
+      "title": "AircraftType",
+      "type": "string"
+    },
+    "LatLng": {
+      "description": "Point inside the fictional Republic of Veridia map bounds.",
+      "properties": {
+        "lat": {
+          "maximum": 10.0,
+          "minimum": 0.0,
+          "title": "Lat",
+          "type": "number"
+        },
+        "lng": {
+          "maximum": 12.0,
+          "minimum": 0.0,
+          "title": "Lng",
+          "type": "number"
+        }
+      },
+      "required": [
+        "lat",
+        "lng"
+      ],
+      "title": "LatLng",
+      "type": "object"
+    },
+    "MissionType": {
+      "enum": [
+        "CAP",
+        "strike",
+        "recon",
+        "airlift",
+        "SAR",
+        "escort"
+      ],
+      "title": "MissionType",
+      "type": "string"
+    }
+  },
+  "description": "Flat shape the injector UI sends (not wrapped in ``mission``).",
+  "properties": {
+    "durationHours": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0,
+          "type": "number"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Durationhours"
+    },
+    "launchBaseId": {
+      "minLength": 1,
+      "title": "Launchbaseid",
+      "type": "string"
+    },
+    "name": {
+      "minLength": 1,
+      "title": "Name",
+      "type": "string"
+    },
+    "priority": {
+      "enum": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "title": "Priority",
+      "type": "integer"
+    },
+    "requiredAircraftType": {
+      "$ref": "#/$defs/AircraftType"
+    },
+    "targetCoordinates": {
+      "$ref": "#/$defs/LatLng"
+    },
+    "type": {
+      "$ref": "#/$defs/MissionType"
+    }
+  },
+  "required": [
+    "name",
+    "type",
+    "priority",
+    "launchBaseId",
+    "targetCoordinates",
+    "requiredAircraftType"
+  ],
+  "title": "NewPriorityMissionPayload",
+  "type": "object"
+}

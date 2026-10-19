@@ -1,0 +1,20 @@
+{
+  "properties": {
+    "quantity": {
+      "minimum": 0,
+      "title": "Quantity",
+      "type": "integer"
+    },
+    "weaponType": {
+      "minLength": 1,
+      "title": "Weapontype",
+      "type": "string"
+    }
+  },
+  "required": [
+    "weaponType",
+    "quantity"
+  ],
+  "title": "RequiredWeaponItem",
+  "type": "object"
+}

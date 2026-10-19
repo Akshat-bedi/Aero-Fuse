@@ -1,0 +1,40 @@
+{
+  "$defs": {
+    "TradeoffDirection": {
+      "enum": [
+        "good",
+        "bad",
+        "neutral"
+      ],
+      "title": "TradeoffDirection",
+      "type": "string"
+    }
+  },
+  "properties": {
+    "delta": {
+      "title": "Delta",
+      "type": "number"
+    },
+    "direction": {
+      "$ref": "#/$defs/TradeoffDirection"
+    },
+    "label": {
+      "minLength": 1,
+      "title": "Label",
+      "type": "string"
+    },
+    "unit": {
+      "minLength": 1,
+      "title": "Unit",
+      "type": "string"
+    }
+  },
+  "required": [
+    "label",
+    "delta",
+    "unit",
+    "direction"
+  ],
+  "title": "Tradeoff",
+  "type": "object"
+}

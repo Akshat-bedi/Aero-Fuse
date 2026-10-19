@@ -1,0 +1,66 @@
+{
+  "$defs": {
+    "EventType": {
+      "enum": [
+        "THREAT_DETECTED",
+        "AIRCRAFT_UNSERVICEABLE",
+        "BASE_CLOSED",
+        "WEATHER_DEGRADED",
+        "NEW_PRIORITY_MISSION",
+        "CREW_UNAVAILABLE"
+      ],
+      "title": "EventType",
+      "type": "string"
+    }
+  },
+  "description": "Payload of the ``IMPACT_ANALYSIS`` WebSocket message.\n\n``eventId``/``eventType`` are part of the frontend type but not the\ncontract's payload sketch; both are emitted, both are optional on parse.",
+  "properties": {
+    "eventId": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Eventid"
+    },
+    "eventType": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/EventType"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "impactedMissionIds": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Impactedmissionids",
+      "type": "array"
+    },
+    "reasons": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Reasons",
+      "type": "array"
+    },
+    "timeToDecisionMin": {
+      "minimum": 0,
+      "title": "Timetodecisionmin",
+      "type": "number"
+    }
+  },
+  "required": [
+    "timeToDecisionMin"
+  ],
+  "title": "ImpactAnalysis",
+  "type": "object"
+}

@@ -1,0 +1,55 @@
+{
+  "properties": {
+    "confidence": {
+      "maximum": 1,
+      "minimum": 0,
+      "title": "Confidence",
+      "type": "number"
+    },
+    "createdAt": {
+      "title": "Createdat",
+      "type": "string"
+    },
+    "entityId": {
+      "minLength": 1,
+      "title": "Entityid",
+      "type": "string"
+    },
+    "entityType": {
+      "minLength": 1,
+      "title": "Entitytype",
+      "type": "string"
+    },
+    "horizonMinutes": {
+      "minimum": 0,
+      "title": "Horizonminutes",
+      "type": "number"
+    },
+    "message": {
+      "minLength": 1,
+      "title": "Message",
+      "type": "string"
+    },
+    "metric": {
+      "minLength": 1,
+      "title": "Metric",
+      "type": "string"
+    },
+    "value": {
+      "title": "Value",
+      "type": "number"
+    }
+  },
+  "required": [
+    "entityType",
+    "entityId",
+    "metric",
+    "value",
+    "confidence",
+    "horizonMinutes",
+    "createdAt",
+    "message"
+  ],
+  "title": "Prediction",
+  "type": "object"
+}
