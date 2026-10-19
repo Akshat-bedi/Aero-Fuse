@@ -1,6 +1,6 @@
 """Health endpoint (``GET /api/health``)."""
 
-from fastapi import APIRouter
+from fastapi import APIRouter, Request
 
 from app.config import get_settings
 from app.domain.base import WireModel
@@ -18,16 +18,20 @@ class HealthResponse(WireModel):
 
 
 @router.get("/health")
-async def get_health() -> HealthResponse:
-    """Report process health.
+async def get_health(request: Request) -> HealthResponse:
+    """Report process health with the current sim time.
 
-    ``simTime`` is ``null`` until the simulation clock lands in B2;
-    ``solverReady`` flips to ``true`` when the CP-SAT optimiser lands in B5.
+    ``simTime`` is an ISO-8601 UTC string from the sim clock. If no runtime is
+    attached (unit tests without lifespan) it falls back to the configured
+    start time, keeping the contract's four keys. ``solverReady`` flips to
+    ``true`` when the CP-SAT optimiser lands in B5.
     """
     settings = get_settings()
+    runtime = getattr(request.app.state, "runtime", None)
+    sim_time: str = runtime.clock.now() if runtime is not None else settings.sim_start_time
     return HealthResponse(
         status="ok",
         version=settings.app_version,
-        sim_time=None,
+        sim_time=sim_time,
         solver_ready=False,
     )

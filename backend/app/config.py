@@ -29,7 +29,7 @@ class Settings(BaseSettings):
     port: int = 8000
     log_level: str = "INFO"
 
-    cors_origins: str = "http://localhost:5173"
+    cors_origins: str = "http://localhost:5173,http://127.0.0.1:5173"
 
     seed: int = 42
     db_url: str = "sqlite:///./airops.db"
@@ -47,6 +47,11 @@ class Settings(BaseSettings):
 
     sim_start_time: str = "2026-10-17T12:00:00.000Z"
     sim_default_speed: int = 1
+
+    # Wall-clock cadence of the sim loop and the WebSocket heartbeat.
+    sim_tick_interval_s: float = 1.0
+    ws_heartbeat_sec: float = 5.0
+    ws_queue_size: int = 256
 
     @property
     def cors_origin_list(self) -> list[str]:
