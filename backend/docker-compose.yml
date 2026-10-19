@@ -6,6 +6,9 @@ services:
       - "8000:8000"
     environment:
       SEED: "42"
+      SEED_PATH: "/srv/airops/shared/seed/world.json"
       CORS_ORIGINS: "http://localhost:5173"
       SIM_START_TIME: "2026-10-17T12:00:00.000Z"
+    volumes:
+      - ../shared/seed:/srv/airops/shared/seed:ro
     restart: unless-stopped

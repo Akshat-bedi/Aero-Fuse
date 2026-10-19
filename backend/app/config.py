@@ -5,8 +5,12 @@ next to this project. Defaults are deterministic, offline demo values.
 """
 
 from functools import lru_cache
+from pathlib import Path
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+_DEFAULT_SEED_PATH = _REPO_ROOT / "shared" / "seed" / "world.json"
 
 
 class Settings(BaseSettings):
@@ -29,6 +33,10 @@ class Settings(BaseSettings):
 
     seed: int = 42
     db_url: str = "sqlite:///./airops.db"
+
+    # Canonical world seed (authoritative baseline dataset). The default is
+    # repo-relative; Docker compose mounts ../shared and overrides SEED_PATH.
+    seed_path: str = str(_DEFAULT_SEED_PATH)
 
     auth_enabled: bool = False
     jwt_secret: str = "dev-only-change-me"
