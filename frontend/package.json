@@ -12,7 +12,8 @@
     "test:watch": "vitest",
     "preview": "vite preview",
     "fake-backend": "node scripts/fake-backend.mjs",
-    "check:offline": "node scripts/check-offline.mjs"
+    "check:offline": "node scripts/check-offline.mjs",
+    "export:seed": "vite-node scripts/export-seed.ts"
   },
   "dependencies": {
     "@fontsource/inter": "^5.1.1",

@@ -1,0 +1,2441 @@
+{
+  "activeEvents": [],
+  "aircraft": [
+    {
+      "assignedMissionId": "M-01",
+      "baseId": "BASE-A",
+      "callsign": "VAPOR-11",
+      "flightHoursToNextService": 43,
+      "fuelPct": 74,
+      "heading": 65,
+      "id": "AC-01",
+      "position": {
+        "lat": 8.6,
+        "lng": 4.8
+      },
+      "speed": 420,
+      "status": "airborne",
+      "tailNumber": "VR-F01",
+      "type": "Fighter-A",
+      "weaponLoad": [
+        {
+          "quantity": 2,
+          "weaponType": "GENERIC-AAM-M"
+        },
+        {
+          "quantity": 2,
+          "weaponType": "GENERIC-AAM-S"
+        }
+      ]
+    },
+    {
+      "baseId": "BASE-A",
+      "callsign": "VAPOR-12",
+      "flightHoursToNextService": 61,
+      "fuelPct": 18,
+      "heading": 0,
+      "id": "AC-02",
+      "position": {
+        "lat": 8.5,
+        "lng": 3.5
+      },
+      "speed": 0,
+      "status": "unserviceable",
+      "tailNumber": "VR-F02",
+      "type": "Fighter-A",
+      "weaponLoad": [
+        {
+          "quantity": 2,
+          "weaponType": "GENERIC-AAM-M"
+        },
+        {
+          "quantity": 2,
+          "weaponType": "GENERIC-AAM-S"
+        }
+      ]
+    },
+    {
+      "assignedMissionId": "M-03",
+      "baseId": "BASE-A",
+      "callsign": "VAPOR-13",
+      "flightHoursToNextService": 79,
+      "fuelPct": 74,
+      "heading": 65,
+      "id": "AC-03",
+      "position": {
+        "lat": 2.2,
+        "lng": 5.1
+      },
+      "speed": 420,
+      "status": "airborne",
+      "tailNumber": "VR-F03",
+      "type": "Fighter-A",
+      "weaponLoad": [
+        {
+          "quantity": 2,
+          "weaponType": "GENERIC-AAM-M"
+        },
+        {
+          "quantity": 2,
+          "weaponType": "GENERIC-AAM-S"
+        }
+      ]
+    },
+    {
+      "baseId": "BASE-A",
+      "callsign": "VAPOR-14",
+      "flightHoursToNextService": 97,
+      "fuelPct": 95,
+      "heading": 0,
+      "id": "AC-04",
+      "position": {
+        "lat": 8.5,
+        "lng": 3.5
+      },
+      "speed": 0,
+      "status": "serviceable",
+      "tailNumber": "VR-F04",
+      "type": "Fighter-A",
+      "weaponLoad": [
+        {
+          "quantity": 2,
+          "weaponType": "GENERIC-AAM-M"
+        },
+        {
+          "quantity": 2,
+          "weaponType": "GENERIC-AAM-S"
+        }
+      ]
+    },
+    {
+      "baseId": "BASE-A",
+      "callsign": "VAPOR-15",
+      "flightHoursToNextService": 115,
+      "fuelPct": 95,
+      "heading": 0,
+      "id": "AC-05",
+      "position": {
+        "lat": 8.5,
+        "lng": 3.5
+      },
+      "speed": 0,
+      "status": "serviceable",
+      "tailNumber": "VR-F05",
+      "type": "Fighter-A",
+      "weaponLoad": [
+        {
+          "quantity": 2,
+          "weaponType": "GENERIC-AAM-M"
+        },
+        {
+          "quantity": 2,
+          "weaponType": "GENERIC-AAM-S"
+        }
+      ]
+    },
+    {
+      "baseId": "BASE-B",
+      "callsign": "VAPOR-16",
+      "flightHoursToNextService": 133,
+      "fuelPct": 95,
+      "heading": 0,
+      "id": "AC-06",
+      "position": {
+        "lat": 5.2,
+        "lng": 6.8
+      },
+      "speed": 0,
+      "status": "maintenance",
+      "tailNumber": "VR-F06",
+      "type": "Fighter-A",
+      "weaponLoad": [
+        {
+          "quantity": 2,
+          "weaponType": "GENERIC-AAM-M"
+        },
+        {
+          "quantity": 2,
+          "weaponType": "GENERIC-AAM-S"
+        }
+      ]
+    },
+    {
+      "assignedMissionId": "M-04",
+      "baseId": "BASE-B",
+      "callsign": "HAMMER-07",
+      "flightHoursToNextService": 18.4,
+      "fuelPct": 62.5,
+      "heading": 74,
+      "id": "AC-07",
+      "position": {
+        "lat": 4.21,
+        "lng": 6.88
+      },
+      "speed": 430,
+      "status": "airborne",
+      "tailNumber": "VR-S07",
+      "type": "Strike-B",
+      "weaponLoad": [
+        {
+          "quantity": 4,
+          "weaponType": "PGM-Mk2"
+        }
+      ]
+    },
+    {
+      "baseId": "BASE-D",
+      "callsign": "VAPOR-18",
+      "flightHoursToNextService": 169,
+      "fuelPct": 95,
+      "heading": 0,
+      "id": "AC-08",
+      "position": {
+        "lat": 4.6,
+        "lng": 10.5
+      },
+      "speed": 0,
+      "status": "serviceable",
+      "tailNumber": "VR-F08",
+      "type": "Fighter-A",
+      "weaponLoad": [
+        {
+          "quantity": 2,
+          "weaponType": "GENERIC-AAM-M"
+        },
+        {
+          "quantity": 2,
+          "weaponType": "GENERIC-AAM-S"
+        }
+      ]
+    },
+    {
+      "assignedMissionId": "M-07",
+      "baseId": "BASE-B",
+      "callsign": "STRIKER-9",
+      "flightHoursToNextService": 147,
+      "fuelPct": 88,
+      "heading": 0,
+      "id": "AC-09",
+      "position": {
+        "lat": 5.2,
+        "lng": 6.8
+      },
+      "speed": 0,
+      "status": "serviceable",
+      "tailNumber": "VR-S09",
+      "type": "Strike-B",
+      "weaponLoad": [
+        {
+          "quantity": 4,
+          "weaponType": "PGM-Mk2"
+        }
+      ]
+    },
+    {
+      "baseId": "BASE-B",
+      "callsign": "STRIKER-10",
+      "flightHoursToNextService": 162,
+      "fuelPct": 88,
+      "heading": 0,
+      "id": "AC-10",
+      "position": {
+        "lat": 5.2,
+        "lng": 6.8
+      },
+      "speed": 0,
+      "status": "serviceable",
+      "tailNumber": "VR-S10",
+      "type": "Strike-B",
+      "weaponLoad": [
+        {
+          "quantity": 4,
+          "weaponType": "PGM-Mk2"
+        }
+      ]
+    },
+    {
+      "baseId": "BASE-B",
+      "callsign": "STRIKER-11",
+      "flightHoursToNextService": 177,
+      "fuelPct": 88,
+      "heading": 0,
+      "id": "AC-11",
+      "position": {
+        "lat": 5.2,
+        "lng": 6.8
+      },
+      "speed": 0,
+      "status": "serviceable",
+      "tailNumber": "VR-S11",
+      "type": "Strike-B",
+      "weaponLoad": [
+        {
+          "quantity": 4,
+          "weaponType": "PGM-Mk2"
+        }
+      ]
+    },
+    {
+      "baseId": "BASE-B",
+      "callsign": "STRIKER-12",
+      "flightHoursToNextService": 192,
+      "fuelPct": 88,
+      "heading": 0,
+      "id": "AC-12",
+      "position": {
+        "lat": 5.2,
+        "lng": 6.8
+      },
+      "speed": 0,
+      "status": "serviceable",
+      "tailNumber": "VR-S12",
+      "type": "Strike-B",
+      "weaponLoad": [
+        {
+          "quantity": 4,
+          "weaponType": "PGM-Mk2"
+        }
+      ]
+    },
+    {
+      "baseId": "BASE-B",
+      "callsign": "STRIKER-13",
+      "flightHoursToNextService": 207,
+      "fuelPct": 88,
+      "heading": 0,
+      "id": "AC-13",
+      "position": {
+        "lat": 5.2,
+        "lng": 6.8
+      },
+      "speed": 0,
+      "status": "serviceable",
+      "tailNumber": "VR-S13",
+      "type": "Strike-B",
+      "weaponLoad": [
+        {
+          "quantity": 4,
+          "weaponType": "PGM-Mk2"
+        }
+      ]
+    },
+    {
+      "baseId": "BASE-B",
+      "callsign": "STRIKER-14",
+      "flightHoursToNextService": 222,
+      "fuelPct": 42,
+      "heading": 0,
+      "id": "AC-14",
+      "position": {
+        "lat": 5.2,
+        "lng": 6.8
+      },
+      "speed": 0,
+      "status": "turnaround",
+      "tailNumber": "VR-S14",
+      "type": "Strike-B",
+      "weaponLoad": [
+        {
+          "quantity": 4,
+          "weaponType": "PGM-Mk2"
+        }
+      ]
+    },
+    {
+      "assignedMissionId": "M-05",
+      "baseId": "BASE-C",
+      "callsign": "HERC-21",
+      "flightHoursToNextService": 140,
+      "fuelPct": 82,
+      "heading": 45,
+      "id": "AC-15",
+      "position": {
+        "lat": 3.2,
+        "lng": 5.5
+      },
+      "speed": 310,
+      "status": "airborne",
+      "tailNumber": "VR-T15",
+      "type": "Transport-C",
+      "weaponLoad": []
+    },
+    {
+      "baseId": "BASE-C",
+      "callsign": "HERC-22",
+      "flightHoursToNextService": 140,
+      "fuelPct": 98,
+      "heading": 0,
+      "id": "AC-16",
+      "position": {
+        "lat": 1.8,
+        "lng": 4.2
+      },
+      "speed": 0,
+      "status": "serviceable",
+      "tailNumber": "VR-T16",
+      "type": "Transport-C",
+      "weaponLoad": []
+    },
+    {
+      "baseId": "BASE-C",
+      "callsign": "HERC-23",
+      "flightHoursToNextService": 140,
+      "fuelPct": 98,
+      "heading": 0,
+      "id": "AC-17",
+      "position": {
+        "lat": 1.8,
+        "lng": 4.2
+      },
+      "speed": 0,
+      "status": "serviceable",
+      "tailNumber": "VR-T17",
+      "type": "Transport-C",
+      "weaponLoad": []
+    },
+    {
+      "baseId": "BASE-C",
+      "callsign": "HERC-24",
+      "flightHoursToNextService": 140,
+      "fuelPct": 98,
+      "heading": 0,
+      "id": "AC-18",
+      "position": {
+        "lat": 1.8,
+        "lng": 4.2
+      },
+      "speed": 0,
+      "status": "serviceable",
+      "tailNumber": "VR-T18",
+      "type": "Transport-C",
+      "weaponLoad": []
+    },
+    {
+      "assignedMissionId": "M-02",
+      "baseId": "BASE-D",
+      "callsign": "SHADOW-31",
+      "flightHoursToNextService": 85,
+      "fuelPct": 68,
+      "heading": 180,
+      "id": "AC-19",
+      "position": {
+        "lat": 5.8,
+        "lng": 9.6
+      },
+      "speed": 380,
+      "status": "airborne",
+      "tailNumber": "VR-R19",
+      "type": "Recon-D",
+      "weaponLoad": [
+        {
+          "quantity": 1,
+          "weaponType": "GENERIC-RECON-POD"
+        }
+      ]
+    },
+    {
+      "baseId": "BASE-D",
+      "callsign": "SHADOW-32",
+      "flightHoursToNextService": 85,
+      "fuelPct": 94,
+      "heading": 0,
+      "id": "AC-20",
+      "position": {
+        "lat": 4.6,
+        "lng": 10.5
+      },
+      "speed": 0,
+      "status": "serviceable",
+      "tailNumber": "VR-R20",
+      "type": "Recon-D",
+      "weaponLoad": [
+        {
+          "quantity": 1,
+          "weaponType": "GENERIC-RECON-POD"
+        }
+      ]
+    },
+    {
+      "baseId": "BASE-D",
+      "callsign": "SHADOW-33",
+      "flightHoursToNextService": 85,
+      "fuelPct": 94,
+      "heading": 0,
+      "id": "AC-21",
+      "position": {
+        "lat": 4.6,
+        "lng": 10.5
+      },
+      "speed": 0,
+      "status": "serviceable",
+      "tailNumber": "VR-R21",
+      "type": "Recon-D",
+      "weaponLoad": [
+        {
+          "quantity": 1,
+          "weaponType": "GENERIC-RECON-POD"
+        }
+      ]
+    },
+    {
+      "assignedMissionId": "M-08",
+      "baseId": "BASE-D",
+      "callsign": "DUSTOFF-41",
+      "flightHoursToNextService": 45,
+      "fuelPct": 90,
+      "heading": 0,
+      "id": "AC-22",
+      "position": {
+        "lat": 4.6,
+        "lng": 10.5
+      },
+      "speed": 0,
+      "status": "serviceable",
+      "tailNumber": "VR-H22",
+      "type": "Helicopter-E",
+      "weaponLoad": []
+    },
+    {
+      "baseId": "BASE-A",
+      "callsign": "DUSTOFF-42",
+      "flightHoursToNextService": 45,
+      "fuelPct": 90,
+      "heading": 0,
+      "id": "AC-23",
+      "position": {
+        "lat": 8.5,
+        "lng": 3.5
+      },
+      "speed": 0,
+      "status": "serviceable",
+      "tailNumber": "VR-H23",
+      "type": "Helicopter-E",
+      "weaponLoad": []
+    },
+    {
+      "baseId": "BASE-A",
+      "callsign": "DUSTOFF-43",
+      "flightHoursToNextService": 45,
+      "fuelPct": 90,
+      "heading": 0,
+      "id": "AC-24",
+      "position": {
+        "lat": 8.5,
+        "lng": 3.5
+      },
+      "speed": 0,
+      "status": "serviceable",
+      "tailNumber": "VR-H24",
+      "type": "Helicopter-E",
+      "weaponLoad": []
+    }
+  ],
+  "airspace": [
+    {
+      "activeFrom": "2026-10-17T00:00:00Z",
+      "activeTo": "2026-10-17T23:59:59Z",
+      "ceilingFt": 35000,
+      "floorFt": 15000,
+      "id": "AS-01",
+      "name": "Corridor North-Transit (Echo)",
+      "polygon": {
+        "coordinates": [
+          [
+            [
+              2.5,
+              7.8
+            ],
+            [
+              6,
+              7.8
+            ],
+            [
+              6,
+              8.8
+            ],
+            [
+              2.5,
+              8.8
+            ],
+            [
+              2.5,
+              7.8
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "type": "corridor"
+    },
+    {
+      "activeFrom": "2026-10-17T06:00:00Z",
+      "activeTo": "2026-10-17T18:00:00Z",
+      "ceilingFt": 45000,
+      "floorFt": 0,
+      "id": "AS-02",
+      "name": "Restricted Range Bravo (Weapons Test)",
+      "polygon": {
+        "coordinates": [
+          [
+            [
+              6.5,
+              3.5
+            ],
+            [
+              8.5,
+              3.5
+            ],
+            [
+              8.5,
+              5.5
+            ],
+            [
+              6.5,
+              5.5
+            ],
+            [
+              6.5,
+              3.5
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "type": "restricted"
+    },
+    {
+      "activeFrom": "2026-10-17T00:00:00Z",
+      "activeTo": "2026-10-17T23:59:59Z",
+      "ceilingFt": 60000,
+      "floorFt": 0,
+      "id": "AS-03",
+      "name": "No-Fly Buffer Zone (Northern Border)",
+      "polygon": {
+        "coordinates": [
+          [
+            [
+              1,
+              9.2
+            ],
+            [
+              11,
+              9.2
+            ],
+            [
+              11,
+              9.9
+            ],
+            [
+              1,
+              9.9
+            ],
+            [
+              1,
+              9.2
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "type": "no-fly"
+    },
+    {
+      "activeFrom": "2026-10-17T10:00:00Z",
+      "activeTo": "2026-10-17T22:00:00Z",
+      "ceilingFt": 25000,
+      "floorFt": 0,
+      "id": "AS-04",
+      "name": "Eastern Maritime Danger Area",
+      "polygon": {
+        "coordinates": [
+          [
+            [
+              9.5,
+              1
+            ],
+            [
+              11.5,
+              1
+            ],
+            [
+              11.5,
+              3.5
+            ],
+            [
+              9.5,
+              3.5
+            ],
+            [
+              9.5,
+              1
+            ]
+          ]
+        ],
+        "type": "Polygon"
+      },
+      "type": "danger"
+    }
+  ],
+  "auditLog": [],
+  "bases": [
+    {
+      "code": "BASE-A",
+      "fuelStockPct": 92,
+      "id": "BASE-A",
+      "location": {
+        "lat": 8.5,
+        "lng": 3.5
+      },
+      "name": "Sector Alpha Fighter Base",
+      "runwayStatus": "open",
+      "shelterCapacity": 16,
+      "weather": {
+        "baseId": "BASE-A",
+        "cloudBaseFt": 4500,
+        "forecast": [
+          {
+            "severity": "nominal",
+            "time": "2026-10-17T12:00:00Z",
+            "visibilityKm": 18,
+            "windKts": 12
+          },
+          {
+            "severity": "nominal",
+            "time": "2026-10-17T18:00:00Z",
+            "visibilityKm": 16,
+            "windKts": 14
+          }
+        ],
+        "severity": "nominal",
+        "visibilityKm": 18,
+        "windKts": 12
+      }
+    },
+    {
+      "code": "BASE-B",
+      "fuelStockPct": 65,
+      "id": "BASE-B",
+      "location": {
+        "lat": 5.2,
+        "lng": 6.8
+      },
+      "name": "North Bastion Strike Base",
+      "runwayStatus": "degraded",
+      "shelterCapacity": 24,
+      "weather": {
+        "baseId": "BASE-B",
+        "cloudBaseFt": 1200,
+        "forecast": [
+          {
+            "severity": "caution",
+            "time": "2026-10-17T12:00:00Z",
+            "visibilityKm": 6,
+            "windKts": 28
+          },
+          {
+            "severity": "severe",
+            "time": "2026-10-17T18:00:00Z",
+            "visibilityKm": 3,
+            "windKts": 36
+          }
+        ],
+        "severity": "caution",
+        "visibilityKm": 6,
+        "windKts": 28
+      }
+    },
+    {
+      "code": "BASE-C",
+      "fuelStockPct": 88,
+      "id": "BASE-C",
+      "location": {
+        "lat": 1.8,
+        "lng": 4.2
+      },
+      "name": "Charlie Logistics & Transport Hub",
+      "runwayStatus": "open",
+      "shelterCapacity": 20,
+      "weather": {
+        "baseId": "BASE-C",
+        "cloudBaseFt": 5000,
+        "forecast": [
+          {
+            "severity": "nominal",
+            "time": "2026-10-17T12:00:00Z",
+            "visibilityKm": 22,
+            "windKts": 10
+          },
+          {
+            "severity": "nominal",
+            "time": "2026-10-17T18:00:00Z",
+            "visibilityKm": 20,
+            "windKts": 12
+          }
+        ],
+        "severity": "nominal",
+        "visibilityKm": 22,
+        "windKts": 10
+      }
+    },
+    {
+      "code": "BASE-D",
+      "fuelStockPct": 78,
+      "id": "BASE-D",
+      "location": {
+        "lat": 4.6,
+        "lng": 10.5
+      },
+      "name": "Delta Eastern Forward Strip",
+      "runwayStatus": "open",
+      "shelterCapacity": 10,
+      "weather": {
+        "baseId": "BASE-D",
+        "cloudBaseFt": 6000,
+        "forecast": [
+          {
+            "severity": "nominal",
+            "time": "2026-10-17T12:00:00Z",
+            "visibilityKm": 25,
+            "windKts": 8
+          },
+          {
+            "severity": "nominal",
+            "time": "2026-10-17T18:00:00Z",
+            "visibilityKm": 24,
+            "windKts": 10
+          }
+        ],
+        "severity": "nominal",
+        "visibilityKm": 25,
+        "windKts": 8
+      }
+    }
+  ],
+  "bounds": {
+    "maxLat": 10,
+    "maxLng": 12,
+    "minLat": 0,
+    "minLng": 0
+  },
+  "crew": [
+    {
+      "baseId": "BASE-A",
+      "callsign": "VIPER",
+      "dutyHoursLast24h": 6.4,
+      "fatigueIndex": 52,
+      "id": "CR-01",
+      "qualifications": [
+        "AAM_COMBAT",
+        "NIGHT_OPS",
+        "TACTICAL_DATALINK",
+        "HIGH_G_QUAL"
+      ],
+      "role": "Lead Fighter Pilot",
+      "status": "on-mission"
+    },
+    {
+      "baseId": "BASE-A",
+      "callsign": "HAWK",
+      "dutyHoursLast24h": 4.5,
+      "fatigueIndex": 37,
+      "id": "CR-02",
+      "qualifications": [
+        "AAM_COMBAT",
+        "NIGHT_OPS",
+        "TACTICAL_DATALINK",
+        "HIGH_G_QUAL"
+      ],
+      "role": "Lead Fighter Pilot",
+      "status": "available"
+    },
+    {
+      "baseId": "BASE-A",
+      "callsign": "RAVEN",
+      "dutyHoursLast24h": 6.4,
+      "fatigueIndex": 52,
+      "id": "CR-03",
+      "qualifications": [
+        "AAM_COMBAT",
+        "NIGHT_OPS",
+        "TACTICAL_DATALINK",
+        "HIGH_G_QUAL"
+      ],
+      "role": "Lead Fighter Pilot",
+      "status": "on-mission"
+    },
+    {
+      "baseId": "BASE-A",
+      "callsign": "MAVERICK",
+      "dutyHoursLast24h": 6.4,
+      "fatigueIndex": 52,
+      "id": "CR-04",
+      "qualifications": [
+        "AAM_COMBAT",
+        "NIGHT_OPS",
+        "TACTICAL_DATALINK",
+        "HIGH_G_QUAL"
+      ],
+      "role": "Lead Fighter Pilot",
+      "status": "on-mission"
+    },
+    {
+      "baseId": "BASE-A",
+      "callsign": "COBRA",
+      "dutyHoursLast24h": 5.5,
+      "fatigueIndex": 23,
+      "id": "CR-05",
+      "qualifications": [
+        "AAM_COMBAT",
+        "NIGHT_OPS",
+        "TACTICAL_DATALINK",
+        "HIGH_G_QUAL"
+      ],
+      "role": "Lead Fighter Pilot",
+      "status": "resting"
+    },
+    {
+      "baseId": "BASE-A",
+      "callsign": "EAGLE",
+      "dutyHoursLast24h": 8.5,
+      "fatigueIndex": 30,
+      "id": "CR-06",
+      "qualifications": [
+        "AAM_COMBAT",
+        "NIGHT_OPS",
+        "TACTICAL_DATALINK",
+        "HIGH_G_QUAL"
+      ],
+      "role": "Lead Fighter Pilot",
+      "status": "available"
+    },
+    {
+      "baseId": "BASE-A",
+      "callsign": "SPECTRE",
+      "dutyHoursLast24h": 6.4,
+      "fatigueIndex": 52,
+      "id": "CR-07",
+      "qualifications": [
+        "AAM_COMBAT",
+        "NIGHT_OPS",
+        "TACTICAL_DATALINK",
+        "HIGH_G_QUAL"
+      ],
+      "role": "Lead Fighter Pilot",
+      "status": "on-mission"
+    },
+    {
+      "baseId": "BASE-A",
+      "callsign": "VALKYRIE",
+      "dutyHoursLast24h": 11.2,
+      "fatigueIndex": 86,
+      "id": "CR-08",
+      "qualifications": [
+        "AAM_COMBAT",
+        "NIGHT_OPS",
+        "TACTICAL_DATALINK",
+        "HIGH_G_QUAL"
+      ],
+      "role": "Lead Fighter Pilot",
+      "status": "unavailable"
+    },
+    {
+      "baseId": "BASE-A",
+      "callsign": "SHADOW",
+      "dutyHoursLast24h": 1.5,
+      "fatigueIndex": 16,
+      "id": "CR-09",
+      "qualifications": [
+        "AAM_COMBAT",
+        "NIGHT_OPS",
+        "TACTICAL_DATALINK",
+        "HIGH_G_QUAL"
+      ],
+      "role": "Lead Fighter Pilot",
+      "status": "available"
+    },
+    {
+      "baseId": "BASE-A",
+      "callsign": "TALON",
+      "dutyHoursLast24h": 4.5,
+      "fatigueIndex": 23,
+      "id": "CR-10",
+      "qualifications": [
+        "AAM_COMBAT",
+        "NIGHT_OPS",
+        "TACTICAL_DATALINK",
+        "HIGH_G_QUAL"
+      ],
+      "role": "Lead Fighter Pilot",
+      "status": "resting"
+    },
+    {
+      "baseId": "BASE-B",
+      "callsign": "BOLT",
+      "dutyHoursLast24h": 7.5,
+      "fatigueIndex": 30,
+      "id": "CR-11",
+      "qualifications": [
+        "PGM_DELIVERY",
+        "SEAD_STRIKE",
+        "TACTICAL_DATALINK",
+        "LOW_LEVEL_INGRESS"
+      ],
+      "role": "Strike Weapons Officer",
+      "status": "available"
+    },
+    {
+      "baseId": "BASE-B",
+      "callsign": "APEX",
+      "dutyHoursLast24h": 2.5,
+      "fatigueIndex": 37,
+      "id": "CR-12",
+      "qualifications": [
+        "PGM_DELIVERY",
+        "SEAD_STRIKE",
+        "TACTICAL_DATALINK",
+        "LOW_LEVEL_INGRESS"
+      ],
+      "role": "Strike Weapons Officer",
+      "status": "available"
+    },
+    {
+      "baseId": "BASE-B",
+      "callsign": "HUNTER",
+      "dutyHoursLast24h": 5.5,
+      "fatigueIndex": 44,
+      "id": "CR-13",
+      "qualifications": [
+        "PGM_DELIVERY",
+        "SEAD_STRIKE",
+        "TACTICAL_DATALINK",
+        "LOW_LEVEL_INGRESS"
+      ],
+      "role": "Strike Weapons Officer",
+      "status": "available"
+    },
+    {
+      "baseId": "BASE-B",
+      "callsign": "SENTRY",
+      "dutyHoursLast24h": 10.5,
+      "fatigueIndex": 78,
+      "id": "CR-14",
+      "qualifications": [
+        "PGM_DELIVERY",
+        "SEAD_STRIKE",
+        "TACTICAL_DATALINK",
+        "LOW_LEVEL_INGRESS"
+      ],
+      "role": "Strike Weapons Officer",
+      "status": "available"
+    },
+    {
+      "baseId": "BASE-B",
+      "callsign": "FALCON",
+      "dutyHoursLast24h": 6.4,
+      "fatigueIndex": 52,
+      "id": "CR-15",
+      "qualifications": [
+        "PGM_DELIVERY",
+        "SEAD_STRIKE",
+        "TACTICAL_DATALINK",
+        "LOW_LEVEL_INGRESS"
+      ],
+      "role": "Strike Weapons Officer",
+      "status": "on-mission"
+    },
+    {
+      "baseId": "BASE-B",
+      "callsign": "ARCHER",
+      "dutyHoursLast24h": 6.5,
+      "fatigueIndex": 30,
+      "id": "CR-16",
+      "qualifications": [
+        "PGM_DELIVERY",
+        "SEAD_STRIKE",
+        "TACTICAL_DATALINK",
+        "LOW_LEVEL_INGRESS"
+      ],
+      "role": "Strike Weapons Officer",
+      "status": "available"
+    },
+    {
+      "baseId": "BASE-B",
+      "callsign": "GRIFFIN",
+      "dutyHoursLast24h": 1.5,
+      "fatigueIndex": 37,
+      "id": "CR-17",
+      "qualifications": [
+        "PGM_DELIVERY",
+        "SEAD_STRIKE",
+        "TACTICAL_DATALINK",
+        "LOW_LEVEL_INGRESS"
+      ],
+      "role": "Strike Weapons Officer",
+      "status": "available"
+    },
+    {
+      "baseId": "BASE-B",
+      "callsign": "CYCLONE",
+      "dutyHoursLast24h": 4.5,
+      "fatigueIndex": 44,
+      "id": "CR-18",
+      "qualifications": [
+        "PGM_DELIVERY",
+        "SEAD_STRIKE",
+        "TACTICAL_DATALINK",
+        "LOW_LEVEL_INGRESS"
+      ],
+      "role": "Strike Weapons Officer",
+      "status": "available"
+    },
+    {
+      "baseId": "BASE-D",
+      "callsign": "STORM",
+      "dutyHoursLast24h": 6.4,
+      "fatigueIndex": 52,
+      "id": "CR-19",
+      "qualifications": [
+        "OPTICAL_RECON",
+        "SAR_RADAR",
+        "INSTRUMENT_RATING",
+        "EW_ANALYSIS"
+      ],
+      "role": "Recon Systems Operator",
+      "status": "on-mission"
+    },
+    {
+      "baseId": "BASE-D",
+      "callsign": "BLIZZARD",
+      "dutyHoursLast24h": 2.5,
+      "fatigueIndex": 23,
+      "id": "CR-20",
+      "qualifications": [
+        "OPTICAL_RECON",
+        "SAR_RADAR",
+        "INSTRUMENT_RATING",
+        "EW_ANALYSIS"
+      ],
+      "role": "Recon Systems Operator",
+      "status": "resting"
+    },
+    {
+      "baseId": "BASE-D",
+      "callsign": "THUNDER",
+      "dutyHoursLast24h": 9.8,
+      "fatigueIndex": 72,
+      "id": "CR-21",
+      "qualifications": [
+        "OPTICAL_RECON",
+        "SAR_RADAR",
+        "INSTRUMENT_RATING",
+        "EW_ANALYSIS"
+      ],
+      "role": "Recon Systems Operator",
+      "status": "available"
+    },
+    {
+      "baseId": "BASE-D",
+      "callsign": "DAGGER",
+      "dutyHoursLast24h": 4.2,
+      "fatigueIndex": 28,
+      "id": "CR-22",
+      "qualifications": [
+        "OPTICAL_RECON",
+        "SAR_RADAR",
+        "INSTRUMENT_RATING",
+        "EW_ANALYSIS"
+      ],
+      "role": "Recon Systems Operator",
+      "status": "available"
+    },
+    {
+      "baseId": "BASE-D",
+      "callsign": "SABRE",
+      "dutyHoursLast24h": 3.5,
+      "fatigueIndex": 44,
+      "id": "CR-23",
+      "qualifications": [
+        "OPTICAL_RECON",
+        "SAR_RADAR",
+        "INSTRUMENT_RATING",
+        "EW_ANALYSIS"
+      ],
+      "role": "Recon Systems Operator",
+      "status": "available"
+    },
+    {
+      "baseId": "BASE-D",
+      "callsign": "ARROW",
+      "dutyHoursLast24h": 6.5,
+      "fatigueIndex": 16,
+      "id": "CR-24",
+      "qualifications": [
+        "OPTICAL_RECON",
+        "SAR_RADAR",
+        "INSTRUMENT_RATING",
+        "EW_ANALYSIS"
+      ],
+      "role": "Recon Systems Operator",
+      "status": "available"
+    },
+    {
+      "baseId": "BASE-C",
+      "callsign": "ORBIT",
+      "dutyHoursLast24h": 1.5,
+      "fatigueIndex": 23,
+      "id": "CR-25",
+      "qualifications": [
+        "HEAVY_AIRLIFT",
+        "INSTRUMENT_RATING",
+        "AERIAL_REFUEL",
+        "MEDEVAC"
+      ],
+      "role": "Heavy Transport Captain",
+      "status": "resting"
+    },
+    {
+      "baseId": "BASE-C",
+      "callsign": "VECTOR",
+      "dutyHoursLast24h": 4.5,
+      "fatigueIndex": 30,
+      "id": "CR-26",
+      "qualifications": [
+        "HEAVY_AIRLIFT",
+        "INSTRUMENT_RATING",
+        "AERIAL_REFUEL",
+        "MEDEVAC"
+      ],
+      "role": "Heavy Transport Captain",
+      "status": "available"
+    },
+    {
+      "baseId": "BASE-C",
+      "callsign": "PHOENIX",
+      "dutyHoursLast24h": 7.5,
+      "fatigueIndex": 37,
+      "id": "CR-27",
+      "qualifications": [
+        "HEAVY_AIRLIFT",
+        "INSTRUMENT_RATING",
+        "AERIAL_REFUEL",
+        "MEDEVAC"
+      ],
+      "role": "Heavy Transport Captain",
+      "status": "available"
+    },
+    {
+      "baseId": "BASE-C",
+      "callsign": "TITAN",
+      "dutyHoursLast24h": 2.5,
+      "fatigueIndex": 44,
+      "id": "CR-28",
+      "qualifications": [
+        "HEAVY_AIRLIFT",
+        "INSTRUMENT_RATING",
+        "AERIAL_REFUEL",
+        "MEDEVAC"
+      ],
+      "role": "Heavy Transport Captain",
+      "status": "available"
+    },
+    {
+      "baseId": "BASE-C",
+      "callsign": "HERCULES",
+      "dutyHoursLast24h": 5.5,
+      "fatigueIndex": 16,
+      "id": "CR-29",
+      "qualifications": [
+        "HEAVY_AIRLIFT",
+        "INSTRUMENT_RATING",
+        "AERIAL_REFUEL",
+        "MEDEVAC"
+      ],
+      "role": "Heavy Transport Captain",
+      "status": "available"
+    },
+    {
+      "baseId": "BASE-C",
+      "callsign": "CHOPPER",
+      "dutyHoursLast24h": 8.5,
+      "fatigueIndex": 23,
+      "id": "CR-30",
+      "qualifications": [
+        "HEAVY_AIRLIFT",
+        "INSTRUMENT_RATING",
+        "AERIAL_REFUEL",
+        "MEDEVAC"
+      ],
+      "role": "Heavy Transport Captain",
+      "status": "resting"
+    }
+  ],
+  "missions": [
+    {
+      "assigned": {
+        "aircraftIds": [
+          "AC-01"
+        ],
+        "crewIds": [
+          "CR-01"
+        ]
+      },
+      "currentWaypointIndex": 1,
+      "id": "M-01",
+      "launchBaseId": "BASE-A",
+      "name": "Northern Sentinel (CAP)",
+      "priority": 1,
+      "requiredAircraftType": "Fighter-A",
+      "requiredCrewQuals": [
+        "AAM_COMBAT"
+      ],
+      "requiredWeapons": [
+        {
+          "quantity": 2,
+          "weaponType": "GENERIC-AAM-M"
+        }
+      ],
+      "route": [
+        {
+          "lat": 8.5,
+          "lng": 3.5
+        },
+        {
+          "lat": 8.6,
+          "lng": 4.5
+        },
+        {
+          "lat": 8.8,
+          "lng": 5.2
+        },
+        {
+          "lat": 8.7,
+          "lng": 4.8
+        },
+        {
+          "lat": 8.5,
+          "lng": 3.5
+        }
+      ],
+      "routeOptions": [
+        {
+          "distanceKm": 240,
+          "id": "Route A",
+          "name": "Route A (Direct High-Altitude)",
+          "riskScore": 12,
+          "waypoints": [
+            {
+              "lat": 8.5,
+              "lng": 3.5
+            },
+            {
+              "lat": 8.6,
+              "lng": 4.5
+            },
+            {
+              "lat": 8.8,
+              "lng": 5.2
+            },
+            {
+              "lat": 8.5,
+              "lng": 3.5
+            }
+          ]
+        },
+        {
+          "distanceKm": 285,
+          "id": "Route B",
+          "name": "Route B (Buffer Patrol)",
+          "riskScore": 28,
+          "waypoints": [
+            {
+              "lat": 8.5,
+              "lng": 3.5
+            },
+            {
+              "lat": 8.9,
+              "lng": 4.2
+            },
+            {
+              "lat": 8.8,
+              "lng": 5.2
+            },
+            {
+              "lat": 8.5,
+              "lng": 3.5
+            }
+          ]
+        }
+      ],
+      "status": "in-progress",
+      "target": {
+        "lat": 8.8,
+        "lng": 5.2,
+        "name": "CAP Anchor Point Alpha"
+      },
+      "type": "CAP",
+      "windowEnd": "2026-10-17T16:00:00.000Z",
+      "windowStart": "2026-10-17T12:00:00.000Z"
+    },
+    {
+      "assigned": {
+        "aircraftIds": [
+          "AC-19"
+        ],
+        "crewIds": [
+          "CR-19"
+        ]
+      },
+      "currentWaypointIndex": 2,
+      "id": "M-02",
+      "launchBaseId": "BASE-D",
+      "name": "Eastern Border Recon Orbit",
+      "priority": 2,
+      "requiredAircraftType": "Recon-D",
+      "requiredCrewQuals": [
+        "INSTRUMENT_RATING"
+      ],
+      "requiredWeapons": [
+        {
+          "quantity": 1,
+          "weaponType": "GENERIC-RECON-POD"
+        }
+      ],
+      "route": [
+        {
+          "lat": 4.6,
+          "lng": 10.5
+        },
+        {
+          "lat": 5.5,
+          "lng": 10.2
+        },
+        {
+          "lat": 6.5,
+          "lng": 9.8
+        },
+        {
+          "lat": 5.8,
+          "lng": 9.6
+        },
+        {
+          "lat": 4.6,
+          "lng": 10.5
+        }
+      ],
+      "routeOptions": [
+        {
+          "distanceKm": 320,
+          "id": "Route A",
+          "name": "Route A (Baseline Orbit)",
+          "riskScore": 18,
+          "waypoints": [
+            {
+              "lat": 4.6,
+              "lng": 10.5
+            },
+            {
+              "lat": 5.8,
+              "lng": 9.6
+            },
+            {
+              "lat": 6.5,
+              "lng": 9.8
+            },
+            {
+              "lat": 4.6,
+              "lng": 10.5
+            }
+          ]
+        }
+      ],
+      "status": "in-progress",
+      "target": {
+        "lat": 6.5,
+        "lng": 9.8,
+        "name": "Recon Sector Echo"
+      },
+      "type": "recon",
+      "windowEnd": "2026-10-17T16:00:00.000Z",
+      "windowStart": "2026-10-17T12:00:00.000Z"
+    },
+    {
+      "assigned": {
+        "aircraftIds": [
+          "AC-03"
+        ],
+        "crewIds": [
+          "CR-03"
+        ]
+      },
+      "currentWaypointIndex": 1,
+      "id": "M-03",
+      "launchBaseId": "BASE-C",
+      "name": "Southern Sea Approach Patrol",
+      "priority": 2,
+      "requiredAircraftType": "Fighter-A",
+      "requiredCrewQuals": [
+        "AAM_COMBAT"
+      ],
+      "requiredWeapons": [
+        {
+          "quantity": 2,
+          "weaponType": "GENERIC-AAM-M"
+        }
+      ],
+      "route": [
+        {
+          "lat": 1.8,
+          "lng": 4.2
+        },
+        {
+          "lat": 2.1,
+          "lng": 4.8
+        },
+        {
+          "lat": 2.5,
+          "lng": 5.5
+        },
+        {
+          "lat": 2,
+          "lng": 5
+        },
+        {
+          "lat": 1.8,
+          "lng": 4.2
+        }
+      ],
+      "routeOptions": [
+        {
+          "distanceKm": 210,
+          "id": "Route A",
+          "name": "Route A (Baseline Channel Patrol)",
+          "riskScore": 14,
+          "waypoints": [
+            {
+              "lat": 1.8,
+              "lng": 4.2
+            },
+            {
+              "lat": 2.1,
+              "lng": 4.8
+            },
+            {
+              "lat": 2.5,
+              "lng": 5.5
+            },
+            {
+              "lat": 2,
+              "lng": 5
+            },
+            {
+              "lat": 1.8,
+              "lng": 4.2
+            }
+          ]
+        }
+      ],
+      "status": "in-progress",
+      "target": {
+        "lat": 2.5,
+        "lng": 5.5,
+        "name": "South Channel Anchor"
+      },
+      "type": "CAP",
+      "windowEnd": "2026-10-17T16:00:00.000Z",
+      "windowStart": "2026-10-17T12:00:00.000Z"
+    },
+    {
+      "assigned": {
+        "aircraftIds": [
+          "AC-07"
+        ],
+        "crewIds": [
+          "CR-07"
+        ]
+      },
+      "currentWaypointIndex": 1,
+      "id": "M-04",
+      "launchBaseId": "BASE-B",
+      "name": "Central Precision Strike Sortie",
+      "priority": 1,
+      "requiredAircraftType": "Strike-B",
+      "requiredCrewQuals": [
+        "TACTICAL_DATALINK"
+      ],
+      "requiredWeapons": [
+        {
+          "quantity": 4,
+          "weaponType": "PGM-Mk2"
+        }
+      ],
+      "route": [
+        {
+          "lat": 5.2,
+          "lng": 6.8
+        },
+        {
+          "lat": 4.8,
+          "lng": 7.4
+        },
+        {
+          "lat": 4.5,
+          "lng": 8.5
+        },
+        {
+          "lat": 5.2,
+          "lng": 6.8
+        }
+      ],
+      "routeOptions": [
+        {
+          "distanceKm": 340,
+          "id": "Route A",
+          "name": "Route A (Northern Approach)",
+          "riskScore": 22,
+          "waypoints": [
+            {
+              "lat": 5.2,
+              "lng": 6.8
+            },
+            {
+              "lat": 5.8,
+              "lng": 7.6
+            },
+            {
+              "lat": 4.5,
+              "lng": 8.5
+            },
+            {
+              "lat": 5.2,
+              "lng": 6.8
+            }
+          ]
+        },
+        {
+          "distanceKm": 310,
+          "id": "Route B",
+          "name": "Route B (Direct Corridor - Intersects SAM THR-02)",
+          "riskScore": 88,
+          "waypoints": [
+            {
+              "lat": 5.2,
+              "lng": 6.8
+            },
+            {
+              "lat": 4.8,
+              "lng": 7.4
+            },
+            {
+              "lat": 4.5,
+              "lng": 8.5
+            },
+            {
+              "lat": 5.2,
+              "lng": 6.8
+            }
+          ]
+        },
+        {
+          "distanceKm": 395,
+          "id": "Route C",
+          "name": "Route C (Southern Dogleg Bypass)",
+          "riskScore": 10,
+          "waypoints": [
+            {
+              "lat": 5.2,
+              "lng": 6.8
+            },
+            {
+              "lat": 3.8,
+              "lng": 6
+            },
+            {
+              "lat": 3.2,
+              "lng": 6.8
+            },
+            {
+              "lat": 3.8,
+              "lng": 7.8
+            },
+            {
+              "lat": 4.5,
+              "lng": 8.5
+            },
+            {
+              "lat": 3.8,
+              "lng": 7.8
+            },
+            {
+              "lat": 3.2,
+              "lng": 6.8
+            },
+            {
+              "lat": 3.8,
+              "lng": 6
+            },
+            {
+              "lat": 5.2,
+              "lng": 6.8
+            }
+          ]
+        }
+      ],
+      "status": "in-progress",
+      "target": {
+        "lat": 4.5,
+        "lng": 8.5,
+        "name": "Contested Logistics Hub Oscar"
+      },
+      "type": "strike",
+      "windowEnd": "2026-10-17T16:00:00.000Z",
+      "windowStart": "2026-10-17T12:00:00.000Z"
+    },
+    {
+      "assigned": {
+        "aircraftIds": [
+          "AC-15"
+        ],
+        "crewIds": [
+          "CR-25"
+        ]
+      },
+      "currentWaypointIndex": 1,
+      "id": "M-05",
+      "launchBaseId": "BASE-C",
+      "name": "Inter-Base Munitions Airlift",
+      "priority": 3,
+      "requiredAircraftType": "Transport-C",
+      "requiredCrewQuals": [
+        "INSTRUMENT_RATING"
+      ],
+      "requiredWeapons": [],
+      "route": [
+        {
+          "lat": 1.8,
+          "lng": 4.2
+        },
+        {
+          "lat": 3.2,
+          "lng": 5.5
+        },
+        {
+          "lat": 5.2,
+          "lng": 6.8
+        }
+      ],
+      "routeOptions": [
+        {
+          "distanceKm": 420,
+          "id": "Route A",
+          "name": "Route A (Direct Transit Corridor)",
+          "riskScore": 8,
+          "waypoints": [
+            {
+              "lat": 1.8,
+              "lng": 4.2
+            },
+            {
+              "lat": 3.2,
+              "lng": 5.5
+            },
+            {
+              "lat": 5.2,
+              "lng": 6.8
+            }
+          ]
+        }
+      ],
+      "status": "in-progress",
+      "target": {
+        "lat": 5.2,
+        "lng": 6.8,
+        "name": "BASE-B Munitions Ramp"
+      },
+      "type": "airlift",
+      "windowEnd": "2026-10-17T16:00:00.000Z",
+      "windowStart": "2026-10-17T12:00:00.000Z"
+    },
+    {
+      "assigned": {
+        "aircraftIds": [
+          "AC-04"
+        ],
+        "crewIds": [
+          "CR-04"
+        ]
+      },
+      "id": "M-06",
+      "launchBaseId": "BASE-A",
+      "name": "Quick Reaction Alert (QRA)",
+      "priority": 1,
+      "requiredAircraftType": "Fighter-A",
+      "requiredCrewQuals": [
+        "AAM_COMBAT"
+      ],
+      "requiredWeapons": [
+        {
+          "quantity": 2,
+          "weaponType": "GENERIC-AAM-M"
+        }
+      ],
+      "route": [
+        {
+          "lat": 8.5,
+          "lng": 3.5
+        },
+        {
+          "lat": 7.8,
+          "lng": 4
+        },
+        {
+          "lat": 8.5,
+          "lng": 3.5
+        }
+      ],
+      "routeOptions": [
+        {
+          "distanceKm": 180,
+          "id": "Route A",
+          "name": "Route A (Buffer Intercept Track)",
+          "riskScore": 16,
+          "waypoints": [
+            {
+              "lat": 8.5,
+              "lng": 3.5
+            },
+            {
+              "lat": 7.8,
+              "lng": 4
+            },
+            {
+              "lat": 8.5,
+              "lng": 3.5
+            }
+          ]
+        }
+      ],
+      "status": "planned",
+      "target": {
+        "lat": 7.8,
+        "lng": 4,
+        "name": "North Sector Buffer Line"
+      },
+      "type": "CAP",
+      "windowEnd": "2026-10-17T20:00:00.000Z",
+      "windowStart": "2026-10-17T16:00:00.000Z"
+    },
+    {
+      "assigned": {
+        "aircraftIds": [
+          "AC-09"
+        ],
+        "crewIds": [
+          "CR-11"
+        ]
+      },
+      "id": "M-07",
+      "launchBaseId": "BASE-B",
+      "name": "Offensive Counter-Air Sweep",
+      "priority": 2,
+      "requiredAircraftType": "Strike-B",
+      "requiredCrewQuals": [
+        "TACTICAL_DATALINK"
+      ],
+      "requiredWeapons": [
+        {
+          "quantity": 4,
+          "weaponType": "PGM-Mk2"
+        }
+      ],
+      "route": [
+        {
+          "lat": 5.2,
+          "lng": 6.8
+        },
+        {
+          "lat": 4.8,
+          "lng": 8.2
+        },
+        {
+          "lat": 5.2,
+          "lng": 6.8
+        }
+      ],
+      "routeOptions": [
+        {
+          "distanceKm": 260,
+          "id": "Route A",
+          "name": "Route A (Direct OCA Sweep)",
+          "riskScore": 24,
+          "waypoints": [
+            {
+              "lat": 5.2,
+              "lng": 6.8
+            },
+            {
+              "lat": 4.8,
+              "lng": 8.2
+            },
+            {
+              "lat": 5.2,
+              "lng": 6.8
+            }
+          ]
+        }
+      ],
+      "status": "approved",
+      "target": {
+        "lat": 4.8,
+        "lng": 8.2,
+        "name": "Hostile Airfield Bravo Radar"
+      },
+      "type": "strike",
+      "windowEnd": "2026-10-17T20:00:00.000Z",
+      "windowStart": "2026-10-17T16:00:00.000Z"
+    },
+    {
+      "assigned": {
+        "aircraftIds": [
+          "AC-22"
+        ],
+        "crewIds": [
+          "CR-22"
+        ]
+      },
+      "id": "M-08",
+      "launchBaseId": "BASE-D",
+      "name": "Forward Strip CSAR Standby",
+      "priority": 2,
+      "requiredAircraftType": "Helicopter-E",
+      "requiredCrewQuals": [
+        "SAR_RADAR"
+      ],
+      "requiredWeapons": [],
+      "route": [
+        {
+          "lat": 4.6,
+          "lng": 10.5
+        },
+        {
+          "lat": 5,
+          "lng": 10
+        },
+        {
+          "lat": 4.6,
+          "lng": 10.5
+        }
+      ],
+      "routeOptions": [
+        {
+          "distanceKm": 120,
+          "id": "Route A",
+          "name": "Route A (Ridge Ingress Corridor)",
+          "riskScore": 15,
+          "waypoints": [
+            {
+              "lat": 4.6,
+              "lng": 10.5
+            },
+            {
+              "lat": 5,
+              "lng": 10
+            },
+            {
+              "lat": 4.6,
+              "lng": 10.5
+            }
+          ]
+        }
+      ],
+      "status": "planned",
+      "target": {
+        "lat": 5,
+        "lng": 10,
+        "name": "Mountain Ridge Evac Box"
+      },
+      "type": "SAR",
+      "windowEnd": "2026-10-17T20:00:00.000Z",
+      "windowStart": "2026-10-17T16:00:00.000Z"
+    },
+    {
+      "assigned": {
+        "aircraftIds": [
+          "AC-20"
+        ],
+        "crewIds": [
+          "CR-20"
+        ]
+      },
+      "id": "M-09",
+      "launchBaseId": "BASE-A",
+      "name": "Electronic Warfare Escort",
+      "priority": 3,
+      "requiredAircraftType": "Recon-D",
+      "requiredCrewQuals": [
+        "INSTRUMENT_RATING"
+      ],
+      "requiredWeapons": [
+        {
+          "quantity": 1,
+          "weaponType": "GENERIC-RECON-POD"
+        }
+      ],
+      "route": [
+        {
+          "lat": 8.5,
+          "lng": 3.5
+        },
+        {
+          "lat": 7.2,
+          "lng": 6.5
+        },
+        {
+          "lat": 8.5,
+          "lng": 3.5
+        }
+      ],
+      "routeOptions": [
+        {
+          "distanceKm": 310,
+          "id": "Route A",
+          "name": "Route A (Stand-Off Staging Track)",
+          "riskScore": 18,
+          "waypoints": [
+            {
+              "lat": 8.5,
+              "lng": 3.5
+            },
+            {
+              "lat": 7.2,
+              "lng": 6.5
+            },
+            {
+              "lat": 8.5,
+              "lng": 3.5
+            }
+          ]
+        }
+      ],
+      "status": "planned",
+      "target": {
+        "lat": 7.2,
+        "lng": 6.5,
+        "name": "Standoff Jamming Orbit Zulu"
+      },
+      "type": "escort",
+      "windowEnd": "2026-10-17T20:00:00.000Z",
+      "windowStart": "2026-10-17T16:00:00.000Z"
+    },
+    {
+      "assigned": {
+        "aircraftIds": [
+          "AC-16"
+        ],
+        "crewIds": [
+          "CR-26"
+        ]
+      },
+      "id": "M-10",
+      "launchBaseId": "BASE-C",
+      "name": "Scheduled Personnel Rotation",
+      "priority": 4,
+      "requiredAircraftType": "Transport-C",
+      "requiredCrewQuals": [
+        "INSTRUMENT_RATING"
+      ],
+      "requiredWeapons": [],
+      "route": [
+        {
+          "lat": 1.8,
+          "lng": 4.2
+        },
+        {
+          "lat": 3.2,
+          "lng": 7.5
+        },
+        {
+          "lat": 4.6,
+          "lng": 10.5
+        }
+      ],
+      "routeOptions": [
+        {
+          "distanceKm": 580,
+          "id": "Route A",
+          "name": "Route A (Intra-Theatre Transport)",
+          "riskScore": 6,
+          "waypoints": [
+            {
+              "lat": 1.8,
+              "lng": 4.2
+            },
+            {
+              "lat": 3.2,
+              "lng": 7.5
+            },
+            {
+              "lat": 4.6,
+              "lng": 10.5
+            }
+          ]
+        }
+      ],
+      "status": "planned",
+      "target": {
+        "lat": 4.6,
+        "lng": 10.5,
+        "name": "BASE-D Personnel Terminal"
+      },
+      "type": "airlift",
+      "windowEnd": "2026-10-17T20:00:00.000Z",
+      "windowStart": "2026-10-17T16:00:00.000Z"
+    }
+  ],
+  "predictions": [
+    {
+      "confidence": 0.88,
+      "createdAt": "2026-10-17T12:00:00.000Z",
+      "entityId": "AC-06",
+      "entityType": "aircraft",
+      "horizonMinutes": 120,
+      "message": "Aircraft AC-06 APG radar transmitter power drop predicted in 2h",
+      "metric": "radar_degradation",
+      "value": 0.81
+    },
+    {
+      "confidence": 0.72,
+      "createdAt": "2026-10-17T12:00:00.000Z",
+      "entityId": "AC-14",
+      "entityType": "aircraft",
+      "horizonMinutes": 360,
+      "message": "Aircraft AC-14 likely unserviceable within 6h (confidence 72%)",
+      "metric": "serviceability_risk",
+      "value": 0.72
+    },
+    {
+      "confidence": 0.68,
+      "createdAt": "2026-10-17T12:00:00.000Z",
+      "entityId": "AC-22",
+      "entityType": "aircraft",
+      "horizonMinutes": 480,
+      "message": "Helicopter AC-22 rotor mast harmonic vibration exceedance predicted in 8h",
+      "metric": "rotor_vibration",
+      "value": 0.62
+    },
+    {
+      "confidence": 0.78,
+      "createdAt": "2026-10-17T12:00:00.000Z",
+      "entityId": "BASE-A",
+      "entityType": "weather",
+      "horizonMinutes": 240,
+      "message": "Base BASE-A cloud ceiling breach below landing minima in 4h",
+      "metric": "weather_minima_breach",
+      "value": 0.65
+    },
+    {
+      "confidence": 0.76,
+      "createdAt": "2026-10-17T12:00:00.000Z",
+      "entityId": "BASE-B",
+      "entityType": "base",
+      "horizonMinutes": 300,
+      "message": "Base BASE-B crosswinds forecast >32kts in 5h: runway ops degraded",
+      "metric": "crosswind_hazard",
+      "value": 0.74
+    },
+    {
+      "confidence": 0.85,
+      "createdAt": "2026-10-17T12:00:00.000Z",
+      "entityId": "BASE-C",
+      "entityType": "base",
+      "horizonMinutes": 540,
+      "message": "Base BASE-C fuel below threshold in 9h",
+      "metric": "fuel_depletion",
+      "value": 0.35
+    },
+    {
+      "confidence": 0.9,
+      "createdAt": "2026-10-17T12:00:00.000Z",
+      "entityId": "CR-09",
+      "entityType": "crew",
+      "horizonMinutes": 180,
+      "message": "Crew CR-09 fatigue critical after next sortie",
+      "metric": "fatigue_risk",
+      "value": 0.88
+    },
+    {
+      "confidence": 0.84,
+      "createdAt": "2026-10-17T12:00:00.000Z",
+      "entityId": "CR-14",
+      "entityType": "crew",
+      "horizonMinutes": 150,
+      "message": "Crew CR-14 continuous duty window will exceed 12h threshold in 2.5h",
+      "metric": "duty_hour_breach",
+      "value": 0.84
+    }
+  ],
+  "recommendations": [],
+  "sim": {
+    "paused": false,
+    "speed": 1,
+    "time": "2026-10-17T12:00:00.000Z"
+  },
+  "stateVersion": 1,
+  "threats": [
+    {
+      "confidence": 0.85,
+      "id": "THR-01",
+      "lastSeen": "2026-10-17T11:45:00Z",
+      "position": {
+        "lat": 7.5,
+        "lng": 5
+      },
+      "rangeKm": 65,
+      "status": "active",
+      "type": "SAM"
+    },
+    {
+      "confidence": 0.9,
+      "id": "THR-02",
+      "lastSeen": "2026-10-17T12:00:00Z",
+      "position": {
+        "lat": 4.8,
+        "lng": 7.5
+      },
+      "rangeKm": 85,
+      "status": "active",
+      "type": "SAM"
+    },
+    {
+      "confidence": 0.75,
+      "id": "THR-03",
+      "lastSeen": "2026-10-17T11:30:00Z",
+      "position": {
+        "lat": 6.2,
+        "lng": 8.8
+      },
+      "rangeKm": 120,
+      "status": "active",
+      "type": "radar"
+    },
+    {
+      "confidence": 0.6,
+      "id": "THR-04",
+      "lastSeen": "2026-10-17T12:05:00Z",
+      "position": {
+        "lat": 3.5,
+        "lng": 9
+      },
+      "rangeKm": 45,
+      "status": "suspected",
+      "type": "fighter"
+    }
+  ],
+  "weaponStocks": [
+    {
+      "baseId": "BASE-A",
+      "quantity": 64,
+      "weaponType": "GENERIC-AAM-M"
+    },
+    {
+      "baseId": "BASE-A",
+      "quantity": 96,
+      "weaponType": "GENERIC-AAM-S"
+    },
+    {
+      "baseId": "BASE-A",
+      "quantity": 6,
+      "weaponType": "GENERIC-ANTIRADAR"
+    },
+    {
+      "baseId": "BASE-A",
+      "quantity": 18,
+      "weaponType": "GENERIC-CARGO-PALLET"
+    },
+    {
+      "baseId": "BASE-A",
+      "quantity": 8,
+      "weaponType": "GENERIC-RECON-POD"
+    },
+    {
+      "baseId": "BASE-A",
+      "quantity": 24,
+      "weaponType": "PGM-Mk2"
+    },
+    {
+      "baseId": "BASE-B",
+      "quantity": 48,
+      "weaponType": "GENERIC-AAM-M"
+    },
+    {
+      "baseId": "BASE-B",
+      "quantity": 52,
+      "weaponType": "GENERIC-AAM-S"
+    },
+    {
+      "baseId": "BASE-B",
+      "quantity": 18,
+      "weaponType": "GENERIC-ANTIRADAR"
+    },
+    {
+      "baseId": "BASE-B",
+      "quantity": 22,
+      "weaponType": "GENERIC-CARGO-PALLET"
+    },
+    {
+      "baseId": "BASE-B",
+      "quantity": 4,
+      "weaponType": "GENERIC-RECON-POD"
+    },
+    {
+      "baseId": "BASE-B",
+      "quantity": 48,
+      "weaponType": "PGM-Mk2"
+    },
+    {
+      "baseId": "BASE-C",
+      "quantity": 14,
+      "weaponType": "GENERIC-AAM-M"
+    },
+    {
+      "baseId": "BASE-C",
+      "quantity": 32,
+      "weaponType": "GENERIC-AAM-S"
+    },
+    {
+      "baseId": "BASE-C",
+      "quantity": 0,
+      "weaponType": "GENERIC-ANTIRADAR"
+    },
+    {
+      "baseId": "BASE-C",
+      "quantity": 120,
+      "weaponType": "GENERIC-CARGO-PALLET"
+    },
+    {
+      "baseId": "BASE-C",
+      "quantity": 2,
+      "weaponType": "GENERIC-RECON-POD"
+    },
+    {
+      "baseId": "BASE-C",
+      "quantity": 12,
+      "weaponType": "PGM-Mk2"
+    },
+    {
+      "baseId": "BASE-D",
+      "quantity": 16,
+      "weaponType": "GENERIC-AAM-M"
+    },
+    {
+      "baseId": "BASE-D",
+      "quantity": 24,
+      "weaponType": "GENERIC-AAM-S"
+    },
+    {
+      "baseId": "BASE-D",
+      "quantity": 4,
+      "weaponType": "GENERIC-ANTIRADAR"
+    },
+    {
+      "baseId": "BASE-D",
+      "quantity": 14,
+      "weaponType": "GENERIC-CARGO-PALLET"
+    },
+    {
+      "baseId": "BASE-D",
+      "quantity": 12,
+      "weaponType": "GENERIC-RECON-POD"
+    },
+    {
+      "baseId": "BASE-D",
+      "quantity": 8,
+      "weaponType": "PGM-Mk2"
+    }
+  ],
+  "weather": [
+    {
+      "baseId": "BASE-A",
+      "cloudBaseFt": 4500,
+      "forecast": [
+        {
+          "severity": "nominal",
+          "time": "2026-10-17T12:00:00Z",
+          "visibilityKm": 18,
+          "windKts": 12
+        },
+        {
+          "severity": "nominal",
+          "time": "2026-10-17T18:00:00Z",
+          "visibilityKm": 16,
+          "windKts": 14
+        }
+      ],
+      "severity": "nominal",
+      "visibilityKm": 18,
+      "windKts": 12
+    },
+    {
+      "baseId": "BASE-B",
+      "cloudBaseFt": 1200,
+      "forecast": [
+        {
+          "severity": "caution",
+          "time": "2026-10-17T12:00:00Z",
+          "visibilityKm": 6,
+          "windKts": 28
+        },
+        {
+          "severity": "severe",
+          "time": "2026-10-17T18:00:00Z",
+          "visibilityKm": 3,
+          "windKts": 36
+        }
+      ],
+      "severity": "caution",
+      "visibilityKm": 6,
+      "windKts": 28
+    },
+    {
+      "baseId": "BASE-C",
+      "cloudBaseFt": 5000,
+      "forecast": [
+        {
+          "severity": "nominal",
+          "time": "2026-10-17T12:00:00Z",
+          "visibilityKm": 22,
+          "windKts": 10
+        },
+        {
+          "severity": "nominal",
+          "time": "2026-10-17T18:00:00Z",
+          "visibilityKm": 20,
+          "windKts": 12
+        }
+      ],
+      "severity": "nominal",
+      "visibilityKm": 22,
+      "windKts": 10
+    },
+    {
+      "baseId": "BASE-D",
+      "cloudBaseFt": 6000,
+      "forecast": [
+        {
+          "severity": "nominal",
+          "time": "2026-10-17T12:00:00Z",
+          "visibilityKm": 25,
+          "windKts": 8
+        },
+        {
+          "severity": "nominal",
+          "time": "2026-10-17T18:00:00Z",
+          "visibilityKm": 24,
+          "windKts": 10
+        }
+      ],
+      "severity": "nominal",
+      "visibilityKm": 25,
+      "windKts": 8
+    }
+  ]
+}

@@ -50,7 +50,7 @@ export const MOCK_MAP_BOUNDS: MapBounds = {
   maxLng: 12.0,
 };
 
-const SEED_BASES: Record<string, Base> = {
+export const SEED_BASES: Record<string, Base> = {
   'BASE-A': {
     id: 'BASE-A',
     name: 'Sector Alpha Fighter Base',
@@ -133,7 +133,7 @@ const SEED_BASES: Record<string, Base> = {
   },
 };
 
-const SEED_WEAPON_STOCKS: WeaponStock[] = [
+export const SEED_WEAPON_STOCKS: WeaponStock[] = [
   // BASE-A (Fighter Intercept Focus)
   { baseId: 'BASE-A', weaponType: 'GENERIC-AAM-M', quantity: 64 },
   { baseId: 'BASE-A', weaponType: 'GENERIC-AAM-S', quantity: 96 },
@@ -463,6 +463,21 @@ export function generateSeedMissions(includeConflicts = false, baseTime?: Date):
         { lat: 2.0, lng: 5.0 },
         { lat: 1.8, lng: 4.2 },
       ],
+      routeOptions: [
+        {
+          id: 'Route A',
+          name: 'Route A (Baseline Channel Patrol)',
+          waypoints: [
+            { lat: 1.8, lng: 4.2 },
+            { lat: 2.1, lng: 4.8 },
+            { lat: 2.5, lng: 5.5 },
+            { lat: 2.0, lng: 5.0 },
+            { lat: 1.8, lng: 4.2 },
+          ],
+          distanceKm: 210,
+          riskScore: 14,
+        },
+      ],
       windowStart: isoNow,
       windowEnd: isoPlus4h,
       requiredAircraftType: 'Fighter-A',
@@ -549,6 +564,19 @@ export function generateSeedMissions(includeConflicts = false, baseTime?: Date):
         { lat: 3.2, lng: 5.5 },
         { lat: 5.2, lng: 6.8 },
       ],
+      routeOptions: [
+        {
+          id: 'Route A',
+          name: 'Route A (Direct Transit Corridor)',
+          waypoints: [
+            { lat: 1.8, lng: 4.2 },
+            { lat: 3.2, lng: 5.5 },
+            { lat: 5.2, lng: 6.8 },
+          ],
+          distanceKm: 420,
+          riskScore: 8,
+        },
+      ],
       windowStart: isoNow,
       windowEnd: isoPlus4h,
       requiredAircraftType: 'Transport-C',
@@ -570,6 +598,19 @@ export function generateSeedMissions(includeConflicts = false, baseTime?: Date):
         { lat: 7.8, lng: 4.0 },
         { lat: 8.5, lng: 3.5 },
       ],
+      routeOptions: [
+        {
+          id: 'Route A',
+          name: 'Route A (Buffer Intercept Track)',
+          waypoints: [
+            { lat: 8.5, lng: 3.5 },
+            { lat: 7.8, lng: 4.0 },
+            { lat: 8.5, lng: 3.5 },
+          ],
+          distanceKm: 180,
+          riskScore: 16,
+        },
+      ],
       windowStart: isoPlus4h,
       windowEnd: isoPlus8h,
       requiredAircraftType: 'Fighter-A',
@@ -589,6 +630,19 @@ export function generateSeedMissions(includeConflicts = false, baseTime?: Date):
         { lat: 5.2, lng: 6.8 },
         { lat: 4.8, lng: 8.2 },
         { lat: 5.2, lng: 6.8 },
+      ],
+      routeOptions: [
+        {
+          id: 'Route A',
+          name: 'Route A (Direct OCA Sweep)',
+          waypoints: [
+            { lat: 5.2, lng: 6.8 },
+            { lat: 4.8, lng: 8.2 },
+            { lat: 5.2, lng: 6.8 },
+          ],
+          distanceKm: 260,
+          riskScore: 24,
+        },
       ],
       windowStart: isoPlus4h,
       windowEnd: isoPlus8h,
@@ -610,6 +664,19 @@ export function generateSeedMissions(includeConflicts = false, baseTime?: Date):
         { lat: 5.0, lng: 10.0 },
         { lat: 4.6, lng: 10.5 },
       ],
+      routeOptions: [
+        {
+          id: 'Route A',
+          name: 'Route A (Ridge Ingress Corridor)',
+          waypoints: [
+            { lat: 4.6, lng: 10.5 },
+            { lat: 5.0, lng: 10.0 },
+            { lat: 4.6, lng: 10.5 },
+          ],
+          distanceKm: 120,
+          riskScore: 15,
+        },
+      ],
       windowStart: isoPlus4h,
       windowEnd: isoPlus8h,
       requiredAircraftType: 'Helicopter-E',
@@ -630,6 +697,19 @@ export function generateSeedMissions(includeConflicts = false, baseTime?: Date):
         { lat: 7.2, lng: 6.5 },
         { lat: 8.5, lng: 3.5 },
       ],
+      routeOptions: [
+        {
+          id: 'Route A',
+          name: 'Route A (Stand-Off Staging Track)',
+          waypoints: [
+            { lat: 8.5, lng: 3.5 },
+            { lat: 7.2, lng: 6.5 },
+            { lat: 8.5, lng: 3.5 },
+          ],
+          distanceKm: 310,
+          riskScore: 18,
+        },
+      ],
       windowStart: isoPlus4h,
       windowEnd: isoPlus8h,
       requiredAircraftType: 'Recon-D',
@@ -649,6 +729,19 @@ export function generateSeedMissions(includeConflicts = false, baseTime?: Date):
         { lat: 1.8, lng: 4.2 },
         { lat: 3.2, lng: 7.5 },
         { lat: 4.6, lng: 10.5 },
+      ],
+      routeOptions: [
+        {
+          id: 'Route A',
+          name: 'Route A (Intra-Theatre Transport)',
+          waypoints: [
+            { lat: 1.8, lng: 4.2 },
+            { lat: 3.2, lng: 7.5 },
+            { lat: 4.6, lng: 10.5 },
+          ],
+          distanceKm: 580,
+          riskScore: 6,
+        },
       ],
       windowStart: isoPlus4h,
       windowEnd: isoPlus8h,
@@ -775,7 +868,7 @@ export function generateSeedMissions(includeConflicts = false, baseTime?: Date):
   return missions;
 }
 
-function generateSeedAirspace(): Record<string, Airspace> {
+export function generateSeedAirspace(): Record<string, Airspace> {
   return {
     'AS-01': {
       id: 'AS-01',
@@ -864,7 +957,7 @@ function generateSeedAirspace(): Record<string, Airspace> {
   };
 }
 
-function generateSeedThreats(): Record<string, Threat> {
+export function generateSeedThreats(): Record<string, Threat> {
   return {
     'THR-01': {
       id: 'THR-01',
@@ -905,8 +998,8 @@ function generateSeedThreats(): Record<string, Threat> {
   };
 }
 
-function generateSeedPredictions(): Prediction[] {
-  const now = new Date().toISOString();
+export function generateSeedPredictions(baseTime?: Date): Prediction[] {
+  const now = (baseTime || new Date()).toISOString();
   return [
     {
       entityType: 'aircraft',

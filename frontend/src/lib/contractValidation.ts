@@ -292,7 +292,8 @@ export function validateOperationalAlert(val: unknown): ValidationReport {
 }
 
 /**
- * Validates complete OperationalSnapshot
+/**
+ * Validates complete OperationalSnapshot or WireSnapshot
  */
 export function validateSnapshot(val: unknown): ValidationReport {
   const errors: string[] = [];
@@ -301,42 +302,188 @@ export function validateSnapshot(val: unknown): ValidationReport {
   }
 
   if (typeof val.stateVersion !== 'number') errors.push('stateVersion must be a number');
-  if (!isObject(val.bases)) errors.push('bases dictionary is required');
-  if (!isObject(val.aircraft)) errors.push('aircraft dictionary is required');
-  if (!isObject(val.crew)) errors.push('crew dictionary is required');
-  if (!isObject(val.missions)) errors.push('missions dictionary is required');
 
-  // Validate individual entities inside dictionaries
-  if (isObject(val.bases)) {
+  // Validate bases (accepts Record or Array)
+  if (Array.isArray(val.bases)) {
+    val.bases.forEach((b, idx) => {
+      const res = validateBase(b);
+      const entityId = isObject(b) && typeof b.id === 'string' ? b.id : `index ${idx}`;
+      if (!res.valid) errors.push(`Base ${entityId}: ${res.errors.join(', ')}`);
+    });
+  } else if (isObject(val.bases)) {
     Object.entries(val.bases).forEach(([key, b]) => {
       const res = validateBase(b);
       const entityId = isObject(b) && typeof b.id === 'string' ? b.id : key;
       if (!res.valid) errors.push(`Base ${entityId}: ${res.errors.join(', ')}`);
     });
+  } else {
+    errors.push('bases dictionary or array is required');
   }
 
-  if (isObject(val.aircraft)) {
+  // Validate aircraft (accepts Record or Array)
+  if (Array.isArray(val.aircraft)) {
+    val.aircraft.forEach((a, idx) => {
+      const res = validateAircraft(a);
+      const entityId = isObject(a) && typeof a.id === 'string' ? a.id : `index ${idx}`;
+      if (!res.valid) errors.push(`Aircraft ${entityId}: ${res.errors.join(', ')}`);
+    });
+  } else if (isObject(val.aircraft)) {
     Object.entries(val.aircraft).forEach(([key, a]) => {
       const res = validateAircraft(a);
       const entityId = isObject(a) && typeof a.id === 'string' ? a.id : key;
       if (!res.valid) errors.push(`Aircraft ${entityId}: ${res.errors.join(', ')}`);
     });
+  } else {
+    errors.push('aircraft dictionary or array is required');
   }
 
-  if (isObject(val.crew)) {
+  // Validate crew (accepts Record or Array)
+  if (Array.isArray(val.crew)) {
+    val.crew.forEach((c, idx) => {
+      const res = validateCrew(c);
+      const entityId = isObject(c) && typeof c.id === 'string' ? c.id : `index ${idx}`;
+      if (!res.valid) errors.push(`Crew ${entityId}: ${res.errors.join(', ')}`);
+    });
+  } else if (isObject(val.crew)) {
     Object.entries(val.crew).forEach(([key, c]) => {
       const res = validateCrew(c);
       const entityId = isObject(c) && typeof c.id === 'string' ? c.id : key;
       if (!res.valid) errors.push(`Crew ${entityId}: ${res.errors.join(', ')}`);
     });
+  } else {
+    errors.push('crew dictionary or array is required');
   }
 
-  if (isObject(val.missions)) {
+  // Validate missions (accepts Record or Array)
+  if (Array.isArray(val.missions)) {
+    val.missions.forEach((m, idx) => {
+      const res = validateMission(m);
+      const entityId = isObject(m) && typeof m.id === 'string' ? m.id : `index ${idx}`;
+      if (!res.valid) errors.push(`Mission ${entityId}: ${res.errors.join(', ')}`);
+    });
+  } else if (isObject(val.missions)) {
     Object.entries(val.missions).forEach(([key, m]) => {
       const res = validateMission(m);
       const entityId = isObject(m) && typeof m.id === 'string' ? m.id : key;
       if (!res.valid) errors.push(`Mission ${entityId}: ${res.errors.join(', ')}`);
     });
+  } else {
+    errors.push('missions dictionary or array is required');
+  }
+
+  return { valid: errors.length === 0, errors };
+}
+
+/**
+ * Validates complete WireSnapshot against API_CONTRACT.md section 6.13
+ */
+export function validateWireSnapshot(val: unknown): ValidationReport {
+  const errors: string[] = [];
+  if (!isObject(val)) {
+    return { valid: false, errors: ['WireSnapshot must be an object'] };
+  }
+
+  if (typeof val.stateVersion !== 'number') {
+    errors.push('stateVersion must be a number');
+  }
+
+  if (!isObject(val.sim)) {
+    errors.push('sim object is required');
+  } else {
+    if (!isIsoDate(val.sim.time)) errors.push(`sim.time must be valid ISO timestamp: ${val.sim.time}`);
+    if (typeof val.sim.speed !== 'number') errors.push('sim.speed must be a number');
+    if (typeof val.sim.paused !== 'boolean') errors.push('sim.paused must be a boolean');
+  }
+
+  if (val.bounds !== undefined) {
+    if (!isObject(val.bounds)) {
+      errors.push('bounds must be an object');
+    } else {
+      if (
+        typeof val.bounds.minLat !== 'number' ||
+        typeof val.bounds.maxLat !== 'number' ||
+        typeof val.bounds.minLng !== 'number' ||
+        typeof val.bounds.maxLng !== 'number'
+      ) {
+        errors.push('bounds must contain minLat, maxLat, minLng, maxLng numbers');
+      }
+    }
+  }
+
+  if (!Array.isArray(val.bases)) {
+    errors.push('bases array is required');
+  } else {
+    val.bases.forEach((b, idx) => {
+      const res = validateBase(b);
+      const entityId = isObject(b) && typeof b.id === 'string' ? b.id : `index ${idx}`;
+      if (!res.valid) errors.push(`Base ${entityId}: ${res.errors.join(', ')}`);
+    });
+  }
+
+  if (!Array.isArray(val.aircraft)) {
+    errors.push('aircraft array is required');
+  } else {
+    val.aircraft.forEach((a, idx) => {
+      const res = validateAircraft(a);
+      const entityId = isObject(a) && typeof a.id === 'string' ? a.id : `index ${idx}`;
+      if (!res.valid) errors.push(`Aircraft ${entityId}: ${res.errors.join(', ')}`);
+    });
+  }
+
+  if (!Array.isArray(val.crew)) {
+    errors.push('crew array is required');
+  } else {
+    val.crew.forEach((c, idx) => {
+      const res = validateCrew(c);
+      const entityId = isObject(c) && typeof c.id === 'string' ? c.id : `index ${idx}`;
+      if (!res.valid) errors.push(`Crew ${entityId}: ${res.errors.join(', ')}`);
+    });
+  }
+
+  if (!Array.isArray(val.missions)) {
+    errors.push('missions array is required');
+  } else {
+    val.missions.forEach((m, idx) => {
+      const res = validateMission(m);
+      const entityId = isObject(m) && typeof m.id === 'string' ? m.id : `index ${idx}`;
+      if (!res.valid) errors.push(`Mission ${entityId}: ${res.errors.join(', ')}`);
+    });
+  }
+
+  if (!Array.isArray(val.airspace)) {
+    errors.push('airspace array is required');
+  } else {
+    val.airspace.forEach((as, idx) => {
+      const res = validateAirspace(as);
+      const entityId = isObject(as) && typeof as.id === 'string' ? as.id : `index ${idx}`;
+      if (!res.valid) errors.push(`Airspace ${entityId}: ${res.errors.join(', ')}`);
+    });
+  }
+
+  if (!Array.isArray(val.threats)) {
+    errors.push('threats array is required');
+  } else {
+    val.threats.forEach((t, idx) => {
+      const res = validateThreat(t);
+      const entityId = isObject(t) && typeof t.id === 'string' ? t.id : `index ${idx}`;
+      if (!res.valid) errors.push(`Threat ${entityId}: ${res.errors.join(', ')}`);
+    });
+  }
+
+  if (!Array.isArray(val.weaponStocks)) {
+    errors.push('weaponStocks array is required');
+  }
+
+  if (!Array.isArray(val.weather)) {
+    errors.push('weather array is required');
+  }
+
+  if (!Array.isArray(val.predictions)) {
+    errors.push('predictions array is required');
+  }
+
+  if (!Array.isArray(val.recommendations)) {
+    errors.push('recommendations array is required');
   }
 
   return { valid: errors.length === 0, errors };
