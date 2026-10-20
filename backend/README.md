@@ -50,6 +50,10 @@ python scripts/demo_dump.py
 # Or against a running server:
 curl -X POST "http://localhost:8000/api/demo-scripts/sam-route-b/run?reset=true"
 curl -X POST "http://localhost:8000/api/demo-scripts/runway-closure-aog/run?reset=true"
+
+# Full live loop: reset -> demo -> recommendation -> approve -> state + audit
+python scripts/full_loop.py --demo all
+python scripts/verify_audit.py --db .\airops.db
 ```
 
 Expected flow: `EVENT_INJECTED` -> `IMPACT_ANALYSIS` -> `ALERT` ->
@@ -128,6 +132,6 @@ app/
   audit/             hashchain.py, SQLite store/model
   fusion/ geo/ optimiser/ predict/ scenarios/ security/   (later stages)
 tests/               pytest suite + offline socket guard
-scripts/             ws_listen.py, demo_dump.py, verify_audit.py
+scripts/             ws_listen.py, demo_dump.py, full_loop.py, verify_audit.py
 tasks.py             cross-platform task runner
 ```

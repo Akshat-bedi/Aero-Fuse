@@ -195,6 +195,7 @@ python tasks.py run              # uvicorn on :8000 with reload
 python tasks.py check            # ruff + mypy (strict) + pytest
 python scripts/ws_listen.py --duration 30   # print live WS frames
 python scripts/demo_dump.py      # both demo scripts, full recommendation artefacts
+python scripts/full_loop.py --demo all      # live reset -> demo -> approve -> audit
 python scripts/verify_audit.py   # independent stdlib-only chain verification
 ```
 

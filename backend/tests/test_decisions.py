@@ -2,13 +2,23 @@
 
 from __future__ import annotations
 
+import asyncio
 from datetime import timedelta
 from typing import Any, cast
 
-from app.domain import Recommendation, RecommendationStatus
+from app.domain import (
+    DecisionRequest,
+    MissionStatus,
+    OpsEventRequest,
+    Recommendation,
+    RecommendationStatus,
+    dump_wire,
+)
 from app.retask import geometry_lite
 from app.runtime import SimRuntime
 from fastapi.testclient import TestClient
+
+from baseline_rules import baseline_violations
 
 LiveApp = tuple[TestClient, SimRuntime]
 
@@ -235,3 +245,129 @@ def test_pending_recommendation_expires(app_client: LiveApp) -> None:
     )
     assert response.status_code == 409
     assert response.json()["type"] == "https://airops.dss/errors/stale-recommendation"
+
+
+async def test_concurrent_approvals_apply_the_plan_once(runtime: SimRuntime) -> None:
+    event = runtime.inject_event(OpsEventRequest(**THREAT_EVENT))
+    runtime.schedule_retask(event)
+    recommendation_id = "REC-0001"
+    version_before = runtime.store.version
+    request = DecisionRequest(decision="approve", operator="COMMANDER_ALPHA")
+
+    first, second = await asyncio.gather(
+        runtime.decisions.decide(recommendation_id, request),
+        runtime.decisions.decide(recommendation_id, request),
+    )
+
+    assert first.status is RecommendationStatus.APPROVED
+    assert second.status is RecommendationStatus.APPROVED
+    assert runtime.store.version == version_before + 1
+    approved_entries = [
+        entry for entry in runtime.audit.entries() if entry.action == "DECISION_APPROVED"
+    ]
+    assert len(approved_entries) == 1
+
+
+def test_alternative_recommendation_id_is_not_decidable(app_client: LiveApp) -> None:
+    client, runtime = app_client
+    recommendation = _pending_recommendation(client, runtime)
+    alternatives = recommendation["alternatives"]
+    assert len(alternatives) == 2
+    alternative_id = alternatives[0]["id"]
+    assert alternative_id == "REC-0001-ALT1"
+    audit_before = client.get("/api/audit").json()
+
+    response = client.post(
+        f"/api/recommendations/{alternative_id}/decision",
+        json={"decision": "approve", "operator": "COMMANDER_ALPHA"},
+    )
+    assert response.status_code == 404
+    assert client.get("/api/audit").json() == audit_before
+    assert runtime.store.version == recommendation["stateVersion"]
+
+
+def test_validate_modification_is_read_only(app_client: LiveApp) -> None:
+    client, runtime = app_client
+    recommendation = _pending_recommendation(client, runtime)
+    eligible = client.get("/api/missions/M-04/eligible-resources").json()
+    replacement = next(
+        item["id"] for item in eligible["aircraft"] if item["id"] != "AC-07"
+    )
+    snapshot_before = client.get("/api/snapshot").content
+    audit_before = client.get("/api/audit").json()
+
+    validated = client.post(
+        f"/api/recommendations/{recommendation['id']}/validate-modification",
+        json={"aircraftSwap": {"missionId": "M-04", "newAircraftId": replacement}},
+    )
+    assert validated.status_code == 200
+    assert validated.json()["valid"] is True
+    assert client.get("/api/snapshot").content == snapshot_before
+    assert client.get("/api/audit").json() == audit_before
+    assert runtime.store.missions["M-04"].assigned.aircraft_ids == ["AC-07"]
+
+
+def _is_rotation_of(
+    actual: list[Any], expected: list[Any]
+) -> bool:
+    if len(actual) != len(expected):
+        return False
+    return any(
+        actual == expected[offset:] + expected[:offset]
+        for offset in range(len(expected))
+    )
+
+
+def test_sam_route_b_full_loop_approves_m04_on_route_c(app_client: LiveApp) -> None:
+    client, runtime = app_client
+    run = client.post("/api/demo-scripts/sam-route-b/run?reset=true")
+    assert run.status_code == 200
+    assert runtime.demos.wait_idle(5.0)
+    assert runtime.retask.wait_idle(5.0)
+    recommendation = client.get("/api/recommendations/REC-0001").json()
+    assert recommendation["status"] == "pending"
+    version_before = runtime.store.version
+
+    response = client.post(
+        "/api/recommendations/REC-0001/decision",
+        json={"decision": "approve", "operator": "COMMANDER_ALPHA"},
+    )
+    assert response.status_code == 200
+    assert response.json()["status"] == "approved"
+    assert runtime.store.version == version_before + 1
+
+    mission = runtime.store.missions["M-04"]
+    route_c = geometry_lite.route_option_for(mission, "Route C")
+    assert mission.status is MissionStatus.IN_PROGRESS
+    assert route_c is not None
+    assert len(mission.route) == len(route_c.waypoints) + 1
+    assert _is_rotation_of(list(mission.route[1:]), list(route_c.waypoints))
+    assert baseline_violations(dump_wire(runtime.snapshot(), exclude_none=True)) == []
+    assert client.get("/api/audit").json()[-1]["action"] == "DECISION_APPROVED"
+
+
+def test_runway_closure_aog_leaves_first_stale_and_second_approvable(
+    app_client: LiveApp,
+) -> None:
+    client, runtime = app_client
+    run = client.post("/api/demo-scripts/runway-closure-aog/run?reset=true")
+    assert run.status_code == 200
+    assert runtime.demos.wait_idle(5.0)
+    assert runtime.retask.wait_idle(5.0)
+
+    statuses = {
+        recommendation["id"]: recommendation["status"]
+        for recommendation in client.get("/api/recommendations").json()
+    }
+    assert statuses == {"REC-0001": "stale", "REC-0002": "pending"}
+    version_before = runtime.store.version
+
+    response = client.post(
+        "/api/recommendations/REC-0002/decision",
+        json={"decision": "approve", "operator": "COMMANDER_ALPHA"},
+    )
+    assert response.status_code == 200
+    assert response.json()["status"] == "approved"
+    assert runtime.store.version == version_before + 1
+    assert client.get("/api/recommendations/REC-0001").json()["status"] == "stale"
+    assert client.get("/api/audit").json()[-1]["action"] == "DECISION_APPROVED"

@@ -7,6 +7,7 @@ import sqlite3
 import subprocess
 import sys
 from pathlib import Path
+from typing import Any
 
 from app.audit.hashchain import compute_hash
 from app.runtime import SimRuntime
@@ -27,6 +28,17 @@ THREAT_EVENT = {
 
 def _db_path(runtime: SimRuntime) -> Path:
     return Path(runtime.settings.db_url.removeprefix("sqlite:///"))
+
+
+def _standalone_verify(database: Path) -> tuple[int, dict[str, Any]]:
+    script = Path(__file__).resolve().parents[1] / "scripts" / "verify_audit.py"
+    completed = subprocess.run(
+        [sys.executable, str(script), "--db", str(database)],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return completed.returncode, json.loads(completed.stdout)
 
 
 def test_baseline_chain_is_valid_and_hash_recomputes(app_client: LiveApp) -> None:
@@ -151,6 +163,49 @@ def test_invalid_details_json_is_reported_not_crashed(app_client: LiveApp) -> No
     assert body["valid"] is False
     assert body["brokenLinkIndex"] == 1
     assert "Details JSON invalid" in body["message"]
+
+
+def test_middle_row_deletion_breaks_endpoint_and_standalone_verifier(
+    app_client: LiveApp,
+) -> None:
+    client, runtime = app_client
+    assert client.post("/api/events", json=THREAT_EVENT).status_code == 201
+    assert runtime.retask.wait_idle(5.0)
+    database = _db_path(runtime)
+    with sqlite3.connect(database) as connection:
+        connection.execute("DELETE FROM audit_entries WHERE seq = 2")
+        connection.commit()
+
+    endpoint = client.get("/api/audit/verify").json()
+    returncode, standalone = _standalone_verify(database)
+    assert endpoint["valid"] is False
+    assert standalone["valid"] is False
+    assert endpoint["brokenLinkIndex"] == standalone["brokenLinkIndex"] == 1
+    assert "AUD-0002" in endpoint["message"]
+    assert "AUD-0002" in standalone["message"]
+    assert returncode == 1
+
+
+def test_hash_tamper_breaks_endpoint_and_standalone_verifier(
+    app_client: LiveApp,
+) -> None:
+    client, runtime = app_client
+    database = _db_path(runtime)
+    with sqlite3.connect(database) as connection:
+        connection.execute(
+            "UPDATE audit_entries SET hash = ? WHERE seq = 2",
+            ("f" * 64,),
+        )
+        connection.commit()
+
+    endpoint = client.get("/api/audit/verify").json()
+    returncode, standalone = _standalone_verify(database)
+    assert endpoint["valid"] is False
+    assert standalone["valid"] is False
+    assert endpoint["brokenLinkIndex"] == standalone["brokenLinkIndex"] == 1
+    assert "AUD-0002" in endpoint["message"]
+    assert "AUD-0002" in standalone["message"]
+    assert returncode == 1
 
 
 def test_standalone_verifier_checks_the_sqlite_file(runtime: SimRuntime) -> None:
