@@ -1,6 +1,6 @@
 """Domain models (Pydantic, camelCase on the wire)."""
 
-from app.domain.audit import AuditEntry
+from app.domain.audit import AuditEntry, AuditVerification
 from app.domain.base import (
     IsoTimestamp,
     WireModel,
@@ -107,6 +107,7 @@ __all__ = [
     "AlertType",
     "AssignmentModification",
     "AuditEntry",
+    "AuditVerification",
     "Base",
     "BaseClosedPayload",
     "Change",

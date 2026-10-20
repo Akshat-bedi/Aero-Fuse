@@ -10,6 +10,7 @@ WORKDIR /srv/airops
 
 COPY pyproject.toml README.md ./
 COPY app ./app
+COPY scripts ./scripts
 RUN pip install .
 
 EXPOSE 8000

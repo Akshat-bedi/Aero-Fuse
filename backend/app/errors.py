@@ -7,6 +7,8 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from app.retask.decisions import DecisionError
+
 logger = logging.getLogger("airops.errors")
 
 PROBLEM_CONTENT_TYPE = "application/problem+json"
@@ -36,6 +38,23 @@ def register_error_handlers(app: FastAPI) -> None:
     @app.exception_handler(StarletteHTTPException)
     async def http_exception_handler(_: Request, exc: StarletteHTTPException) -> JSONResponse:
         return _problem(exc.status_code, str(exc.detail), str(exc.detail))
+
+    @app.exception_handler(DecisionError)
+    async def decision_exception_handler(_: Request, exc: DecisionError) -> JSONResponse:
+        body: dict[str, object] = {
+            "type": exc.problem_type,
+            "title": exc.title,
+            "status": exc.status_code,
+            "detail": exc.detail,
+            **exc.extensions,
+        }
+        if exc.violations:
+            body["violations"] = exc.violations
+        return JSONResponse(
+            status_code=exc.status_code,
+            content=body,
+            media_type=PROBLEM_CONTENT_TYPE,
+        )
 
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(_: Request, exc: RequestValidationError) -> JSONResponse:

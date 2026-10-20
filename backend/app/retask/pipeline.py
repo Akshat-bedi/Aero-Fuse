@@ -175,8 +175,26 @@ class RetaskPipeline:
         if generation != self._generation:
             return
 
+        if proposal.primary.state_version != state.version:
+            logger.info(
+                "state changed while processing %s (v%s -> v%s); re-evaluating",
+                event.id,
+                proposal.primary.state_version,
+                state.version,
+            )
+            impact = self.engine.analyse_impact(event, state)
+            proposal = self.engine.propose(event, state, impact)
+
         recommendation = proposal.primary
         state.recommendations[recommendation.id] = recommendation
+        self.runtime.staleness.register(recommendation)
+        self.runtime.append_audit_sync(
+            operator="SYSTEM",
+            action="RECOMMENDATION_GENERATED",
+            target_id=recommendation.id,
+            details=recommendation.summary,
+            state_version=recommendation.state_version,
+        )
         elapsed = (time.perf_counter() - started) * 1000.0
         ready = RetaskProgress(
             is_replan_active=False,
@@ -217,6 +235,14 @@ class RetaskPipeline:
             )
         recommendation = proposal.primary
         state.recommendations[recommendation.id] = recommendation
+        self.runtime.staleness.register(recommendation)
+        self.runtime.append_audit_sync(
+            operator="SYSTEM",
+            action="RECOMMENDATION_GENERATED",
+            target_id=recommendation.id,
+            details=recommendation.summary,
+            state_version=recommendation.state_version,
+        )
         ready = RetaskProgress(
             is_replan_active=False,
             stage=RetaskStage.READY,
