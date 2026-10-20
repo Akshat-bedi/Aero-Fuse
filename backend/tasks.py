@@ -4,6 +4,8 @@ Usage:
     python tasks.py install     # create backend/.venv and install deps
     python tasks.py run         # uvicorn with --reload on port 8000
     python tasks.py serve       # uvicorn without --reload
+    python tasks.py secure      # uvicorn with AUTH_ENABLED=true
+    python tasks.py users       # list seeded demo accounts
     python tasks.py test        # pytest
     python tasks.py lint        # ruff check
     python tasks.py format      # ruff format + fix
@@ -14,6 +16,8 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import os
+import secrets
 import shutil
 import subprocess
 import sys
@@ -31,9 +35,9 @@ def venv_python() -> Path:
     return candidate if candidate.exists() else Path(sys.executable)
 
 
-def run(args: list[str]) -> None:
+def run(args: list[str], *, env: dict[str, str] | None = None) -> None:
     """Run a command from the backend directory, failing on error."""
-    subprocess.run(args, cwd=HERE, check=True)
+    subprocess.run(args, cwd=HERE, check=True, env=env)
 
 
 def cmd_venv() -> None:
@@ -91,6 +95,39 @@ def cmd_serve() -> None:
     )
 
 
+def cmd_secure() -> None:
+    """Start the server with auth enabled and a generated demo secret."""
+    env = os.environ.copy()
+    env["AUTH_ENABLED"] = "true"
+    if not env.get("JWT_SECRET") or env["JWT_SECRET"] == "dev-only-change-me":
+        env["JWT_SECRET"] = secrets.token_urlsafe(48)
+        print("Generated an ephemeral JWT_SECRET for this process.")
+    print("Demo users: python tasks.py users")
+    print("Auth: POST /api/auth/login, then Authorization: Bearer <accessToken>")
+    run(
+        [
+            str(venv_python()),
+            "-m",
+            "uvicorn",
+            "app.main:app",
+            "--host",
+            "0.0.0.0",
+            "--port",
+            "8000",
+        ],
+        env=env,
+    )
+
+
+def cmd_users() -> None:
+    """List the seeded fictional demo accounts and credentials."""
+    from app.security.users import DEMO_CREDENTIALS, DEMO_PASSWORD, DEMO_STEP_UP_PIN
+
+    print(f"Password: {DEMO_PASSWORD}    Step-up PIN: {DEMO_STEP_UP_PIN}")
+    for username, (user_id, display_name, role) in DEMO_CREDENTIALS.items():
+        print(f"{username:20} {user_id}  {role.value:20} {display_name}")
+
+
 def cmd_test() -> None:
     """Run the test suite."""
     run([str(venv_python()), "-m", "pytest"])
@@ -124,6 +161,8 @@ COMMANDS = {
     "install": cmd_install,
     "run": cmd_run,
     "serve": cmd_serve,
+    "secure": cmd_secure,
+    "users": cmd_users,
     "test": cmd_test,
     "lint": cmd_lint,
     "format": cmd_format,

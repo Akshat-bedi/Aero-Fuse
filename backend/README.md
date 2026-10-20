@@ -4,12 +4,13 @@ FastAPI backend for **AirOps DSS** (SIH 26250): a fused operational picture,
 constraint-based resource optimisation, dynamic retasking, predictions and a
 hash-chained audit log. **Fictional data only; runs fully offline.**
 
-Current stage: **B8a - decisions, hash-chained audit and staleness.** The backend
-serves the full canonical snapshot, sim clock/movement, WebSocket telemetry,
-an async retasking pipeline (impact analysis, alerts, progress, explained
-recommendations and the two demo scripts), commander approve/reject/modify
-endpoints with canonical-plan application, and an append-only SQLite audit
-chain. The CP-SAT optimiser, fusion, predictions and scenarios land in later
+Current stage: **B8b - security wiring.** The backend serves the full canonical
+snapshot, sim clock/movement, WebSocket telemetry, an async retasking pipeline
+(impact analysis, alerts, progress, explained recommendations and the two demo
+scripts), commander approve/reject/modify endpoints with canonical-plan
+application, an append-only SQLite audit chain, and optional JWT/RBAC with
+step-up and two-person approvals. Auth stays off by default; demo behaviour is
+unchanged. The CP-SAT optimiser, fusion, predictions and scenarios land in later
 stages (see `../ROADMAP.md`).
 
 ## Requirements
@@ -40,6 +41,32 @@ curl http://localhost:8000/api/health
 
 Point the frontend at it with `VITE_DATA_SOURCE=live`,
 `VITE_API_BASE_URL=http://localhost:8000/api`, `VITE_WS_URL=ws://localhost:8000/ws`.
+
+## Authentication (optional)
+
+Set `AUTH_ENABLED=true` and provide a real `JWT_SECRET` (32+ characters) from
+the environment. Demo accounts use password `veridia-demo` and step-up PIN
+`4821`: `ops_planner`, `commander`, `commander_2`, `auditor` (plus `observer`,
+`intel_officer`, `maintenance_officer`, `sys_admin`).
+
+```powershell
+$login = Invoke-RestMethod -Method Post http://localhost:8000/api/auth/login `
+  -ContentType "application/json" `
+  -Body '{"username":"ops_planner","password":"veridia-demo"}'
+$headers = @{ Authorization = "Bearer $($login.accessToken)" }
+Invoke-RestMethod http://localhost:8000/api/snapshot -Headers $headers
+
+# Step up before a commander decision (marks the current session for 5 minutes)
+$step = Invoke-RestMethod -Method Post http://localhost:8000/api/auth/step-up `
+  -Headers $headers -ContentType "application/json" `
+  -Body '{"pin":"4821"}'
+```
+
+Authenticate the WebSocket with `Sec-WebSocket-Protocol: bearer.<jwt>` or a
+first `{"type":"AUTH","token":"..."}` message; query tokens are rejected.
+Commanders cannot read `/api/audit`; use `auditor`. The frontend login/token
+client changes are documented in `docs/SECURITY_WIRING.md` and are not part of
+this backend slice.
 
 ## Demos
 
@@ -77,6 +104,8 @@ semantics are in `docs/AUDIT.md`.
 |---|---|
 | `python tasks.py install` | Create `.venv` and install deps (`.[dev]`) |
 | `python tasks.py run` / `serve` | Uvicorn on port 8000, with / without reload |
+| `python tasks.py secure` | Uvicorn with `AUTH_ENABLED=true` and an ephemeral demo secret |
+| `python tasks.py users` | List seeded demo accounts, password and step-up PIN |
 | `python tasks.py test` | pytest |
 | `python tasks.py lint` | `ruff check .` |
 | `python tasks.py format` | `ruff format` + safe fixes |

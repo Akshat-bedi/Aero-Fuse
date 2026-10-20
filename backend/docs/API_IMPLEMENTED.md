@@ -1,10 +1,10 @@
-# API implemented through B8a
+# API implemented through B8b
 
 Status: **state store, sim clock, movement, weather drift, rule-based retasking,
-REST and WebSocket, commander decisions, hash-chained audit and staleness**
-(Stages B2, B6a and B8a). Everything below is live code under
-`backend/app/`; shapes are validated against the Pydantic models exported in
-`backend/docs/schemas/`.
+REST and WebSocket, commander decisions, hash-chained audit, staleness, JWT/RBAC
+and two-person approvals** (Stages B2, B6a, B8a and B8b). Everything below is
+live code under `backend/app/`; shapes are validated against the Pydantic models
+exported in `backend/docs/schemas/`.
 
 Authoritative references: `docs/API_CONTRACT.md`, `frontend/src/types/index.ts`,
 `frontend/src/lib/contractValidation.ts`. Retask rules are documented in
@@ -16,6 +16,14 @@ contract-change candidates.
 Base path `/api`. All responses are `application/json`; errors are RFC 7807
 problem details and never contain stack traces.
 
+With `AUTH_ENABLED=true`, every route below except `/health` and `/auth/login`
+requires `Authorization: Bearer <accessToken>` and the permission mapped in
+`app/api/routes.py`. Missing/invalid tokens are `401`; insufficient permission
+is `403`. With `AUTH_ENABLED=false`, callers are the demo commander and the
+original behaviour is unchanged. Security routes: `POST /auth/login`,
+`POST /auth/refresh`, `POST /auth/logout`, `POST /auth/step-up`, `GET /auth/me`,
+plus `GET /auth/users` and `PATCH /auth/users/{id}/role` for `sys_admin`.
+
 | Method | Path | Status | Notes |
 |---|---|---|---|
 | GET | `/health` | 200 | `{status, version, simTime, solverReady}`; `simTime` is an ISO-8601 UTC string, `solverReady` is `false` until B5 |
@@ -26,7 +34,8 @@ problem details and never contain stack traces.
 | GET | `/recommendations/{id}` | 200 | One recommendation; 404 when unknown |
 | GET | `/missions/{id}/eligible-resources` | 200 | `{aircraft: [...], crew: [...]}` feasible for the Modify dropdowns; 404 for an unknown mission |
 | POST | `/recommendations/{id}/validate-modification` | 200 | Body is the **raw** modifications object (`{aircraftSwap?,crewSwap?}` or the array shape); returns `{conflicts,score,tradeoffs,valid}` and applies nothing |
-| POST | `/recommendations/{id}/decision` | 200 | Body `{decision:"approve"\|"reject"\|"modify", reason?, modifications?, operator}`. Returns the updated `Recommendation`. Reject requires a reason (422). Stale/expired approval returns 409 `https://airops.dss/errors/stale-recommendation`; invalid modification returns 422 with `violations`; repeated identical decisions are idempotent |
+| POST | `/recommendations/{id}/decision` | 200 | Body `{decision:"approve"\|"reject"\|"modify", reason?, modifications?, operator?}`. Returns the updated `Recommendation`. Reject requires a reason (422). Stale/expired approval returns 409 `https://airops.dss/errors/stale-recommendation`; invalid modification returns 422 with `violations`; repeated identical decisions are idempotent. With auth on, a fresh step-up is required (`428`) and high-impact recommendations stay `pending` until a second commander approves |
+| POST | `/recommendations/{id}/approvals/revoke` | 200 | Auth-on only: retract the acting commander's own pending approval; returns the recommendation and audits `APPROVAL_REVOKED` |
 | GET | `/audit` | 200 | Chronological hash-chained entries. Filters `operator`, `action`, `from`, `to`; `limit` 1–1000 (default 100), `offset`; `X-Total-Count` header; `format=csv` exports the same page |
 | GET | `/audit/verify` | 200 | Recomputes the SHA-256 chain: `{valid, brokenLinkIndex, message}` |
 | GET | `/demo-scripts` | 200 | Two catalogued scripts with `name`/`description` |
@@ -55,7 +64,11 @@ recommendation, and that application commits once through the store.
   the `Change` list once, marks the recommendation `approved`, bumps
   `stateVersion` once, emits `ENTITY_UPDATE`, `RECOMMENDATION_UPDATED` and then
   `AUDIT_APPENDED` (`DECISION_APPROVED`). A recommendation already `approved`
-  returns 200 unchanged; a conflicting decision returns 409.
+  returns 200 unchanged; a conflicting decision returns 409. With auth on, the
+  first approval records `APPROVAL_RECORDED` on the security audit sink and
+  leaves the recommendation `pending` when two approvers are required; the plan
+  is applied only by the final distinct commander. The triggering operator
+  cannot decide their own event, and every decision requires a fresh step-up.
 - **Reject** requires a non-empty reason (`422`), marks the recommendation
   `rejected`, leaves the plan and `stateVersion` untouched, and audits
   `DECISION_REJECTED`.
@@ -109,7 +122,10 @@ recommendation, and that application commits once through the store.
 | `HEARTBEAT` | every 5 wall seconds | `{}` |
 
 Client frames: `{"type": "PING"}` is accepted and ignored; unknown client
-message types are ignored, never fatal.
+message types are ignored for operational roles, never fatal. With auth on,
+authenticate with `Sec-WebSocket-Protocol: bearer.<jwt>` or a first
+`{"type":"AUTH","token":"..."}` message before `SNAPSHOT`; query tokens are
+rejected. Observer/auditor may only send `PING` (otherwise close `4403`).
 
 Example `POSITION_TICK`:
 
@@ -185,6 +201,10 @@ stalls the server or other clients.
 12. Alternative ids (for example `REC-0001-ALT1`) are display-only. The frontend
     has no decision path for them; only the primary id can be approved, rejected
     or modified.
+13. Auth-on adds `/api/auth/*`, `Authorization` headers, WebSocket AUTH,
+    `428` step-up responses and optional `approvalsRequired`/`approvals` fields.
+    These are contract-change candidates tracked in issue #13; the auth-off wire
+    shape is unchanged.
 
 ## How to run and verify
 
