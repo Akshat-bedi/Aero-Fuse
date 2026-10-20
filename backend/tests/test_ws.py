@@ -98,6 +98,37 @@ def test_event_injection_broadcasts_event_then_entity_update(app_client: LiveApp
         assert [threat["id"] for threat in update_frame["payload"]["threats"]] == ["THR-05"]
 
 
+def test_decision_broadcasts_recommendation_update_and_audit(
+    app_client: LiveApp,
+) -> None:
+    client, runtime = app_client
+    with client.websocket_connect("/ws") as ws:
+        ws.receive_json()
+        client.post("/api/events", json=THREAT_EVENT)
+        assert runtime.retask.wait_idle(5.0)
+
+        while ws.receive_json()["type"] != "RECOMMENDATION_READY":
+            pass
+
+        response = client.post(
+            "/api/recommendations/REC-0001/decision",
+            json={"decision": "approve", "operator": "COMMANDER_ALPHA"},
+        )
+        assert response.status_code == 200
+
+        frames: list[dict[str, Any]] = []
+        while len(frames) < 3:
+            frames.append(ws.receive_json())
+        assert [frame["type"] for frame in frames] == [
+            "ENTITY_UPDATE",
+            "RECOMMENDATION_UPDATED",
+            "AUDIT_APPENDED",
+        ]
+        assert frames[1]["payload"]["status"] == "approved"
+        assert frames[2]["payload"]["action"] == "DECISION_APPROVED"
+        assert frames[2]["stateVersion"] == runtime.store.version
+
+
 def test_reset_broadcasts_a_full_snapshot(app_client: LiveApp) -> None:
     client, runtime = app_client
     with client.websocket_connect("/ws") as ws:

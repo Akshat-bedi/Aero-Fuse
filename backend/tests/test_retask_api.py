@@ -197,6 +197,23 @@ def test_reset_clears_recommendations(
     assert runtime.store.audit_log == []
 
 
+def test_state_change_during_retask_recomputes_the_recommendation() -> None:
+    settings = get_settings().model_copy(update={"retask_min_stage_ms": 500})
+    application: FastAPI = create_app(autostart_sim=False, settings=settings)
+    with TestClient(application) as client:
+        runtime = cast(SimRuntime, application.state.runtime)
+        assert client.post("/api/events", json=THREAT_EVENT).status_code == 201
+        time.sleep(0.05)
+        assert client.post("/api/events", json=THREAT_EVENT).status_code == 201
+        assert runtime.retask.wait_idle(5.0)
+
+        recommendations = runtime.store.recommendations
+        assert len(recommendations) == 2
+        first = recommendations["REC-0001"]
+        assert first.state_version == runtime.store.version == 3
+        assert first.status.value == "pending"
+
+
 def test_reset_during_retask_discards_the_stale_result() -> None:
     settings = get_settings().model_copy(update={"retask_min_stage_ms": 100})
     application: FastAPI = create_app(autostart_sim=False, settings=settings)
