@@ -15,9 +15,13 @@ from app.security.approvals import (
 from app.security.audit_events import InMemoryAuditSink, SecurityAuditEvent
 from app.security.auth import LoginRequest
 from app.security.deps import (
+<<<<<<< HEAD
     STEP_UP_REQUIRED_TYPE,
     SecurityContext,
     StepUpRequiredError,
+=======
+    SecurityContext,
+>>>>>>> origin/main
     Unauthenticated,
     approval_denial_exception,
     create_auth_router,
@@ -400,7 +404,11 @@ def test_approval_denials_map_to_contract_statuses() -> None:
 
     cases = {
         DenialReason.NOT_COMMANDER: 403,
+<<<<<<< HEAD
         DenialReason.STEP_UP_REQUIRED: 428,
+=======
+        DenialReason.STEP_UP_REQUIRED: 427,
+>>>>>>> origin/main
         DenialReason.SEPARATION_OF_DUTIES: 403,
         DenialReason.ALREADY_DECIDED: 409,
         DenialReason.REASON_REQUIRED: 422,
@@ -414,7 +422,11 @@ def test_approval_denials_map_to_contract_statuses() -> None:
         assert exception.status_code == expected
 
 
+<<<<<<< HEAD
 def test_step_up_required_outcome_maps_to_428(
+=======
+def test_step_up_required_outcome_maps_to_427(
+>>>>>>> origin/main
     auth_context: SecurityContext, auth_settings: SecuritySettings
 ) -> None:
     commander = Identity(
@@ -435,6 +447,7 @@ def test_step_up_required_outcome_maps_to_428(
     assert outcome.denial is DenialReason.STEP_UP_REQUIRED
     exception = approval_denial_exception(outcome)
     assert exception is not None
+<<<<<<< HEAD
     assert exception.status_code == 428
 
 
@@ -457,6 +470,9 @@ def test_step_up_required_renders_rfc7807(auth_context: SecurityContext) -> None
         "detail": "Step-up PIN required.",
         "instance": "/decide",
     }
+=======
+    assert exception.status_code == 427
+>>>>>>> origin/main
 
 
 def _token_from_router(client: TestClient, username: str) -> str:

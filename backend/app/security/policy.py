@@ -110,7 +110,13 @@ _OVERSIGHT_READ_PERMISSIONS: frozenset[Permission] = frozenset(
 EVENT_TYPE_GRANTS: Mapping[Role, frozenset[EventType]] = MappingProxyType(
     {
         Role.INTEL_OFFICER: frozenset({EventType.THREAT_DETECTED}),
+<<<<<<< HEAD
         Role.MAINTENANCE_OFFICER: frozenset({EventType.AIRCRAFT_UNSERVICEABLE}),
+=======
+        Role.MAINTENANCE_OFFICER: frozenset(
+            {EventType.AIRCRAFT_UNSERVICEABLE, EventType.BASE_CLOSED}
+        ),
+>>>>>>> origin/main
         Role.OPS_PLANNER: frozenset(EventType),
         Role.COMMANDER: frozenset(EventType),
     }

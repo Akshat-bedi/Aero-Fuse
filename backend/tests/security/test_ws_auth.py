@@ -59,6 +59,7 @@ def test_demo_mode_authenticates_without_a_token() -> None:
         assert socket.receive_json() == {"type": "AUTH_OK", "role": "commander"}
 
 
+<<<<<<< HEAD
 def test_query_parameter_token_is_rejected(
     ws_client: TestClient, auth_context: SecurityContext
 ) -> None:
@@ -69,6 +70,11 @@ def test_query_parameter_token_is_rejected(
         socket.send_json({"type": "PING"})
         socket.receive_json()
     assert caught.value.code == 4401
+=======
+def test_query_parameter_token(ws_client: TestClient, auth_context: SecurityContext) -> None:
+    with ws_client.websocket_connect(f"/ws?token={_token(auth_context)}") as socket:
+        assert socket.receive_json()["role"] == "commander"
+>>>>>>> origin/main
 
 
 def test_first_message_token(ws_client: TestClient, auth_context: SecurityContext) -> None:
@@ -99,7 +105,10 @@ def test_invalid_query_token_is_rejected(ws_client: TestClient) -> None:
         pytest.raises(WebSocketDisconnect) as caught,
         ws_client.websocket_connect("/ws?token=garbage") as socket,
     ):
+<<<<<<< HEAD
         socket.send_json({"type": "PING"})
+=======
+>>>>>>> origin/main
         socket.receive_json()
     assert caught.value.code == 4401
 
@@ -118,9 +127,13 @@ def test_first_message_other_than_auth_is_rejected(
 
 def test_observer_may_only_ping(ws_client: TestClient, auth_context: SecurityContext) -> None:
     token = _token(auth_context, "observer")
+<<<<<<< HEAD
     with ws_client.websocket_connect(
         "/ws", subprotocols=[f"bearer.{token}"]
     ) as socket:
+=======
+    with ws_client.websocket_connect(f"/ws?token={token}") as socket:
+>>>>>>> origin/main
         socket.receive_json()
         socket.send_json({"type": "PING"})
         assert socket.receive_json()["type"] == "ECHO"
@@ -144,9 +157,13 @@ def test_operational_roles_may_send_other_messages(
     ws_client: TestClient, auth_context: SecurityContext
 ) -> None:
     token = _token(auth_context, "ops_planner")
+<<<<<<< HEAD
     with ws_client.websocket_connect(
         "/ws", subprotocols=[f"bearer.{token}"]
     ) as socket:
+=======
+    with ws_client.websocket_connect(f"/ws?token={token}") as socket:
+>>>>>>> origin/main
         socket.receive_json()
         socket.send_json({"type": "COMMAND"})
         assert socket.receive_json()["type"] == "ECHO"
