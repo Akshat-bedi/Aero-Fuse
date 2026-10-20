@@ -7,14 +7,22 @@ next to this project. Defaults are deterministic, offline demo values.
 from functools import lru_cache
 from pathlib import Path
 
-from pydantic_settings import BaseSettings, SettingsConfigDict
+from pydantic_settings import SettingsConfigDict
+
+from app.security.settings import SecuritySettings
 
 _REPO_ROOT = Path(__file__).resolve().parents[2]
 _DEFAULT_SEED_PATH = _REPO_ROOT / "shared" / "seed" / "world.json"
 
 
-class Settings(BaseSettings):
-    """Runtime configuration for the AirOps DSS backend."""
+class Settings(SecuritySettings):
+    """Runtime configuration for the AirOps DSS backend.
+
+    Security settings (``AUTH_ENABLED``, ``JWT_SECRET``, session TTLs, lockout,
+    step-up and approval thresholds) are inherited from
+    :class:`app.security.settings.SecuritySettings`, so the environment names
+    and defaults have one source of truth.
+    """
 
     model_config = SettingsConfigDict(
         env_file=".env",
@@ -37,9 +45,6 @@ class Settings(BaseSettings):
     # Canonical world seed (authoritative baseline dataset). The default is
     # repo-relative; Docker compose mounts ../shared and overrides SEED_PATH.
     seed_path: str = str(_DEFAULT_SEED_PATH)
-
-    auth_enabled: bool = False
-    jwt_secret: str = "dev-only-change-me"
 
     solver_time_limit_s: float = 4.0
     reco_ttl_min: int = 90

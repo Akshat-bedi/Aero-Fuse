@@ -57,3 +57,4 @@ python_version = "3.11"
 strict = true
 warn_unreachable = true
 plugins = ["pydantic.mypy"]
+exclude = ["tests/security/conftest.py"]

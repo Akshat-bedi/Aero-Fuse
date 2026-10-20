@@ -33,6 +33,14 @@ class Tradeoff(WireModel):
     direction: TradeoffDirection
 
 
+class ApprovalRecord(WireModel):
+    """One commander's approval on a recommendation (optional wire extra)."""
+
+    operator: str = Field(min_length=1)
+    role: str = Field(min_length=1)
+    timestamp: IsoTimestamp
+
+
 class Recommendation(WireModel):
     id: str = Field(pattern=r"^REC-")
     trigger_event_id: str = Field(min_length=1)
@@ -55,6 +63,9 @@ class Recommendation(WireModel):
     confidence: float = Field(ge=0, le=1)
     data_freshness_sec: float = Field(ge=0)
     modifications: dict[str, Any] | None = None
+    approvals_required: int | None = Field(default=None, ge=1)
+    approvals: list[ApprovalRecord] | None = None
+    triggered_by: str | None = Field(default=None, exclude=True)
 
 
 Recommendation.model_rebuild()
@@ -109,7 +120,7 @@ class DecisionRequest(WireModel):
     decision: Literal["approve", "reject", "modify"]
     reason: str | None = None
     modifications: ModificationsRequest | None = None
-    operator: str = "demo-commander"
+    operator: str | None = None
 
     @model_validator(mode="before")
     @classmethod
