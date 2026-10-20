@@ -4,7 +4,8 @@ Status: **rule-based retasking slice** (Stage B6a). This is the explainable,
 deterministic fallback that the CP-SAT optimiser (B5) will replace behind the
 same `RetaskEngine` boundary. It recomputes plans but **never changes the live
 plan**: only the event's own factual effect is applied when the event is
-injected. Approval and plan application land in B8a.
+injected. Approval, plan application and audit landed in B8a (see
+`docs/AUDIT.md`).
 
 Code map:
 
@@ -148,7 +149,8 @@ One lower-priority planned/approved mission of the same type may be pre-empted
 (cancelled) to free resources. Then assign a serviceable aircraft and an
 available qualified crew (same base first). The `new_assignment` change makes
 the mission `approved` only in the computed plan; the live mission stays
-`planned` until B8a applies a decision. No resources: P1/P2 failure, lower
+`planned` until an approved B8a decision applies it. No resources: P1/P2
+failure, lower
 priorities remain unassigned with a relaxation.
 
 ## 6. Profiles and alternatives
@@ -252,9 +254,10 @@ artefacts for both demos.
 - Limitations (accepted for B6a): straight-segment geometry; threats evaluated
   at their current position for the whole sortie; no time-phased airspace;
   base closure duration is not independently persisted (B4); no per-minute
-  launch offsets; no CP-SAT optimality; no decision application/audit chain
-  (B8a); no fusion/prediction inputs yet. B5/B4 replace these while keeping the
-  engine protocol and wire shapes.
+  launch offsets; no CP-SAT optimality; no fusion/prediction inputs yet.
+  Decision application, hash-chained audit and staleness were added in B8a.
+  B5/B4 replace the remaining limitations while keeping the engine protocol
+  and wire shapes.
 
 ## 12. Verify
 

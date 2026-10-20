@@ -4,12 +4,13 @@ FastAPI backend for **AirOps DSS** (SIH 26250): a fused operational picture,
 constraint-based resource optimisation, dynamic retasking, predictions and a
 hash-chained audit log. **Fictional data only; runs fully offline.**
 
-Current stage: **B6a - rule-based retasking slice.** The backend serves the full
-canonical snapshot, sim clock/movement, WebSocket telemetry and an async
-retasking pipeline (impact analysis, alerts, progress, explained
-recommendations and the two demo scripts). The CP-SAT optimiser, fusion,
-predictions, scenarios and decision/audit endpoints land in later stages (see
-`../ROADMAP.md`).
+Current stage: **B8a - decisions, hash-chained audit and staleness.** The backend
+serves the full canonical snapshot, sim clock/movement, WebSocket telemetry,
+an async retasking pipeline (impact analysis, alerts, progress, explained
+recommendations and the two demo scripts), commander approve/reject/modify
+endpoints with canonical-plan application, and an append-only SQLite audit
+chain. The CP-SAT optimiser, fusion, predictions and scenarios land in later
+stages (see `../ROADMAP.md`).
 
 ## Requirements
 
@@ -53,8 +54,16 @@ curl -X POST "http://localhost:8000/api/demo-scripts/runway-closure-aog/run?rese
 
 Expected flow: `EVENT_INJECTED` -> `IMPACT_ANALYSIS` -> `ALERT` ->
 four `RETASK_PROGRESS` stages -> `RECOMMENDATION_READY`. The live plan does not
-change until a commander decision (B8a). Rules and exact demo outputs are in
-`docs/RETASK_RULES.md`.
+change until a commander decision. Approve with:
+
+```powershell
+curl.exe -X POST "http://localhost:8000/api/recommendations/REC-0001/decision" `
+  -H "Content-Type: application/json" `
+  -d '{"decision":"approve","operator":"COMMANDER_ALPHA"}'
+```
+
+Rules and exact demo outputs are in `docs/RETASK_RULES.md`; decision and audit
+semantics are in `docs/AUDIT.md`.
 
 ## Tasks
 
@@ -75,11 +84,15 @@ change until a commander decision (B8a). Rules and exact demo outputs are in
 Settings come from environment variables or a local `.env` (see `.env.example`);
 parameters are documented there. Defaults are deterministic demo values.
 B6a adds `RETASK_MIN_STAGE_MS` (progress animation padding, default 600 ms) and
-`DEMO_STEP_DELAY_S` (default 10 sim seconds).
+`DEMO_STEP_DELAY_S` (default 10 sim seconds). B8a adds `DB_URL`
+(`sqlite:///./airops.db`) and `RECO_TTL_MIN` (pending recommendation expiry,
+default 90 sim minutes).
 
 ## API and docs
 
 - `docs/API_IMPLEMENTED.md` - every live REST/WebSocket frame with semantics.
+- `docs/AUDIT.md` - hash rule, SQLite schema, baseline blocks, decision audit
+  actions and standalone verification.
 - `docs/RETASK_RULES.md` - impact rules, candidate generation, profiles,
   scoring, validation, apply semantics and demo expectations.
 - `docs/MODELS.md` - domain-model conventions; JSON Schemas in `docs/schemas/`.
@@ -92,6 +105,8 @@ docker compose up --build
 # API on http://localhost:8000; container needs no outbound network at runtime
 ```
 
+Compose stores the audit database in the named volume `airops-audit`
+(`/srv/airops/data/airops.db`), so recreating the container keeps the chain.
 Docker was not available on the development machine, so the image is unverified;
 treat this as best effort until B10.
 
@@ -108,9 +123,11 @@ app/
   domain/            Pydantic models (camelCase wire aliases)
   state/             canonical store, seed loader, versioning
   sim/               clock, movement, weather drift
-  retask/            impact, rules/, engine, apply, validate, pipeline, demos
-  fusion/ geo/ optimiser/ predict/ scenarios/ audit/ security/   (later stages)
+  retask/            impact, rules/, engine, apply, validate, pipeline, demos,
+                     decisions.py, staleness.py
+  audit/             hashchain.py, SQLite store/model
+  fusion/ geo/ optimiser/ predict/ scenarios/ security/   (later stages)
 tests/               pytest suite + offline socket guard
-scripts/             ws_listen.py, demo_dump.py
+scripts/             ws_listen.py, demo_dump.py, verify_audit.py
 tasks.py             cross-platform task runner
 ```
