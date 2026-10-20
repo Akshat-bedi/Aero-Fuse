@@ -62,6 +62,17 @@ from app.state.seed import load_seed
 DEFAULT_THREAT_CONFIDENCE = 0.9
 DEFAULT_NEW_MISSION_HOURS = 3.0
 
+_ENTITY_COLLECTIONS: tuple[tuple[str, str], ...] = (
+    ("bases", "bases"),
+    ("aircraft", "aircraft"),
+    ("crew", "crew"),
+    ("missions", "missions"),
+    ("airspace", "airspace"),
+    ("threats", "threats"),
+    ("weather", "weather"),
+)
+_LIST_COLLECTIONS: tuple[tuple[str, str], ...] = (("weaponStocks", "weapon_stocks"),)
+
 ChangeKind = Literal["entities", "event", "reset"]
 
 
@@ -251,6 +262,48 @@ class StateStore:
         with self._lock:
             if not any(changed.values()):
                 return None
+            return self._commit(changed, kind="entities")
+
+    def apply_planned(self, planned: StateStore) -> StateChange | None:
+        """Copy entity changes from an evaluated plan and commit exactly once.
+
+        Used by approve/modify. Recommendations, audit entries, predictions and
+        events are owned by the runtime/audit service and are never copied from
+        a planning copy. Returns ``None`` when the plan is entity-identical.
+        """
+        with self._lock:
+            changed: dict[str, list[str]] = {}
+            for kind, attribute in _ENTITY_COLLECTIONS:
+                current = getattr(self, attribute)
+                target = getattr(planned, attribute)
+                ids = [
+                    entity_id
+                    for entity_id in target
+                    if entity_id not in current or current[entity_id] != target[entity_id]
+                ]
+                if ids:
+                    changed[kind] = ids
+            for kind, attribute in _LIST_COLLECTIONS:
+                current_list = getattr(self, attribute)
+                target_list = getattr(planned, attribute)
+                if current_list != target_list:
+                    changed[kind] = [
+                        item.id if hasattr(item, "id") else str(index)
+                        for index, item in enumerate(target_list)
+                    ]
+
+            if not any(changed.values()):
+                return None
+
+            for _, attribute in _ENTITY_COLLECTIONS:
+                current = getattr(self, attribute)
+                target = getattr(planned, attribute)
+                for entity_id, entity in target.items():
+                    current[entity_id] = entity
+            for _, attribute in _LIST_COLLECTIONS:
+                setattr(self, attribute, list(getattr(planned, attribute)))
+            if planned.bounds is not None:
+                self.bounds = planned.bounds
             return self._commit(changed, kind="entities")
 
     def apply_aircraft_tick(self, updates: Iterable[AircraftTickUpdate]) -> None:

@@ -378,7 +378,10 @@ def _hold_target(
 
 
 def _metrics(
-    state: StateStore, planned: StateStore, impact: ImpactAnalysis, event: OpsEvent
+    state: StateStore,
+    planned: StateStore,
+    impact: ImpactAnalysis,
+    event: OpsEvent | None,
 ) -> _Metrics:
     coverage = _coverage(state, planned)
     threat_avoidance = _threat_avoidance(state, planned, event)
@@ -437,8 +440,10 @@ def _coverage(state: StateStore, planned: StateStore) -> float:
     return 100.0 * fulfilled / total if total else 100.0
 
 
-def _threat_avoidance(state: StateStore, planned: StateStore, event: OpsEvent) -> float:
-    triggering = find_injected_threat(event, state)
+def _threat_avoidance(
+    state: StateStore, planned: StateStore, event: OpsEvent | None
+) -> float:
+    triggering = find_injected_threat(event, state) if event is not None else None
     threats = [triggering] if triggering is not None else list(state.threats.values())
     threats = [threat for threat in threats if threat.status is not ThreatStatus.NEUTRALISED]
     if not threats:

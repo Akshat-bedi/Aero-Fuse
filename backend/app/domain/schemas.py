@@ -15,7 +15,7 @@ from pathlib import Path
 
 from pydantic import BaseModel
 
-from app.domain.audit import AuditEntry
+from app.domain.audit import AuditEntry, AuditVerification
 from app.domain.decision import (
     AircraftSwapModification,
     AssignmentModification,
@@ -125,6 +125,7 @@ SCHEMA_MODELS: dict[str, type[BaseModel]] = {
     "position_tick_item": PositionTickItem,
     # Audit
     "audit_entry": AuditEntry,
+    "audit_verification": AuditVerification,
     # Scenarios
     "scenario_aircraft_loss": ScenarioAircraftLoss,
     "scenario_base_outage": ScenarioBaseOutage,

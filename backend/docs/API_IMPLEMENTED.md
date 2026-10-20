@@ -1,7 +1,8 @@
-# API implemented in B6a
+# API implemented through B8a
 
 Status: **state store, sim clock, movement, weather drift, rule-based retasking,
-REST and WebSocket** (Stages B2 and B6a). Everything below is live code under
+REST and WebSocket, commander decisions, hash-chained audit and staleness**
+(Stages B2, B6a and B8a). Everything below is live code under
 `backend/app/`; shapes are validated against the Pydantic models exported in
 `backend/docs/schemas/`.
 
@@ -18,13 +19,16 @@ problem details and never contain stack traces.
 | Method | Path | Status | Notes |
 |---|---|---|---|
 | GET | `/health` | 200 | `{status, version, simTime, solverReady}`; `simTime` is an ISO-8601 UTC string, `solverReady` is `false` until B5 |
-| GET | `/snapshot` | 200 | Full `WireSnapshot`: arrays for every collection, `bounds`, `sim {time, speed, paused}`, `stateVersion`, `activeEvents`; byte-identical to `shared/seed/world.json` at t0 |
+| GET | `/snapshot` | 200 | Full `WireSnapshot`: arrays for every collection, `bounds`, `sim {time, speed, paused}`, `stateVersion`, `activeEvents`, and the SQLite `auditLog` (three baseline blocks). Matches `shared/seed/world.json` at t0 except for `auditLog` |
 | POST | `/sim/control` | 200 | Body `{action, speed?}` with `action` in `pause|resume|speed|reset` and `speed` in `1|5|20` (required for `speed`). Returns `{simTime, speed, paused}`. `reset` reloads the seed, clears recommendations/alerts/scenarios (none of the latter exist yet), invalidates in-flight retasking, keeps the audit log, bumps `stateVersion`, then broadcasts a fresh `SNAPSHOT` |
 | POST | `/events` | 201 | Body `{type, payload, severity?, operator?, description?}`; returns the **full `OpsEvent`** with `id` (`EV-0001`, ...) and sim-clock `timestamp`. Unknown referenced ids → 404, malformed payloads → 422. Retasking runs asynchronously after the response |
 | GET | `/recommendations?status=` | 200 | Stored pending/decided recommendations (B6a emits `pending` only), optional status filter |
 | GET | `/recommendations/{id}` | 200 | One recommendation; 404 when unknown |
 | GET | `/missions/{id}/eligible-resources` | 200 | `{aircraft: [...], crew: [...]}` feasible for the Modify dropdowns; 404 for an unknown mission |
-| GET | `/audit` | 200 | `[]` until B8 (hash chain) |
+| POST | `/recommendations/{id}/validate-modification` | 200 | Body is the **raw** modifications object (`{aircraftSwap?,crewSwap?}` or the array shape); returns `{conflicts,score,tradeoffs,valid}` and applies nothing |
+| POST | `/recommendations/{id}/decision` | 200 | Body `{decision:"approve"\|"reject"\|"modify", reason?, modifications?, operator}`. Returns the updated `Recommendation`. Reject requires a reason (422). Stale/expired approval returns 409 `https://airops.dss/errors/stale-recommendation`; invalid modification returns 422 with `violations`; repeated identical decisions are idempotent |
+| GET | `/audit` | 200 | Chronological hash-chained entries. Filters `operator`, `action`, `from`, `to`; `limit` 1–1000 (default 100), `offset`; `X-Total-Count` header; `format=csv` exports the same page |
+| GET | `/audit/verify` | 200 | Recomputes the SHA-256 chain: `{valid, brokenLinkIndex, message}` |
 | GET | `/demo-scripts` | 200 | Two catalogued scripts with `name`/`description` |
 | POST | `/demo-scripts/{name}/run?reset=` | 200 | Starts a script in the background and returns `{status:"started", eventCount}`; `reset=true` restores the clean seed first. 404 unknown, 409 already running |
 
@@ -33,7 +37,8 @@ problem details and never contain stack traces.
 `POST /events` applies the factual effect, appends the event to `activeEvents`,
 bumps `stateVersion` by exactly 1 and broadcasts. Impact analysis and the
 recommendation are produced afterwards by the async pipeline; **the live plan is
-never changed by retasking** (decisions land in B8a).
+never changed by retasking**. Only an explicit approve/modify decision applies a
+recommendation, and that application commits once through the store.
 
 | Event | Effect |
 |---|---|
@@ -43,6 +48,33 @@ never changed by retasking** (decisions land in B8a).
 | `WEATHER_DEGRADED` | Matching weather entry (by `baseId`/`region`) updated (404 if none) |
 | `CREW_UNAVAILABLE` | Crew → `unavailable` (404 if unknown) |
 | `NEW_PRIORITY_MISSION` | New `planned` mission (`M-11`, ...): window starts at the event time, default 3 h (`durationHours` overrides), route = launch base → target, no assignment |
+
+## Decisions, staleness and audit
+
+- **Approve** re-validates the recommendation against the current state, applies
+  the `Change` list once, marks the recommendation `approved`, bumps
+  `stateVersion` once, emits `ENTITY_UPDATE`, `RECOMMENDATION_UPDATED` and then
+  `AUDIT_APPENDED` (`DECISION_APPROVED`). A recommendation already `approved`
+  returns 200 unchanged; a conflicting decision returns 409.
+- **Reject** requires a non-empty reason (`422`), marks the recommendation
+  `rejected`, leaves the plan and `stateVersion` untouched, and audits
+  `DECISION_REJECTED`.
+- **Modify** merges the manual `aircraftSwap`/`crewSwap` into the proposed
+  changes, validates them, applies the plan once and audits
+  `DECISION_MODIFIED`. Invalid swaps return `422` with RFC 7807
+  `application/problem+json` and a `violations` array.
+- **Validate-modification** runs the same checks and returns
+  `{conflicts, score, tradeoffs, valid}` without changing the store.
+- **Staleness:** pending recommendations become `stale` when a committed change
+  touches their proposed mission plan, assigned airframe/crew, launch-base
+  runway, a tracked threat, or a new threat intersecting the proposed route.
+  Position/fuel/clock ticks never stale them. `RECOMMENDATION_STALE` is audited
+  and `RECOMMENDATION_UPDATED` is broadcast. Pending recommendations expire
+  after `RECO_TTL_MIN` (default 90 sim minutes) and audit
+  `RECOMMENDATION_EXPIRED`.
+- **Audit** is an SQLite append-only SHA-256 chain; see `docs/AUDIT.md` for the
+  exact canonicalisation, baseline blocks and verification command. Reset keeps
+  the chain; it never rewrites or deletes entries.
 
 ## WebSocket
 
@@ -72,6 +104,8 @@ never changed by retasking** (decisions land in B8a).
 | `ALERT` | once per analysed event | `OperationalAlert` (`id="<event>-AL"`) |
 | `RETASK_PROGRESS` | four analysis stages, then ready | `{isReplanActive, stage, elapsedMs, message}` |
 | `RECOMMENDATION_READY` | when the analysis completes | full `Recommendation` (with alternatives) |
+| `RECOMMENDATION_UPDATED` | approve/reject/modify, stale or expiry | full updated `Recommendation`; decision frames use the post-commit version |
+| `AUDIT_APPENDED` | after every audit append | full `AuditEntry` (the frontend appends it to its audit store) |
 | `HEARTBEAT` | every 5 wall seconds | `{}` |
 
 Client frames: `{"type": "PING"}` is accepted and ignored; unknown client
@@ -127,15 +161,16 @@ stalls the server or other clients.
 4. **Weather drift is not broadcast via `ENTITY_UPDATE`** (the frontend ignores
    weather there); drift appears in snapshots only. `WEATHER_DEGRADED` events do
    emit their weather entry.
-5. `GET /audit` is a stub (`[]`) until B8. `RECOMMENDATION_READY` is emitted but
-   there is no decision/modify/reject endpoint yet (B8a), so stored
-   recommendations remain `pending` until a reset.
+5. `GET /snapshot` matches `shared/seed/world.json` at t0 **except** for
+   `auditLog`, which carries the three SQLite baseline blocks (test
+   `test_snapshot_matches_seed_except_for_the_audit_genesis`). Entity order
+   follows seed order and is not otherwise guaranteed.
 6. `NEW_PRIORITY_MISSION` defaults (3 h window, no quals/weapons, empty
    assignment, `M-nn` ids) are backend assumptions until the optimiser exists;
    B6a assigns resources in the recommendation only.
-7. `GET /snapshot` equals `shared/seed/world.json` at t0 (test
-   `test_snapshot_matches_seed_exactly_at_t0`); entity order follows seed order
-   and is not otherwise guaranteed.
+7. `AUD-0003` baseline details use plain ASCII (`4.80N 7.50E`) while the
+   frontend mock contains a literal U+FFFD; ids/actions/operators/targets and
+   timestamps match. Real SHA-256 hashes replace the mock's placeholder chain.
 8. `POST /sim/control` `reset` keeps the audit log but clears recommendations,
    alerts and scenarios; the contract mentions only "clears recommendations,
    alerts and scenarios".
@@ -144,6 +179,12 @@ stalls the server or other clients.
    B4/B5.
 10. `RetaskProgress` frames are padded by `RETASK_MIN_STAGE_MS` (default 600 ms)
     so the UI animation is visible; tests set it to 0.
+11. The optional `AUTO_REEVALUATE` policy is not enabled in B8a: stale
+    recommendations remain visible for re-injection or a fresh event-driven
+    analysis. `supersedesId` is not emitted yet (contract-change candidate).
+12. Alternative ids (for example `REC-0001-ALT1`) are display-only. The frontend
+    has no decision path for them; only the primary id can be approved, rejected
+    or modified.
 
 ## How to run and verify
 
@@ -154,6 +195,7 @@ python tasks.py run              # uvicorn on :8000 with reload
 python tasks.py check            # ruff + mypy (strict) + pytest
 python scripts/ws_listen.py --duration 30   # print live WS frames
 python scripts/demo_dump.py      # both demo scripts, full recommendation artefacts
+python scripts/verify_audit.py   # independent stdlib-only chain verification
 ```
 
 ## Measured performance (dev laptop, single uvicorn worker)

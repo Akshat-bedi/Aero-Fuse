@@ -40,10 +40,21 @@ def seed_snapshot(seed_raw: dict[str, Any]) -> WireSnapshot:
     return WireSnapshot.model_validate(seed_raw)
 
 
+@pytest.fixture(autouse=True)
+def isolated_audit_db(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Iterator[None]:
+    """Give every test its own SQLite audit database."""
+    monkeypatch.setenv("DB_URL", f"sqlite:///{(tmp_path / 'audit.db').as_posix()}")
+    get_settings.cache_clear()
+    yield
+    get_settings.cache_clear()
+
+
 @pytest.fixture()
-def runtime() -> SimRuntime:
+def runtime() -> Iterator[SimRuntime]:
     """A SimRuntime without the wall-clock loops (deterministic fast-forward)."""
-    return SimRuntime(test_settings())
+    rt = SimRuntime(test_settings())
+    yield rt
+    rt.audit.close()
 
 
 @pytest.fixture()

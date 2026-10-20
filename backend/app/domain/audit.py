@@ -20,3 +20,11 @@ class AuditEntry(WireModel):
     )
     hash: str = Field(min_length=1)
     state_version: int | None = Field(default=None, ge=0)
+
+
+class AuditVerification(WireModel):
+    """Response for ``GET /api/audit/verify``."""
+
+    valid: bool
+    broken_link_index: int | None = None
+    message: str = ""

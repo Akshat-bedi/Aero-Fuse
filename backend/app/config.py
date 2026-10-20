@@ -42,7 +42,7 @@ class Settings(BaseSettings):
     jwt_secret: str = "dev-only-change-me"
 
     solver_time_limit_s: float = 4.0
-    reco_ttl_min: int = 15
+    reco_ttl_min: int = 90
     stale_data_sec: int = 30
 
     sim_start_time: str = "2026-10-17T12:00:00.000Z"

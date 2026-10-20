@@ -19,17 +19,22 @@ import contextlib
 from typing import Any
 
 from app.api.ws import ConnectionManager
+from app.audit import AuditLog
 from app.config import Settings
 from app.domain import (
+    AuditEntry,
     ClockTickPayload,
     OpsEvent,
     OpsEventRequest,
     PositionTickItem,
+    Recommendation,
     WireSnapshot,
     dump_wire,
 )
+from app.retask.decisions import DecisionService
 from app.retask.demos import DemoRunner
 from app.retask.pipeline import RetaskPipeline
+from app.retask.staleness import StalenessTracker
 from app.sim.clock import SimClock
 from app.sim.engine import SimEngine
 from app.state.seed import load_seed
@@ -50,8 +55,12 @@ class SimRuntime:
         )
         self.engine = SimEngine(self.store, self.clock)
         self.ws = ConnectionManager(max_queue=settings.ws_queue_size)
+        self.audit = AuditLog(settings.db_url)
+        self.staleness = StalenessTracker(self, settings.reco_ttl_min)
         self.retask = RetaskPipeline(self)
         self.demos = DemoRunner(self)
+        self.decisions = DecisionService(self)
+        self.decision_epoch = 0
         self._unsubscribe = self.store.subscribe(self._on_store_change)
         self._tasks: list[asyncio.Task[None]] = []
 
@@ -85,6 +94,7 @@ class SimRuntime:
                 await task
         self._tasks.clear()
         self._unsubscribe()
+        self.audit.close()
 
     async def _tick_loop(self) -> None:
         while True:
@@ -108,7 +118,9 @@ class SimRuntime:
         }
 
     def snapshot(self) -> WireSnapshot:
-        return self.store.wire_snapshot(self.clock.sim_state())
+        snapshot = self.store.wire_snapshot(self.clock.sim_state())
+        snapshot.audit_log = self.audit.entries()
+        return snapshot
 
     def snapshot_frame(self) -> dict[str, Any]:
         return self.frame(
@@ -118,6 +130,7 @@ class SimRuntime:
     def broadcast_tick(self) -> None:
         """One sim step + CLOCK_TICK/POSITION_TICK broadcast (never bumps)."""
         result = self.engine.tick()
+        self.staleness.expire_due(self.clock.now())
         version = self.store.version
         self.ws.broadcast(self.frame("CLOCK_TICK", dump_wire(result.clock), version))
         if result.position_updates:
@@ -148,12 +161,25 @@ class SimRuntime:
         elif action == "speed" and speed is not None:
             self.clock.set_speed(speed)
         elif action == "reset":
+            self.decision_epoch += 1
             self.demos.reset()
             self.retask.reset()
+            self.staleness.reset()
             snapshot = load_seed(self.settings.seed_path)
             self.store.reset(snapshot)
             self.clock.reset(snapshot.sim.time)
             self.engine.reset()
+        self.append_audit_sync(
+            operator="demo-commander",
+            action="SIM_CONTROL",
+            target_id="SIM",
+            details=(
+                f"Simulation control action '{action}'"
+                + (f" speed={speed}" if speed is not None else "")
+                + f" applied at {self.clock.now()}."
+            ),
+            state_version=self.store.version,
+        )
         self.broadcast_clock_now()
         return {"simTime": self.clock.now(), "speed": self.clock.speed, "paused": self.clock.paused}
 
@@ -185,14 +211,90 @@ class SimRuntime:
             description=request.description,
         )
         self.store.apply_event(event)
+        self.append_audit_sync(
+            operator=request.operator or "demo-operator",
+            action="INJECT_EVENT",
+            target_id=event.id,
+            details=(
+                f"Injected {event.type.value} event {event.id}"
+                + (f": {event.description}" if event.description else ".")
+            ),
+            state_version=self.store.version,
+        )
         return event
 
     def schedule_retask(self, event: OpsEvent) -> None:
         """Queue the event for impact analysis and recommendation generation."""
         self.retask.schedule(event)
 
+    def event_by_id(self, event_id: str) -> OpsEvent | None:
+        for event in self.store.active_events:
+            if event.id == event_id:
+                return event
+        return None
+
+    async def append_audit(
+        self,
+        *,
+        operator: str,
+        action: str,
+        target_id: str,
+        details: str | dict[str, Any],
+        state_version: int | None = None,
+    ) -> AuditEntry:
+        entry = await self.audit.append(
+            timestamp=self.clock.now(),
+            operator=operator,
+            action=action,
+            target_id=target_id,
+            details=details,
+            state_version=state_version,
+        )
+        self._broadcast_audit(entry)
+        return entry
+
+    def append_audit_sync(
+        self,
+        *,
+        operator: str,
+        action: str,
+        target_id: str,
+        details: str | dict[str, Any],
+        state_version: int | None = None,
+    ) -> AuditEntry:
+        entry = self.audit.append_sync(
+            timestamp=self.clock.now(),
+            operator=operator,
+            action=action,
+            target_id=target_id,
+            details=details,
+            state_version=state_version,
+        )
+        self._broadcast_audit(entry)
+        return entry
+
+    def _broadcast_audit(self, entry: AuditEntry) -> None:
+        self.ws.broadcast(
+            self.frame(
+                "AUDIT_APPENDED",
+                dump_wire(entry, exclude_none=True),
+                self.store.version,
+            )
+        )
+
+    def broadcast_recommendation(self, recommendation: Recommendation, version: int) -> None:
+        """Emit RECOMMENDATION_UPDATED after a decision/stale/expiry transition."""
+        self.ws.broadcast(
+            self.frame(
+                "RECOMMENDATION_UPDATED",
+                dump_wire(recommendation, exclude_none=True),
+                version,
+            )
+        )
+
     def _on_store_change(self, change: StateChange) -> None:
         if change.kind == "reset":
+            self.staleness.reset()
             self.ws.broadcast(self.snapshot_frame())
             return
         if change.kind == "event" and change.event is not None:
@@ -201,3 +303,4 @@ class SimRuntime:
             payload = self.store.entities_wire(change.changed)
             if payload:
                 self.ws.broadcast(self.frame("ENTITY_UPDATE", payload, change.version))
+        self.staleness.on_state_change(change)

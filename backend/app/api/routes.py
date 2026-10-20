@@ -8,15 +8,20 @@ stages (B4-B8) and are intentionally absent.
 
 from __future__ import annotations
 
+import csv
+import io
 from typing import Any, Literal
 
 import orjson
-from fastapi import APIRouter, HTTPException, Request, Response
+from fastapi import APIRouter, HTTPException, Query, Request, Response
 from pydantic import model_validator
 
 from app.domain import (
-    AuditEntry,
+    AuditVerification,
+    DecisionRequest,
     EligibleResources,
+    ModificationsRequest,
+    ModificationValidationResult,
     OpsEventRequest,
     Recommendation,
     WireModel,
@@ -56,12 +61,25 @@ def _runtime(request: Request) -> SimRuntime:
     return runtime
 
 
-def _json(content: Any, *, status_code: int = 200) -> Response:
+def _csv_cell(value: str) -> str:
+    """Neutralise spreadsheet formula injection in exported audit cells."""
+    if value.startswith(("=", "+", "-", "@", "\t", "\r")):
+        return f"'{value}"
+    return value
+
+
+def _json(
+    content: Any,
+    *,
+    status_code: int = 200,
+    headers: dict[str, str] | None = None,
+) -> Response:
     """Serialise a wire payload with orjson (settings guarantee ASCII-safe JSON)."""
     return Response(
         content=orjson.dumps(content),
         media_type="application/json",
         status_code=status_code,
+        headers=headers,
     )
 
 
@@ -134,6 +152,32 @@ async def get_recommendation(
     return recommendation
 
 
+@router.post(
+    "/recommendations/{recommendation_id}/validate-modification",
+    response_model=ModificationValidationResult,
+    response_model_exclude_none=True,
+)
+async def validate_modification(
+    recommendation_id: str, body: ModificationsRequest, request: Request
+) -> ModificationValidationResult:
+    """Validate the raw Modify-UI payload without applying anything."""
+    runtime = _runtime(request)
+    return await runtime.decisions.validate_modification(recommendation_id, body)
+
+
+@router.post(
+    "/recommendations/{recommendation_id}/decision",
+    response_model=Recommendation,
+    response_model_exclude_none=True,
+)
+async def decide_recommendation(
+    recommendation_id: str, body: DecisionRequest, request: Request
+) -> Recommendation:
+    """Approve, reject or modify a pending recommendation (human in the loop)."""
+    runtime = _runtime(request)
+    return await runtime.decisions.decide(recommendation_id, body)
+
+
 @router.get(
     "/missions/{mission_id}/eligible-resources",
     response_model=EligibleResources,
@@ -151,11 +195,68 @@ async def get_eligible_resources(mission_id: str, request: Request) -> EligibleR
     )
 
 
-@router.get("/audit", response_model=list[AuditEntry])
-async def get_audit(request: Request) -> list[AuditEntry]:
-    """Audit listing. The hash chain lands in B8; the baseline is empty."""
+@router.get("/audit/verify", response_model=AuditVerification)
+async def verify_audit(request: Request) -> AuditVerification:
+    """Recompute the SHA-256 chain and report the first broken link."""
     runtime = _runtime(request)
-    return list(runtime.store.audit_log)
+    return runtime.audit.verify()
+
+
+@router.get("/audit")
+async def get_audit(
+    request: Request,
+    operator: str | None = None,
+    action: str | None = None,
+    from_timestamp: str | None = Query(default=None, alias="from"),
+    to_timestamp: str | None = Query(default=None, alias="to"),
+    limit: int = Query(default=100, ge=1, le=1000),
+    offset: int = Query(default=0, ge=0),
+    format: Literal["json", "csv"] = "json",
+) -> Response:
+    """Paginated audit listing with filters and optional CSV export."""
+    runtime = _runtime(request)
+    entries, total = runtime.audit.query(
+        operator=operator,
+        action=action,
+        from_timestamp=from_timestamp,
+        to_timestamp=to_timestamp,
+        limit=limit,
+        offset=offset,
+    )
+    if format == "csv":
+        buffer = io.StringIO()
+        writer = csv.writer(buffer, lineterminator="\n")
+        writer.writerow(
+            ["id", "timestamp", "operator", "action", "targetId", "details", "prevHash", "hash"]
+        )
+        for entry in entries:
+            details = (
+                orjson.dumps(entry.details).decode("utf-8")
+                if isinstance(entry.details, dict)
+                else entry.details
+            )
+            writer.writerow(
+                [
+                    _csv_cell(entry.id),
+                    _csv_cell(entry.timestamp),
+                    _csv_cell(entry.operator),
+                    _csv_cell(entry.action),
+                    _csv_cell(entry.target_id),
+                    _csv_cell(details),
+                    _csv_cell(entry.prev_hash),
+                    _csv_cell(entry.hash),
+                ]
+            )
+        return Response(
+            content=buffer.getvalue(),
+            media_type="text/csv",
+            headers={
+                "X-Total-Count": str(total),
+                "Content-Disposition": 'attachment; filename="audit.csv"',
+            },
+        )
+    payload = [dump_wire(entry, exclude_none=True) for entry in entries]
+    return _json(payload, headers={"X-Total-Count": str(total)})
 
 
 @router.get("/demo-scripts")
