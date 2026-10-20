@@ -10,10 +10,10 @@ from __future__ import annotations
 
 import csv
 import io
-from typing import Any, Literal
+from typing import Annotated, Any, Literal
 
 import orjson
-from fastapi import APIRouter, HTTPException, Query, Request, Response
+from fastapi import APIRouter, Depends, HTTPException, Query, Request, Response
 from pydantic import model_validator
 
 from app.domain import (
@@ -30,6 +30,17 @@ from app.domain import (
 from app.retask import eligibility
 from app.retask.demos import DEMO_SCRIPTS, DemoBusyError, UnknownDemoError
 from app.runtime import SimRuntime
+from app.security.deps import (
+    SecurityContext,
+    enforce_decision,
+    enforce_permission,
+    enforce_sim_control,
+    get_security_context,
+    require,
+    require_event_injection,
+    resolve_operator,
+)
+from app.security.policy import Identity, Permission
 from app.state.store import UnknownEntityError
 
 router = APIRouter(tags=["ops"])
@@ -61,6 +72,16 @@ def _runtime(request: Request) -> SimRuntime:
     return runtime
 
 
+def _operator(request: Request, identity: Identity, body_operator: str | None) -> str:
+    context: SecurityContext = get_security_context(request)
+    return resolve_operator(
+        identity,
+        body_operator,
+        context=context,
+        path=request.url.path,
+    )
+
+
 def _csv_cell(value: str) -> str:
     """Neutralise spreadsheet formula injection in exported audit cells."""
     if value.startswith(("=", "+", "-", "@", "\t", "\r")):
@@ -84,23 +105,37 @@ def _json(
 
 
 @router.get("/snapshot")
-async def get_snapshot(request: Request) -> Response:
+async def get_snapshot(
+    request: Request,
+    _identity: Annotated[Identity, Depends(require(Permission.READ_SNAPSHOT))],
+) -> Response:
     """Full canonical state; every collection is an array (wire format)."""
     runtime = _runtime(request)
     return _json(dump_wire(runtime.snapshot(), exclude_none=True))
 
 
 @router.post("/sim/control", response_model=SimControlResponse)
-async def control_simulation(body: SimControlRequest, request: Request) -> SimControlResponse:
+async def control_simulation(
+    body: SimControlRequest,
+    request: Request,
+    identity: Annotated[Identity, Depends(require(Permission.READ_SNAPSHOT))],
+) -> SimControlResponse:
     """Pause/resume/change speed/reset. Reset restores the clean seed and bumps
     ``stateVersion`` so every client resyncs from the re-broadcast snapshot."""
+    context: SecurityContext = get_security_context(request)
+    enforce_sim_control(context, identity, body.action, path=request.url.path)
     runtime = _runtime(request)
-    result = runtime.control(body.action, body.speed)
+    operator = _operator(request, identity, None)
+    result = runtime.control(body.action, body.speed, operator=operator)
     return SimControlResponse.model_validate(result)
 
 
 @router.post("/events", status_code=201)
-async def inject_event(body: OpsEventRequest, request: Request) -> Response:
+async def inject_event(
+    body: OpsEventRequest,
+    request: Request,
+    identity: Annotated[Identity, Depends(require_event_injection())],
+) -> Response:
     """Validate, register and factually apply an operator event.
 
     Returns the full ``OpsEvent`` (id and sim-clock timestamp assigned here).
@@ -108,8 +143,9 @@ async def inject_event(body: OpsEventRequest, request: Request) -> Response:
     are rejected with 422 by the typed models.
     """
     runtime = _runtime(request)
+    operator = _operator(request, identity, body.operator)
     try:
-        event = runtime.inject_event(body)
+        event = runtime.inject_event(body, operator=operator)
     except UnknownEntityError as exc:
         raise HTTPException(
             status_code=404,
@@ -124,7 +160,11 @@ async def inject_event(body: OpsEventRequest, request: Request) -> Response:
     response_model=list[Recommendation],
     response_model_exclude_none=True,
 )
-async def list_recommendations(request: Request, status: str | None = None) -> list[Recommendation]:
+async def list_recommendations(
+    request: Request,
+    _identity: Annotated[Identity, Depends(require(Permission.READ_RECOMMENDATIONS))],
+    status: str | None = None,
+) -> list[Recommendation]:
     """Pending/decided recommendations, optionally filtered by status."""
     runtime = _runtime(request)
     recommendations = list(runtime.store.recommendations.values())
@@ -143,7 +183,9 @@ async def list_recommendations(request: Request, status: str | None = None) -> l
     response_model_exclude_none=True,
 )
 async def get_recommendation(
-    recommendation_id: str, request: Request
+    recommendation_id: str,
+    request: Request,
+    _identity: Annotated[Identity, Depends(require(Permission.READ_RECOMMENDATIONS))],
 ) -> Recommendation:
     """One recommendation by id (404 when unknown)."""
     recommendation = _runtime(request).store.recommendations.get(recommendation_id)
@@ -158,7 +200,10 @@ async def get_recommendation(
     response_model_exclude_none=True,
 )
 async def validate_modification(
-    recommendation_id: str, body: ModificationsRequest, request: Request
+    recommendation_id: str,
+    body: ModificationsRequest,
+    request: Request,
+    _identity: Annotated[Identity, Depends(require(Permission.VALIDATE_MODIFICATION))],
 ) -> ModificationValidationResult:
     """Validate the raw Modify-UI payload without applying anything."""
     runtime = _runtime(request)
@@ -171,11 +216,49 @@ async def validate_modification(
     response_model_exclude_none=True,
 )
 async def decide_recommendation(
-    recommendation_id: str, body: DecisionRequest, request: Request
+    recommendation_id: str,
+    body: DecisionRequest,
+    request: Request,
+    identity: Annotated[Identity, Depends(require(Permission.READ_RECOMMENDATIONS))],
 ) -> Recommendation:
     """Approve, reject or modify a pending recommendation (human in the loop)."""
+    context: SecurityContext = get_security_context(request)
+    enforce_decision(context, identity, body.decision, path=request.url.path)
     runtime = _runtime(request)
-    return await runtime.decisions.decide(recommendation_id, body)
+    operator = _operator(request, identity, body.operator)
+    return await runtime.decisions.decide(
+        recommendation_id,
+        body,
+        identity=identity,
+        operator=operator,
+    )
+
+
+@router.post(
+    "/recommendations/{recommendation_id}/approvals/revoke",
+    response_model=Recommendation,
+    response_model_exclude_none=True,
+)
+async def revoke_recommendation_approval(
+    recommendation_id: str,
+    request: Request,
+    identity: Annotated[Identity, Depends(require(Permission.READ_RECOMMENDATIONS))],
+) -> Recommendation:
+    """Retract the acting commander's own pending approval."""
+    context: SecurityContext = get_security_context(request)
+    enforce_permission(
+        context,
+        identity,
+        Permission.DECIDE_APPROVE,
+        path=request.url.path,
+    )
+    runtime = _runtime(request)
+    operator = _operator(request, identity, None)
+    return await runtime.decisions.revoke(
+        recommendation_id,
+        identity=identity,
+        operator=operator,
+    )
 
 
 @router.get(
@@ -183,7 +266,11 @@ async def decide_recommendation(
     response_model=EligibleResources,
     response_model_exclude_none=True,
 )
-async def get_eligible_resources(mission_id: str, request: Request) -> EligibleResources:
+async def get_eligible_resources(
+    mission_id: str,
+    request: Request,
+    _identity: Annotated[Identity, Depends(require(Permission.READ_ELIGIBLE_RESOURCES))],
+) -> EligibleResources:
     """Feasible aircraft/crew for the Modify dropdowns."""
     runtime = _runtime(request)
     mission = runtime.store.missions.get(mission_id)
@@ -196,7 +283,10 @@ async def get_eligible_resources(mission_id: str, request: Request) -> EligibleR
 
 
 @router.get("/audit/verify", response_model=AuditVerification)
-async def verify_audit(request: Request) -> AuditVerification:
+async def verify_audit(
+    request: Request,
+    _identity: Annotated[Identity, Depends(require(Permission.VERIFY_AUDIT))],
+) -> AuditVerification:
     """Recompute the SHA-256 chain and report the first broken link."""
     runtime = _runtime(request)
     return runtime.audit.verify()
@@ -205,6 +295,7 @@ async def verify_audit(request: Request) -> AuditVerification:
 @router.get("/audit")
 async def get_audit(
     request: Request,
+    identity: Annotated[Identity, Depends(require(Permission.READ_AUDIT))],
     operator: str | None = None,
     action: str | None = None,
     from_timestamp: str | None = Query(default=None, alias="from"),
@@ -214,6 +305,14 @@ async def get_audit(
     format: Literal["json", "csv"] = "json",
 ) -> Response:
     """Paginated audit listing with filters and optional CSV export."""
+    context: SecurityContext = get_security_context(request)
+    if format == "csv":
+        enforce_permission(
+            context,
+            identity,
+            Permission.EXPORT_AUDIT,
+            path=request.url.path,
+        )
     runtime = _runtime(request)
     entries, total = runtime.audit.query(
         operator=operator,
@@ -260,21 +359,27 @@ async def get_audit(
 
 
 @router.get("/demo-scripts")
-async def get_demo_scripts() -> list[dict[str, str]]:
+async def get_demo_scripts(
+    _identity: Annotated[Identity, Depends(require(Permission.READ_DEMO_SCRIPTS))],
+) -> list[dict[str, str]]:
     """Catalogue of scripted demo event sequences."""
     return list(DEMO_SCRIPTS)
 
 
 @router.post("/demo-scripts/{name}/run")
 async def run_demo_script(
-    name: str, request: Request, reset: bool = False
+    name: str,
+    request: Request,
+    identity: Annotated[Identity, Depends(require(Permission.RUN_DEMO_SCRIPT))],
+    reset: bool = False,
 ) -> dict[str, Any]:
     """Start a demo script in the background (optionally from a clean seed)."""
     runtime = _runtime(request)
+    operator = _operator(request, identity, None)
     if reset:
-        runtime.control("reset", None)
+        runtime.control("reset", None, operator=operator)
     try:
-        return runtime.demos.start(name)
+        return runtime.demos.start(name, operator=operator)
     except UnknownDemoError as exc:
         raise HTTPException(status_code=404, detail=f"unknown demo script: {name}") from exc
     except DemoBusyError as exc:
@@ -282,3 +387,34 @@ async def run_demo_script(
             status_code=409,
             detail=f"demo script already running: {exc}",
         ) from exc
+
+
+ACTION_LEVEL = "action-level"
+"""Marker for routes whose permission depends on the parsed request body."""
+
+PUBLIC_ROUTES: frozenset[tuple[str, str]] = frozenset({("GET", "/api/health")})
+
+ROUTE_PERMISSIONS: dict[tuple[str, str], Permission | str] = {
+    ("GET", "/api/snapshot"): Permission.READ_SNAPSHOT,
+    ("POST", "/api/sim/control"): ACTION_LEVEL,
+    ("POST", "/api/events"): ACTION_LEVEL,
+    ("GET", "/api/recommendations"): Permission.READ_RECOMMENDATIONS,
+    ("GET", "/api/recommendations/{recommendation_id}"): Permission.READ_RECOMMENDATIONS,
+    (
+        "POST",
+        "/api/recommendations/{recommendation_id}/validate-modification",
+    ): Permission.VALIDATE_MODIFICATION,
+    ("POST", "/api/recommendations/{recommendation_id}/decision"): ACTION_LEVEL,
+    (
+        "POST",
+        "/api/recommendations/{recommendation_id}/approvals/revoke",
+    ): Permission.DECIDE_APPROVE,
+    (
+        "GET",
+        "/api/missions/{mission_id}/eligible-resources",
+    ): Permission.READ_ELIGIBLE_RESOURCES,
+    ("GET", "/api/audit/verify"): Permission.VERIFY_AUDIT,
+    ("GET", "/api/audit"): Permission.READ_AUDIT,
+    ("GET", "/api/demo-scripts"): Permission.READ_DEMO_SCRIPTS,
+    ("POST", "/api/demo-scripts/{name}/run"): Permission.RUN_DEMO_SCRIPT,
+}

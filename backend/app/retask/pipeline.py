@@ -186,6 +186,9 @@ class RetaskPipeline:
             proposal = self.engine.propose(event, state, impact)
 
         recommendation = proposal.primary
+        self.runtime.register_recommendation(
+            recommendation, no_feasible_plan=proposal.no_feasible_plan
+        )
         state.recommendations[recommendation.id] = recommendation
         self.runtime.staleness.register(recommendation)
         self.runtime.append_audit_sync(
@@ -234,6 +237,9 @@ class RetaskPipeline:
                 "RETASK_PROGRESS", dump_wire(progress, exclude_none=True), event
             )
         recommendation = proposal.primary
+        self.runtime.register_recommendation(
+            recommendation, no_feasible_plan=proposal.no_feasible_plan
+        )
         state.recommendations[recommendation.id] = recommendation
         self.runtime.staleness.register(recommendation)
         self.runtime.append_audit_sync(

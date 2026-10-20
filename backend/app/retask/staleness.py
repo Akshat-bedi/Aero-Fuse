@@ -190,6 +190,7 @@ class StalenessTracker:
             if expiring is None or expiring.status is not RecommendationStatus.PENDING:
                 continue
             expiring.status = RecommendationStatus.EXPIRED
+            self.runtime.forget_approval(expiring)
             version = self.runtime.store.version
             self.runtime.broadcast_recommendation(expiring, version)
             self.runtime.append_audit_sync(
@@ -309,6 +310,7 @@ class StalenessTracker:
         ):
             return
         recommendation.status = RecommendationStatus.STALE
+        self.runtime.forget_approval(recommendation)
         version = self.runtime.store.version
         self.runtime.broadcast_recommendation(recommendation, version)
         self.runtime.append_audit_sync(

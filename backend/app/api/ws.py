@@ -17,6 +17,9 @@ from typing import TYPE_CHECKING, Any
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
+from app.security.deps import SecurityContext
+from app.security.ws_auth import authenticate_websocket, enforce_client_message
+
 if TYPE_CHECKING:
     from app.runtime import SimRuntime
 
@@ -54,8 +57,7 @@ class ConnectionManager:
         self._loop = loop
 
     async def connect(self, websocket: WebSocket, initial: dict[str, Any] | None = None) -> _Client:
-        """Accept the socket, enqueue the first message, then register the client."""
-        await websocket.accept()
+        """Register an already-accepted socket and enqueue its first message."""
         client = _Client(websocket)
         if initial is not None:
             self._enqueue(client, initial)
@@ -116,15 +118,30 @@ class ConnectionManager:
 
 @router.websocket("/ws")
 async def websocket_endpoint(websocket: WebSocket) -> None:
-    """Serve the tactical stream: SNAPSHOT first, then ticks and updates."""
+    """Serve the tactical stream: authenticate, SNAPSHOT, then ticks/updates."""
     runtime: SimRuntime = websocket.app.state.runtime
+    context: SecurityContext | None = getattr(websocket.app.state, "security_context", None)
+    if context is None:
+        await websocket.accept()
+        identity = None
+    else:
+        identity = await authenticate_websocket(websocket, context)
+        if identity is None:
+            return
     manager = runtime.ws
     client = await manager.connect(websocket, initial=runtime.snapshot_frame())
     writer = asyncio.create_task(manager.run_writer(client))
     try:
         while True:
             message = await websocket.receive_json()
-            if isinstance(message, dict) and message.get("type") == "PING":
+            message_type = str(message.get("type", "")) if isinstance(message, dict) else ""
+            if (
+                context is not None
+                and identity is not None
+                and not await enforce_client_message(websocket, context, identity, message_type)
+            ):
+                return
+            if message_type == "PING":
                 continue
     except WebSocketDisconnect:
         pass

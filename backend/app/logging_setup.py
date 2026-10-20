@@ -1,6 +1,7 @@
 """Structured JSON logging with request-id correlation."""
 
 import logging
+import re
 from contextvars import ContextVar
 from datetime import UTC, datetime
 
@@ -9,6 +10,16 @@ import orjson
 request_id_var: ContextVar[str] = ContextVar("request_id", default="-")
 
 _formatting_configured = False
+
+_QUERY_STRING_RE = re.compile(
+    r"""(?P<url>(?:[a-z][a-z0-9+.-]*://[^\s"']+|/)[^\s"']*)\?[^\s"']*""",
+    re.IGNORECASE,
+)
+
+
+def redact_query_strings(message: str) -> str:
+    """Remove query strings from request URLs before they reach the log."""
+    return _QUERY_STRING_RE.sub(r"\g<url>", message)
 
 
 class JsonFormatter(logging.Formatter):
@@ -22,7 +33,7 @@ class JsonFormatter(logging.Formatter):
             "level": record.levelname,
             "logger": record.name,
             "requestId": request_id_var.get(),
-            "message": record.getMessage(),
+            "message": redact_query_strings(record.getMessage()),
         }
         if record.exc_info:
             payload["exception"] = self.formatException(record.exc_info)
