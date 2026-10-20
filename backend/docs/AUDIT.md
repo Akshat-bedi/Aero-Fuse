@@ -181,6 +181,10 @@ cd backend
 python scripts/verify_audit.py                     # backend/airops.db
 python scripts/verify_audit.py --db C:\path\to\airops.db
 python scripts/verify_audit.py --db sqlite:///./airops.db
+
+# Drive the live loop first, then verify the same database independently:
+python scripts/full_loop.py --demo all              # server must be running
+python scripts/verify_audit.py --db .\airops.db
 ```
 
 The script imports only the Python standard library. Exit codes: `0` valid,

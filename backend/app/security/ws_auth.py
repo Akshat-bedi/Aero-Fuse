@@ -3,12 +3,21 @@
 The browser cannot set an ``Authorization`` header on a WebSocket handshake, so
 a token may be supplied as:
 
+<<<<<<< HEAD
+=======
 - ``?token=<jwt>`` query parameter (simple, but can appear in logs), or
+>>>>>>> origin/main
 - the ``Sec-WebSocket-Protocol: bearer.<jwt>`` header, or
 - a first message ``{"type": "AUTH", "token": "<jwt>"}`` (or the token under
   ``payload.token``); the server accepts, reads that message, then either
   continues or closes with 4401.
 
+<<<<<<< HEAD
+Query-string tokens are deliberately rejected when authentication is enabled so
+a JWT can never leak into access logs or browser history.
+
+=======
+>>>>>>> origin/main
 No ``SNAPSHOT`` is sent before authentication. Read-only roles (observer,
 auditor) may only send ``PING``; any other client message closes with 4403.
 """
@@ -28,11 +37,14 @@ _UNAUTHORIZED_CODE = 4401
 _FORBIDDEN_CODE = 4403
 
 
+<<<<<<< HEAD
+=======
 def _token_from_query(websocket: WebSocket) -> str | None:
     token = websocket.query_params.get("token")
     return token.strip() if token and token.strip() else None
 
 
+>>>>>>> origin/main
 def _token_from_subprotocol(websocket: WebSocket) -> tuple[str, str] | None:
     header = websocket.headers.get("sec-websocket-protocol")
     if not header:
@@ -71,12 +83,20 @@ async def authenticate_websocket(
         await websocket.accept()
         return identity
 
+<<<<<<< HEAD
+    token: str | None = None
+    subprotocol: str | None = None
+    from_subprotocol = _token_from_subprotocol(websocket)
+    if from_subprotocol is not None:
+        subprotocol, token = from_subprotocol
+=======
     token = _token_from_query(websocket)
     subprotocol: str | None = None
     if token is None:
         from_subprotocol = _token_from_subprotocol(websocket)
         if from_subprotocol is not None:
             subprotocol, token = from_subprotocol
+>>>>>>> origin/main
 
     if token is not None:
         try:

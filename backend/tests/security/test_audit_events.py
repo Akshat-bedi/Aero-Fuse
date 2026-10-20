@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+﻿"""Security audit event constructors and sinks."""
+=======
 """Security audit event constructors and sinks."""
+>>>>>>> origin/main
 
 from __future__ import annotations
 
@@ -64,7 +68,11 @@ def test_login_events_carry_no_secret() -> None:
         role="commander",
         timestamp=NOW,
     )
+<<<<<<< HEAD
+    assert failure.action is SecurityAuditAction.LOCKOUT
+=======
     assert failure.action is SecurityAuditAction.LOGIN_LOCKED
+>>>>>>> origin/main
     assert failure.operator == "anonymous"
     assert success.action is SecurityAuditAction.LOGIN_SUCCESS
     assert "veridia-demo" not in repr(failure.details).casefold()
@@ -141,3 +149,7 @@ def test_null_sink_discards() -> None:
         timestamp=NOW,
     )
     sink.record(event)
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/main

@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+﻿"""Security audit events and a tiny sink protocol.
+=======
 """Security audit events and a tiny sink protocol.
+>>>>>>> origin/main
 
 The hash-chained audit store lands in B8. This module keeps the security layer
 decoupled: it emits structured events through :class:`AuditSink`, and B8 adapts
@@ -20,7 +24,11 @@ class SecurityAuditAction(StrEnum):
 
     LOGIN_SUCCESS = "LOGIN_SUCCESS"
     LOGIN_FAILURE = "LOGIN_FAILURE"
+<<<<<<< HEAD
+    LOCKOUT = "LOCKOUT"
+=======
     LOGIN_LOCKED = "LOGIN_LOCKED"
+>>>>>>> origin/main
     LOGOUT = "LOGOUT"
     TOKEN_REFRESHED = "TOKEN_REFRESHED"
     ACCESS_DENIED = "ACCESS_DENIED"
@@ -147,7 +155,11 @@ def login_failure_event(
     locked: bool = False,
 ) -> SecurityAuditEvent:
     return make_event(
+<<<<<<< HEAD
+        SecurityAuditAction.LOCKOUT if locked else SecurityAuditAction.LOGIN_FAILURE,
+=======
         SecurityAuditAction.LOGIN_LOCKED if locked else SecurityAuditAction.LOGIN_FAILURE,
+>>>>>>> origin/main
         operator="anonymous",
         target_id=username,
         timestamp=timestamp,
@@ -190,3 +202,7 @@ def approval_event(
             "phase": phase,
         },
     )
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/main

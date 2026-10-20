@@ -10,16 +10,20 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.health import router as health_router
 from app.api.routes import router as ops_router
 from app.api.ws import router as ws_router
+from app.audit.security_sink import RuntimeAuditSink
 from app.config import Settings, get_settings
 from app.errors import register_error_handlers
 from app.logging_setup import configure_logging
 from app.middleware import RequestIdMiddleware
 from app.runtime import SimRuntime
+from app.security.deps import (
+    build_security_context,
+    create_auth_router,
+    install_security_context,
+)
 
 
-def create_app(
-    *, autostart_sim: bool = True, settings: Settings | None = None
-) -> FastAPI:
+def create_app(*, autostart_sim: bool = True, settings: Settings | None = None) -> FastAPI:
     """Build the FastAPI application from the current settings.
 
     ``autostart_sim=False`` (tests) builds the runtime and attaches it to
@@ -31,9 +35,13 @@ def create_app(
     resolved = settings or get_settings()
     configure_logging(resolved.log_level)
 
+    audit_sink = RuntimeAuditSink()
+    security = build_security_context(resolved, audit=audit_sink)
+
     @asynccontextmanager
     async def lifespan(app: FastAPI) -> AsyncIterator[None]:
-        runtime = SimRuntime(resolved)
+        runtime = SimRuntime(resolved, security=security)
+        audit_sink.bind(runtime)
         app.state.runtime = runtime
         if autostart_sim:
             runtime.start(asyncio.get_running_loop())
@@ -44,21 +52,22 @@ def create_app(
         finally:
             await runtime.stop()
 
-    app = FastAPI(
-        title=resolved.app_name, version=resolved.app_version, lifespan=lifespan
-    )
+    app = FastAPI(title=resolved.app_name, version=resolved.app_version, lifespan=lifespan)
 
     app.add_middleware(
         CORSMiddleware,
         allow_origins=resolved.cors_origin_list,
         allow_credentials=True,
         allow_methods=["*"],
-        allow_headers=["*"],
+        allow_headers=["Authorization", "Content-Type", "X-Request-ID"],
+        expose_headers=["X-Total-Count"],
     )
     app.add_middleware(RequestIdMiddleware)
 
+    install_security_context(app, security)
     register_error_handlers(app)
     app.include_router(health_router, prefix="/api")
+    app.include_router(create_auth_router(security), prefix="/api")
     app.include_router(ops_router, prefix="/api")
     app.include_router(ws_router)
 

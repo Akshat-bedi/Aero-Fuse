@@ -1,20 +1,21 @@
-"""Commander decision handling, validation and the B8b approval seam (B8a).
+"""Commander decision handling, validation and the B8b approval flow.
 
 Approve/modify applies the recommendation's ``Change`` list (plus any manual
 swaps) to a deep copy, re-validates it against the *current* live state, then
 commits the result exactly once through the store. Reject never touches the
 plan. Every decision is written to the hash-chained audit log.
 
-The approval gate is a narrow protocol so B8b can mount RBAC/JWT without this
-module importing ``app.security``. With authentication disabled the default
-gate allows every resolved operator.
+With ``AUTH_ENABLED=true`` decisions pass through the security package's
+two-person approval state machine: high-impact recommendations need two
+distinct commanders, every decision needs a fresh step-up, separation of duties
+blocks the triggering operator, and modifications are staged until a second
+commander approves them. Demo mode keeps the original one-step behaviour.
 """
 
 from __future__ import annotations
 
 import asyncio
-from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Literal, Protocol
+from typing import TYPE_CHECKING, Any
 
 from app.domain import (
     Change,
@@ -30,6 +31,25 @@ from app.domain import (
 from app.retask.apply import PlanApplicationError, apply_changes
 from app.retask.engine import _metrics, _tradeoffs
 from app.retask.validate import check_plan_lite
+from app.security.approvals import (
+    ApprovalOutcome,
+    ApprovalState,
+    DenialReason,
+    evaluate_approval,
+    evaluate_rejection,
+    initial_state,
+    revoke_approval,
+)
+from app.security.audit_events import (
+    SecurityAuditAction,
+    approval_event,
+    make_event,
+)
+from app.security.deps import (
+    StepUpRequiredError,
+    approval_denial_exception,
+)
+from app.security.policy import Identity as SecurityIdentity
 
 if TYPE_CHECKING:
     from app.runtime import SimRuntime
@@ -38,53 +58,8 @@ DEFAULT_OPERATOR = "demo-commander"
 STALE_PROBLEM_TYPE = "https://airops.dss/errors/stale-recommendation"
 ALREADY_DECIDED_PROBLEM_TYPE = "https://airops.dss/errors/recommendation-already-decided"
 PENDING_APPROVAL_PROBLEM_TYPE = "https://airops.dss/errors/approval-pending"
+APPROVAL_DENIED_PROBLEM_TYPE = "https://airops.dss/errors/approval-denied"
 RESET_PROBLEM_TYPE = "https://airops.dss/errors/decision-cancelled-by-reset"
-
-
-@dataclass(frozen=True)
-class Identity:
-    """Resolved caller identity passed to the approval gate."""
-
-    operator: str
-
-
-@dataclass(frozen=True)
-class GateResult:
-    """Outcome of the B8b approval gate."""
-
-    outcome: Literal["allow", "deny", "pending"]
-    code: str = ""
-    message: str = ""
-
-    @classmethod
-    def allow(cls) -> GateResult:
-        return cls("allow")
-
-    @classmethod
-    def deny(cls, code: str, message: str) -> GateResult:
-        return cls("deny", code=code, message=message)
-
-    @classmethod
-    def pending(cls, code: str, message: str) -> GateResult:
-        return cls("pending", code=code, message=message)
-
-
-class ApprovalGate(Protocol):
-    """B8b seam: authorise or stage a commander decision."""
-
-    def authorise(
-        self, identity: Identity, recommendation: Recommendation, decision: str
-    ) -> GateResult: ...
-
-
-class AllowAllGate:
-    """Default gate used while ``AUTH_ENABLED`` is false."""
-
-    def authorise(
-        self, identity: Identity, recommendation: Recommendation, decision: str
-    ) -> GateResult:
-        del identity, recommendation, decision
-        return GateResult.allow()
 
 
 def resolve_operator(body_operator: str | None) -> str:
@@ -120,22 +95,32 @@ class DecisionError(Exception):
 class DecisionService:
     """Approve/reject/modify and validate-modification implementation."""
 
-    def __init__(self, runtime: SimRuntime, gate: ApprovalGate | None = None) -> None:
+    def __init__(self, runtime: SimRuntime) -> None:
         self.runtime = runtime
-        self.gate: ApprovalGate = gate or AllowAllGate()
         self._locks: dict[str, asyncio.Lock] = {}
         self._locks_guard = asyncio.Lock()
 
-    async def decide(self, recommendation_id: str, request: DecisionRequest) -> Recommendation:
+    async def decide(
+        self,
+        recommendation_id: str,
+        request: DecisionRequest,
+        *,
+        identity: SecurityIdentity | None = None,
+        operator: str | None = None,
+    ) -> Recommendation:
         lock = await self._lock_for(recommendation_id)
         async with lock:
             recommendation = self._require(recommendation_id)
+            actor = operator or resolve_operator(request.operator)
+            flow = self.runtime.approval_flow_enabled
             desired = _desired_status(request.decision)
+
             if recommendation.status is not RecommendationStatus.PENDING:
                 if recommendation.status is desired:
                     return recommendation
                 if not (
                     desired is RecommendationStatus.REJECTED
+                    and not flow
                     and recommendation.status
                     in {RecommendationStatus.STALE, RecommendationStatus.EXPIRED}
                 ):
@@ -170,61 +155,33 @@ class DecisionService:
                     ],
                 )
 
-            identity = Identity(operator=resolve_operator(request.operator))
-            gate_result = self.gate.authorise(identity, recommendation, request.decision)
-            if gate_result.outcome != "allow":
-                action = (
-                    "DECISION_DENIED"
-                    if gate_result.outcome == "deny"
-                    else "DECISION_PENDING"
-                )
-                await self.runtime.append_audit(
-                    operator=identity.operator,
-                    action=action,
-                    target_id=recommendation.id,
-                    details=gate_result.message or f"{request.decision} not authorised.",
-                    state_version=self.runtime.store.version,
-                )
-                if gate_result.outcome == "deny":
+            if flow:
+                if identity is None or self.runtime.security is None:
                     raise DecisionError(
                         403,
-                        "https://airops.dss/errors/approval-denied",
+                        APPROVAL_DENIED_PROBLEM_TYPE,
                         "Decision denied",
-                        gate_result.message or "The approval gate denied this decision.",
-                        extensions={"gateCode": gate_result.code},
+                        "Authenticated commander identity is required.",
                     )
-                raise DecisionError(
-                    409,
-                    PENDING_APPROVAL_PROBLEM_TYPE,
-                    "Second approval required",
-                    gate_result.message or "A second approver must confirm this decision.",
-                    extensions={"gateCode": gate_result.code},
+                return await self._secure_decision(
+                    recommendation,
+                    request,
+                    identity=identity,
+                    actor=actor,
+                    reason=reason,
                 )
 
             epoch = self.runtime.decision_epoch
             if request.decision == "reject":
-                return await self._reject(recommendation, request)
+                return await self._reject(recommendation, actor, reason)
 
-            manual, manual_conflicts = _manual_changes(
-                self.runtime.store.missions, request.modifications
-            )
+            modifications = request.modifications
+            manual, manual_conflicts = _manual_changes(self.runtime.store.missions, modifications)
             if manual_conflicts:
-                raise DecisionError(
-                    422,
-                    "https://airops.dss/errors/modification-invalid",
-                    "Modification invalid",
-                    "The manual assignment cannot be applied.",
-                    violations=[
-                        {"code": "MODIFICATION_INVALID", "message": item}
-                        for item in manual_conflicts
-                    ],
-                )
+                raise _modification_error(manual_conflicts)
 
             changes = [*recommendation.changes, *manual]
-            try:
-                violations = check_plan_lite(self.runtime.store, changes)
-            except PlanApplicationError as exc:
-                violations = [str(exc)]
+            violations = _plan_violations(self.runtime.store, changes)
             if violations:
                 if request.decision == "approve":
                     await self._mark_stale(
@@ -232,64 +189,148 @@ class DecisionService:
                         "Approval re-validation failed: " + "; ".join(violations),
                     )
                     raise _stale_error(recommendation, self.runtime.store.version)
-                raise DecisionError(
-                    422,
-                    "https://airops.dss/errors/modification-invalid",
-                    "Modification invalid",
-                    "The modified plan violates hard constraints.",
-                    violations=[
-                        {"code": "PLAN_VIOLATION", "message": item}
-                        for item in violations
-                    ],
-                )
+                raise _plan_violation_error(violations)
 
             if self.runtime.decision_epoch != epoch:
-                raise DecisionError(
-                    409,
-                    RESET_PROBLEM_TYPE,
-                    "Decision cancelled by reset",
-                    "The simulation was reset while this decision was being processed.",
-                )
+                raise _reset_error()
 
             planned = apply_changes(self.runtime.store, changes)
-            if request.decision == "approve":
-                recommendation.status = RecommendationStatus.APPROVED
-                recommendation.modifications = None
-            else:
-                recommendation.status = RecommendationStatus.MODIFIED
-                recommendation.modifications = (
-                    request.modifications.model_dump(
-                        by_alias=True, exclude_none=True
-                    )
-                    if request.modifications is not None
-                    else {}
-                )
-            old_version = self.runtime.store.version
-            change = self.runtime.store.apply_planned(planned)
-            version = change.version if change is not None else self.runtime.store.version
-            self.runtime.staleness.forget(recommendation.id)
-            self.runtime.broadcast_recommendation(recommendation, version)
-
-            if recommendation.status is RecommendationStatus.APPROVED:
-                details = (
-                    f"Approved {recommendation.id}: {recommendation.summary} "
-                    f"(score {recommendation.score:.0f}; state v{old_version} -> v{version})."
-                )
-                action = "DECISION_APPROVED"
-            else:
-                swaps = _describe_manual(request.modifications)
-                details = (
-                    f"Modified {recommendation.id}: {recommendation.summary}"
-                    + (f" Manual changes: {swaps}." if swaps else ".")
-                )
-                action = "DECISION_MODIFIED"
-            await self.runtime.append_audit(
-                operator=identity.operator,
-                action=action,
-                target_id=recommendation.id,
-                details=details,
-                state_version=version,
+            modified = request.decision == "modify"
+            return await self._commit_plan(
+                recommendation,
+                planned,
+                actor=actor,
+                modifications=modifications,
+                modified=modified,
+                keep_approval_fields=False,
             )
+
+    async def _secure_decision(
+        self,
+        recommendation: Recommendation,
+        request: DecisionRequest,
+        *,
+        identity: SecurityIdentity,
+        actor: str,
+        reason: str,
+    ) -> Recommendation:
+        security = self.runtime.security
+        assert security is not None  # guarded by approval_flow_enabled
+        state = self._approval_state(recommendation)
+        trigger = self._trigger_operator(recommendation)
+
+        if request.decision == "reject":
+            outcome = evaluate_rejection(
+                state,
+                identity,
+                now=security.clock(),
+                trigger_operator=trigger,
+                settings=security.settings,
+                reason=reason,
+                require_step_up=True,
+            )
+            self._raise_denial(outcome, recommendation, actor, "reject")
+            self._save_approval_state(recommendation, outcome.state)
+            return await self._reject(recommendation, actor, reason)
+
+        modifications = request.modifications
+        modifier = self.runtime.approval_modifiers.get(recommendation.id)
+        if request.decision == "modify" and modifications is not None:
+            modifier = actor
+        elif recommendation.id in self.runtime.staged_modifications:
+            modifications = self.runtime.staged_modifications[recommendation.id]
+
+        manual, manual_conflicts = _manual_changes(self.runtime.store.missions, modifications)
+        if manual_conflicts:
+            raise _modification_error(manual_conflicts)
+        staged_changes = [*recommendation.changes, *manual]
+        violations = _plan_violations(self.runtime.store, staged_changes)
+        if violations:
+            raise _plan_violation_error(violations)
+
+        previous_count = len(state.approvals)
+        outcome = evaluate_approval(
+            state,
+            identity,
+            now=security.clock(),
+            high_impact=self.runtime.approval_high_impact.get(recommendation.id, False),
+            trigger_operator=trigger,
+            settings=security.settings,
+            modifier_operator=modifier,
+            require_step_up=True,
+        )
+        self._raise_denial(outcome, recommendation, actor, request.decision)
+
+        if request.decision == "modify" and modifications is not None:
+            self.runtime.staged_modifications[recommendation.id] = modifications
+            self.runtime.approval_modifiers[recommendation.id] = actor
+
+        self._save_approval_state(recommendation, outcome.state)
+        if len(outcome.state.approvals) > previous_count:
+            self._audit_approval(
+                SecurityAuditAction.APPROVAL_RECORDED,
+                recommendation,
+                actor,
+                identity.role.value,
+                outcome.state,
+            )
+        if not outcome.apply_plan:
+            self.runtime.broadcast_recommendation(recommendation, self.runtime.store.version)
+            return recommendation
+
+        planned = apply_changes(self.runtime.store, staged_changes)
+        modified = request.decision == "modify" or modifications is not None
+        return await self._commit_plan(
+            recommendation,
+            planned,
+            actor=actor,
+            modifications=modifications,
+            modified=modified,
+            keep_approval_fields=True,
+        )
+
+    async def revoke(
+        self,
+        recommendation_id: str,
+        *,
+        identity: SecurityIdentity,
+        operator: str | None = None,
+    ) -> Recommendation:
+        """Retract the acting commander's own pending approval."""
+        lock = await self._lock_for(recommendation_id)
+        async with lock:
+            recommendation = self._require(recommendation_id)
+            if not self.runtime.approval_flow_enabled or self.runtime.security is None:
+                raise DecisionError(
+                    409,
+                    PENDING_APPROVAL_PROBLEM_TYPE,
+                    "No approval to revoke",
+                    "The two-person approval flow is not active.",
+                )
+            if recommendation.status is not RecommendationStatus.PENDING:
+                raise DecisionError(
+                    409,
+                    ALREADY_DECIDED_PROBLEM_TYPE,
+                    "Recommendation already decided",
+                    f"{recommendation.id} is {recommendation.status.value}.",
+                )
+            actor = operator or resolve_operator(None)
+            state = self._approval_state(recommendation)
+            outcome = revoke_approval(
+                state,
+                identity,
+                settings=self.runtime.security.settings,
+            )
+            self._raise_denial(outcome, recommendation, actor, "revoke")
+            self._save_approval_state(recommendation, outcome.state)
+            self._audit_approval(
+                SecurityAuditAction.APPROVAL_REVOKED,
+                recommendation,
+                actor,
+                identity.role.value,
+                outcome.state,
+            )
+            self.runtime.broadcast_recommendation(recommendation, self.runtime.store.version)
             return recommendation
 
     async def validate_modification(
@@ -297,9 +338,7 @@ class DecisionService:
     ) -> ModificationValidationResult:
         """Recompute conflicts/score/trade-offs without applying anything."""
         recommendation = self._require(recommendation_id)
-        manual, manual_conflicts = _manual_changes(
-            self.runtime.store.missions, modifications
-        )
+        manual, manual_conflicts = _manual_changes(self.runtime.store.missions, modifications)
         changes = [*recommendation.changes, *manual]
         try:
             conflicts = check_plan_lite(self.runtime.store, changes)
@@ -333,17 +372,158 @@ class DecisionService:
 
     # -------------------------------------------------------------- internals
 
-    async def _reject(
-        self, recommendation: Recommendation, request: DecisionRequest
+    def _approval_state(self, recommendation: Recommendation) -> ApprovalState:
+        state = self.runtime.approval_states.get(recommendation.id)
+        if state is None:
+            state = initial_state(recommendation.approvals_required or 1)
+            self.runtime.approval_states[recommendation.id] = state
+        return state
+
+    def _trigger_operator(self, recommendation: Recommendation) -> str | None:
+        event = self.runtime.event_by_id(recommendation.trigger_event_id)
+        return event.operator if event is not None else None
+
+    def _save_approval_state(self, recommendation: Recommendation, state: ApprovalState) -> None:
+        self.runtime.approval_states[recommendation.id] = state
+        self.runtime.sync_approval_fields(recommendation, state)
+
+    def _audit_approval(
+        self,
+        action: SecurityAuditAction,
+        recommendation: Recommendation,
+        actor: str,
+        role: str,
+        state: ApprovalState,
+    ) -> None:
+        security = self.runtime.security
+        if security is None:
+            return
+        security.audit.record(
+            approval_event(
+                action,
+                operator=actor,
+                recommendation_id=recommendation.id,
+                role=role,
+                approvals_count=len(state.approvals),
+                approvals_required=state.required,
+                phase=state.phase.value,
+                timestamp=security.clock(),
+            )
+        )
+
+    def _raise_denial(
+        self,
+        outcome: ApprovalOutcome,
+        recommendation: Recommendation,
+        actor: str,
+        requested_action: str,
+    ) -> None:
+        if outcome.accepted:
+            return
+        security = self.runtime.security
+        denial = outcome.denial or DenialReason.NOT_COMMANDER
+        if security is not None:
+            if denial is DenialReason.STEP_UP_REQUIRED:
+                security.audit.record(
+                    make_event(
+                        SecurityAuditAction.STEP_UP_FAILURE,
+                        operator=actor,
+                        target_id=recommendation.id,
+                        timestamp=security.clock(),
+                        details={"action": requested_action},
+                    )
+                )
+            else:
+                security.audit.record(
+                    make_event(
+                        SecurityAuditAction.ACCESS_DENIED,
+                        operator=actor,
+                        target_id=recommendation.id,
+                        timestamp=security.clock(),
+                        details={
+                            "action": requested_action,
+                            "denial": denial.value,
+                            "role": "commander",
+                        },
+                    )
+                )
+        if denial is DenialReason.STEP_UP_REQUIRED:
+            raise StepUpRequiredError()
+        error = approval_denial_exception(outcome)
+        assert error is not None
+        problem_type = (
+            APPROVAL_DENIED_PROBLEM_TYPE
+            if error.status_code == 403
+            else ALREADY_DECIDED_PROBLEM_TYPE
+            if error.status_code == 409
+            else "https://airops.dss/errors/reason-required"
+        )
+        raise DecisionError(
+            error.status_code,
+            problem_type,
+            "Decision not permitted",
+            str(error.detail),
+            extensions={"gateCode": denial.value},
+        )
+
+    async def _commit_plan(
+        self,
+        recommendation: Recommendation,
+        planned: Any,
+        *,
+        actor: str,
+        modifications: ModificationsRequest | None,
+        modified: bool,
+        keep_approval_fields: bool,
     ) -> Recommendation:
-        identity = Identity(operator=resolve_operator(request.operator))
+        if modified:
+            recommendation.status = RecommendationStatus.MODIFIED
+            recommendation.modifications = (
+                modifications.model_dump(by_alias=True, exclude_none=True)
+                if modifications is not None
+                else {}
+            )
+        else:
+            recommendation.status = RecommendationStatus.APPROVED
+            recommendation.modifications = None
+        old_version = self.runtime.store.version
+        change = self.runtime.store.apply_planned(planned)
+        version = change.version if change is not None else self.runtime.store.version
+        self.runtime.staleness.forget(recommendation.id)
+        self.runtime.forget_approval(recommendation, clear_fields=not keep_approval_fields)
+        self.runtime.broadcast_recommendation(recommendation, version)
+
+        if recommendation.status is RecommendationStatus.APPROVED:
+            details = (
+                f"Approved {recommendation.id}: {recommendation.summary} "
+                f"(score {recommendation.score:.0f}; state v{old_version} -> v{version})."
+            )
+            action = "DECISION_APPROVED"
+        else:
+            swaps = _describe_manual(modifications)
+            details = f"Modified {recommendation.id}: {recommendation.summary}" + (
+                f" Manual changes: {swaps}." if swaps else "."
+            )
+            action = "DECISION_MODIFIED"
+        await self.runtime.append_audit(
+            operator=actor,
+            action=action,
+            target_id=recommendation.id,
+            details=details,
+            state_version=version,
+        )
+        return recommendation
+
+    async def _reject(
+        self, recommendation: Recommendation, actor: str, reason: str
+    ) -> Recommendation:
         recommendation.status = RecommendationStatus.REJECTED
         version = self.runtime.store.version
         self.runtime.staleness.forget(recommendation.id)
+        self.runtime.forget_approval(recommendation, clear_fields=False)
         self.runtime.broadcast_recommendation(recommendation, version)
-        reason = (request.reason or "").strip()
         await self.runtime.append_audit(
-            operator=identity.operator,
+            operator=actor,
             action="DECISION_REJECTED",
             target_id=recommendation.id,
             details=f"Rejected {recommendation.id}: {reason}",
@@ -355,6 +535,7 @@ class DecisionService:
         if recommendation.status is not RecommendationStatus.PENDING:
             return
         recommendation.status = RecommendationStatus.STALE
+        self.runtime.forget_approval(recommendation)
         version = self.runtime.store.version
         self.runtime.staleness.forget(recommendation.id)
         self.runtime.broadcast_recommendation(recommendation, version)
@@ -394,6 +575,42 @@ def _desired_status(decision: str) -> RecommendationStatus:
     return RecommendationStatus.MODIFIED
 
 
+def _modification_error(conflicts: list[str]) -> DecisionError:
+    return DecisionError(
+        422,
+        "https://airops.dss/errors/modification-invalid",
+        "Modification invalid",
+        "The manual assignment cannot be applied.",
+        violations=[{"code": "MODIFICATION_INVALID", "message": item} for item in conflicts],
+    )
+
+
+def _plan_violation_error(violations: list[str]) -> DecisionError:
+    return DecisionError(
+        422,
+        "https://airops.dss/errors/modification-invalid",
+        "Modification invalid",
+        "The modified plan violates hard constraints.",
+        violations=[{"code": "PLAN_VIOLATION", "message": item} for item in violations],
+    )
+
+
+def _reset_error() -> DecisionError:
+    return DecisionError(
+        409,
+        RESET_PROBLEM_TYPE,
+        "Decision cancelled by reset",
+        "The simulation was reset while this decision was being processed.",
+    )
+
+
+def _plan_violations(store: Any, changes: list[Change]) -> list[str]:
+    try:
+        return check_plan_lite(store, changes)
+    except PlanApplicationError as exc:
+        return [str(exc)]
+
+
 def _stale_error(recommendation: Recommendation, current_version: int) -> DecisionError:
     return DecisionError(
         409,
@@ -431,10 +648,7 @@ def _manual_changes(
                     kind=ChangeKind.AIRCRAFT_SWAP,
                     before=mission.assigned.aircraft_ids[0],
                     after=aircraft_swap.new_aircraft_id,
-                    note=(
-                        "Commander manual airframe swap to "
-                        f"{aircraft_swap.new_aircraft_id}"
-                    ),
+                    note=(f"Commander manual airframe swap to {aircraft_swap.new_aircraft_id}"),
                 )
             )
         elif mission.required_aircraft_type is not None:
@@ -447,10 +661,7 @@ def _manual_changes(
                         "aircraftIds": [aircraft_swap.new_aircraft_id],
                         "crewIds": list(mission.assigned.crew_ids),
                     },
-                    note=(
-                        "Commander manual airframe assignment "
-                        f"{aircraft_swap.new_aircraft_id}"
-                    ),
+                    note=(f"Commander manual airframe assignment {aircraft_swap.new_aircraft_id}"),
                 )
             )
 
@@ -479,10 +690,7 @@ def _manual_changes(
                         "aircraftIds": list(mission.assigned.aircraft_ids),
                         "crewIds": [crew_swap.new_crew_id],
                     },
-                    note=(
-                        "Commander manual crew assignment "
-                        f"{crew_swap.new_crew_id}"
-                    ),
+                    note=(f"Commander manual crew assignment {crew_swap.new_crew_id}"),
                 )
             )
 
@@ -524,9 +732,7 @@ def _describe_manual(modifications: ModificationsRequest | None) -> str:
     parts: list[str] = []
     if modifications.aircraft_swap is not None:
         aircraft_swap = modifications.aircraft_swap
-        parts.append(
-            f"{aircraft_swap.mission_id} aircraft -> {aircraft_swap.new_aircraft_id}"
-        )
+        parts.append(f"{aircraft_swap.mission_id} aircraft -> {aircraft_swap.new_aircraft_id}")
     if modifications.crew_swap is not None:
         crew_swap = modifications.crew_swap
         parts.append(f"{crew_swap.mission_id} crew -> {crew_swap.new_crew_id}")
@@ -536,11 +742,7 @@ def _describe_manual(modifications: ModificationsRequest | None) -> str:
 
 
 __all__ = [
-    "AllowAllGate",
-    "ApprovalGate",
     "DecisionError",
     "DecisionService",
-    "GateResult",
-    "Identity",
     "resolve_operator",
 ]

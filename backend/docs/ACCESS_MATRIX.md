@@ -63,7 +63,11 @@ the AirOps DSS demo; it is not a real military authorisation scheme.
 | Event type | observer | intel_officer | maintenance_officer | ops_planner | commander | auditor | sys_admin |
 | :--- | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
 | `AIRCRAFT_UNSERVICEABLE` | . | . | Y | Y | Y | . | . |
+<<<<<<< HEAD
+| `BASE_CLOSED` | . | . | . | Y | Y | . | . |
+=======
 | `BASE_CLOSED` | . | . | Y | Y | Y | . | . |
+>>>>>>> origin/main
 | `CREW_UNAVAILABLE` | . | . | . | Y | Y | . | . |
 | `NEW_PRIORITY_MISSION` | . | . | . | Y | Y | . | . |
 | `THREAT_DETECTED` | . | Y | . | Y | Y | . | . |

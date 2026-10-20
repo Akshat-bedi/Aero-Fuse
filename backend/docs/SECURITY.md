@@ -1,14 +1,28 @@
+<<<<<<< HEAD
+﻿# AirOps DSS - Security Package
+=======
 # AirOps DSS - Security Package
+>>>>>>> origin/main
 
 > Fictional simulation only. This package demonstrates human-in-the-loop
 > access control, session handling and approval safeguards for the AirOps DSS
 > demo. It is not a real military authorisation system and must not be used to
 > protect real operations.
 
+<<<<<<< HEAD
+The package lives in `backend/app/security/` with tests in
+`backend/tests/security/`. It is wired into `app/main.py` (B8b): REST and
+WebSocket routes enforce permissions, decisions use the approval state machine,
+and security events append to the hash-chained audit log. With
+`AUTH_ENABLED=false` the original demo behaviour is unchanged. See
+[`SECURITY_WIRING.md`](SECURITY_WIRING.md) for the wiring details and frontend
+changes.
+=======
 The package is self-contained in `backend/app/security/` with tests in
 `backend/tests/security/`. It is **not wired into `app/main.py`**; see
 [`SECURITY_WIRING.md`](SECURITY_WIRING.md) for the B8 integration checklist and
 frontend changes.
+>>>>>>> origin/main
 
 ## What is implemented
 
@@ -21,7 +35,11 @@ frontend changes.
 | Tokens and sessions | `tokens.py` | HS256 access/refresh JWTs, refresh rotation, absolute session limit, revocation. |
 | Authentication | `auth.py` | Login, refresh, logout, step-up, role change; generic failure messages. |
 | FastAPI adapters | `deps.py` | `SecurityContext`, `require(permission)`, `resolve_operator`, `/auth/*` router. |
+<<<<<<< HEAD
+| WebSocket auth | `ws_auth.py` | Subprotocol/first-message token; query tokens rejected in secure mode; read-only `PING`; 4401/4403 closes. |
+=======
 | WebSocket auth | `ws_auth.py` | Query/subprotocol/first-message token, read-only `PING`, 4401/4403 closes. |
+>>>>>>> origin/main
 | Approvals | `approvals.py` | High-impact classification, separation of duties, two-person approval, revocation. |
 | Audit events | `audit_events.py` | Sanitised security events through a small `AuditSink` protocol. |
 
@@ -32,7 +50,11 @@ Roles are declared in `Role`; the full matrix is generated in
 
 - `observer` - read-only.
 - `intel_officer` - read + `THREAT_DETECTED` only.
+<<<<<<< HEAD
+- `maintenance_officer` - read + `AIRCRAFT_UNSERVICEABLE` only.
+=======
 - `maintenance_officer` - read + `AIRCRAFT_UNSERVICEABLE` and `BASE_CLOSED`.
+>>>>>>> origin/main
 - `ops_planner` - read, any event, scenarios, demo scripts, sim speed/pause/resume, modification validation.
 - `commander` - planner capabilities plus `SIM_RESET` and approve/reject/modify.
 - `auditor` - read + read/export/verify audit. No operational permission.
@@ -81,11 +103,22 @@ Event injection is additionally restricted by `EventType` through
 | `409` | The recommendation was already decided, or there is no approval to revoke. |
 | `422` | Malformed body, unknown decision/sim action, or a missing rejection reason. |
 | `423` | Account temporarily locked (`Retry-After` seconds). |
+<<<<<<< HEAD
+| `428` | Step-up PIN required for this decision. RFC 7807 body `type` is `https://airops.dss/errors/step-up-required`. |
+
+Decision handlers map `ApprovalOutcome` denials with
+`approval_denial_exception` from `deps.py`; it returns `None` for an accepted
+attempt and never applies the plan by itself. Step-up denials use
+`StepUpRequiredError`; `install_security_context` registers the handler that
+renders the RFC 7807 body (`type`, `title`, `status`, `detail`, `instance`), so
+clients can branch on the `428` status or the body `type`.
+=======
 | `427` | Step-up PIN required for this decision (`STEP_UP_REQUIRED_STATUS`). |
 
 Decision handlers map `ApprovalOutcome` denials with
 `approval_denial_exception` from `deps.py`; it returns `None` for an accepted
 attempt and never applies the plan by itself.
+>>>>>>> origin/main
 
 Example:
 
@@ -172,14 +205,24 @@ candidate.
 `SecurityAuditEvent` carries `action`, `operator`, `target_id`, `timestamp` and
 non-secret `details`. Actions:
 
+<<<<<<< HEAD
+`LOGIN_SUCCESS`, `LOGIN_FAILURE`, `LOCKOUT`, `LOGOUT`,
+=======
 `LOGIN_SUCCESS`, `LOGIN_FAILURE`, `LOGIN_LOCKED`, `LOGOUT`,
+>>>>>>> origin/main
 `TOKEN_REFRESHED`, `ACCESS_DENIED`, `STEP_UP_SUCCESS`, `STEP_UP_FAILURE`,
 `APPROVAL_RECORDED`, `APPROVAL_REVOKED`, `ROLE_CHANGED`, `SPOOF_ATTEMPT`.
 
 `audit_events.py` provides an `AuditSink` protocol, `InMemoryAuditSink` (tests),
+<<<<<<< HEAD
+`NullAuditSink` (explicit no-op) and constructors. `app/audit/security_sink.py`
+adapts the sink to the hash-chained `AuditEntry` store during app startup.
+Passwords, PINs, password hashes and tokens are never placed in event details.
+=======
 `NullAuditSink` (explicit no-op) and constructors. B8 adapts the sink to the
 hash-chained `AuditEntry` store. Passwords, PINs, password hashes and tokens are
 never placed in event details.
+>>>>>>> origin/main
 
 ## WebSocket
 
@@ -191,8 +234,14 @@ Do **not** call `accept` again afterward. The frontend contract uses:
   `payload.token`). The server accepts, reads that message, then continues or
   closes with `4401`.
 
+<<<<<<< HEAD
+A `?token=<jwt>` query parameter is **rejected** when authentication is enabled,
+so tokens cannot leak into access logs or browser history. Access-log messages
+also have their query string stripped defensively.
+=======
 A `?token=<jwt>` query parameter is also accepted for tooling and tests, but it
 is **not part of the frontend contract** because tokens can leak into logs.
+>>>>>>> origin/main
 
 No `SNAPSHOT` is sent before the identity is established. Observer and auditor
 may only send `PING`; other client messages close with `4403`.
@@ -205,11 +254,18 @@ may only send `PING`; other client messages close with `4403`.
 - No general rate limiter beyond account lockout; add one at the edge.
 - HS256 with one shared secret; rotate the secret and restart sessions to
   invalidate all tokens.
+<<<<<<< HEAD
+- Query-string WebSocket tokens are rejected in secure mode; use the
+  first-message or subprotocol form and TLS in any deployed environment.
+- `Settings` inherits `SecuritySettings`, so auth configuration has one source
+  of truth. The demo users and sessions are still process-local.
+=======
 - Query-string WebSocket tokens can leak via logs/proxies; prefer the
   first-message or subprotocol form, and use TLS in any deployed environment.
 - The package is not mounted or enforced until B8 wiring is done.
 - `app/config.py` still owns its own `auth_enabled` / `jwt_secret` fields; B8
   should make it delegate to `SecuritySettings` to keep one source of truth.
+>>>>>>> origin/main
 - Roles model a fictional demo; no classification levels, compartments or
   need-to-know handling are implemented.
 
@@ -228,3 +284,7 @@ The suite covers every role/permission pair, per-event injection, matrix drift,
 settings/env parity, secret hardening, scrypt hashing, lockout/unlock, token
 expiry and refresh rotation, revocation and role changes, step-up, operator
 spoofing, two-person approval, HTTP dependencies/routes and WebSocket auth.
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/main

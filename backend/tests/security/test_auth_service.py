@@ -1,4 +1,8 @@
+<<<<<<< HEAD
+﻿"""Auth service: login, lockout, refresh, logout, step-up, role changes, audit."""
+=======
 """Auth service: login, lockout, refresh, logout, step-up, role changes, audit."""
+>>>>>>> origin/main
 
 from __future__ import annotations
 
@@ -77,7 +81,11 @@ def test_lockout_and_timed_recovery(
     with pytest.raises(AccountLocked) as locked:
         auth_context.auth.login(LoginRequest(username="commander", password="wrong"))
     assert locked.value.retry_after_sec == auth_context.settings.lockout_duration_sec
+<<<<<<< HEAD
+    assert _events(auth_context)[-1].action is SecurityAuditAction.LOCKOUT
+=======
     assert _events(auth_context)[-1].action is SecurityAuditAction.LOGIN_LOCKED
+>>>>>>> origin/main
 
     with pytest.raises(AccountLocked):
         auth_context.auth.login(LoginRequest(username="commander", password=DEMO_PASSWORD))
@@ -214,3 +222,7 @@ def test_seed_demo_users_is_fresh_per_call() -> None:
     assert first is not second
     assert first.get_by_username("commander") is not None
     assert second.get_by_username("commander") is not None
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/main

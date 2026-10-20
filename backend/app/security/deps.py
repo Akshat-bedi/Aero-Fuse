@@ -18,6 +18,10 @@ from datetime import UTC, datetime
 from typing import Annotated
 
 from fastapi import APIRouter, FastAPI, Header, HTTPException, Request, status
+<<<<<<< HEAD
+from fastapi.responses import JSONResponse
+=======
+>>>>>>> origin/main
 
 from app.domain.enums import EventType
 from app.security.approvals import ApprovalOutcome, DenialReason
@@ -132,9 +136,31 @@ def build_security_context(
     )
 
 
+<<<<<<< HEAD
+def _step_up_required_handler(request: Request, exc: Exception) -> JSONResponse:
+    """Render :class:`StepUpRequiredError` as an RFC 7807 body."""
+    detail = exc.detail if isinstance(exc, StepUpRequiredError) else "Step-up PIN required."
+    return JSONResponse(
+        status_code=STEP_UP_REQUIRED_STATUS,
+        content={
+            "type": STEP_UP_REQUIRED_TYPE,
+            "title": "Precondition Required",
+            "status": STEP_UP_REQUIRED_STATUS,
+            "detail": detail,
+            "instance": request.url.path,
+        },
+    )
+
+
+def install_security_context(app: FastAPI, context: SecurityContext) -> None:
+    """Attach the context to ``app.state`` and register security handlers."""
+    app.state.security_context = context
+    app.add_exception_handler(StepUpRequiredError, _step_up_required_handler)
+=======
 def install_security_context(app: FastAPI, context: SecurityContext) -> None:
     """Attach the context to ``app.state`` for dependency lookup."""
     app.state.security_context = context
+>>>>>>> origin/main
 
 
 def get_security_context(request: Request) -> SecurityContext:
@@ -207,6 +233,11 @@ def require(
     ) -> Identity:
         active = context if context is not None else get_security_context(request)
         identity = _identity_or_401(active, authorization)
+<<<<<<< HEAD
+        if not active.auth_enabled:
+            return identity
+=======
+>>>>>>> origin/main
         if not is_allowed(identity, permission):
             _audit_denied(active, identity, permission, request.url.path)
             raise HTTPException(
@@ -227,6 +258,11 @@ def enforce_permission(
     access_context: AccessContext | None = None,
 ) -> None:
     """Enforce a permission inside a handler (after parsing the action)."""
+<<<<<<< HEAD
+    if not context.auth_enabled:
+        return
+=======
+>>>>>>> origin/main
     if is_allowed(identity, permission, access_context):
         return
     _audit_denied(context, identity, permission, path)
@@ -292,6 +328,11 @@ def enforce_event_injection(
     path: str,
 ) -> None:
     """Enforce the per-event-type injection rule inside an event handler."""
+<<<<<<< HEAD
+    if not context.auth_enabled:
+        return
+=======
+>>>>>>> origin/main
     if is_allowed(identity, Permission.INJECT_EVENT, AccessContext(event_type=event_type)):
         return
     _audit_denied(context, identity, Permission.INJECT_EVENT, path)
@@ -301,12 +342,39 @@ def enforce_event_injection(
     )
 
 
+<<<<<<< HEAD
+STEP_UP_REQUIRED_STATUS = 428
+"""Precondition Required, used for "step-up PIN required" decisions."""
+
+STEP_UP_REQUIRED_TYPE = "https://airops.dss/errors/step-up-required"
+"""RFC 7807 ``type`` URI for step-up-required responses."""
+
+
+class StepUpRequiredError(Exception):
+    """A decision needs a fresh step-up PIN.
+
+    Rendered as an RFC 7807 body with ``type`` = :data:`STEP_UP_REQUIRED_TYPE`
+    by the handler registered in :func:`install_security_context`; clients can
+    branch on either the status or the body ``type``.
+    """
+
+    status_code = STEP_UP_REQUIRED_STATUS
+
+    def __init__(self, detail: str = "Step-up PIN required.") -> None:
+        super().__init__(detail)
+        self.detail = detail
+
+
+_APPROVAL_DENIAL_STATUS: dict[DenialReason, int] = {
+    DenialReason.NOT_COMMANDER: status.HTTP_403_FORBIDDEN,
+=======
 STEP_UP_REQUIRED_STATUS = 427
 """Non-standard status the frontend contract uses for "step-up PIN required"."""
 
 _APPROVAL_DENIAL_STATUS: dict[DenialReason, int] = {
     DenialReason.NOT_COMMANDER: status.HTTP_403_FORBIDDEN,
     DenialReason.STEP_UP_REQUIRED: STEP_UP_REQUIRED_STATUS,
+>>>>>>> origin/main
     DenialReason.SEPARATION_OF_DUTIES: status.HTTP_403_FORBIDDEN,
     DenialReason.ALREADY_DECIDED: status.HTTP_409_CONFLICT,
     DenialReason.REASON_REQUIRED: status.HTTP_422_UNPROCESSABLE_CONTENT,
@@ -323,7 +391,13 @@ _APPROVAL_DENIAL_DETAIL: dict[DenialReason, str] = {
 }
 
 
+<<<<<<< HEAD
+def approval_denial_exception(
+    outcome: ApprovalOutcome,
+) -> HTTPException | StepUpRequiredError | None:
+=======
 def approval_denial_exception(outcome: ApprovalOutcome) -> HTTPException | None:
+>>>>>>> origin/main
     """Map an approval outcome to the decision-route HTTP error.
 
     Returns ``None`` when the attempt was accepted (including a duplicate
@@ -333,6 +407,11 @@ def approval_denial_exception(outcome: ApprovalOutcome) -> HTTPException | None:
     if outcome.accepted:
         return None
     denial = outcome.denial or DenialReason.NOT_COMMANDER
+<<<<<<< HEAD
+    if denial is DenialReason.STEP_UP_REQUIRED:
+        return StepUpRequiredError()
+=======
+>>>>>>> origin/main
     return HTTPException(
         status_code=_APPROVAL_DENIAL_STATUS.get(denial, status.HTTP_403_FORBIDDEN),
         detail=_APPROVAL_DENIAL_DETAIL.get(denial, "Decision not permitted."),

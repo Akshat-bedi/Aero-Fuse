@@ -1,9 +1,20 @@
+<<<<<<< HEAD
+﻿# Security Wiring (B8b)
+
+> **Status: wired.** `app/main.py` mounts the auth router and security context,
+> every operational REST route has a permission mapping (enforced by
+> `tests/security/test_route_permissions.py`), `/ws` authenticates before the
+> first `SNAPSHOT`, decisions use the approval state machine, and security
+> events append to the runtime audit chain. Auth-off behaviour is unchanged.
+> The frontend changes in section 10 remain outstanding.
+=======
 # Security Wiring (B8)
 
 > The security package is intentionally **not** mounted in `app/main.py`.
 > This file is the checklist for the B8 integration PR and for the frontend
 > changes that must accompany it. Do not treat the routes as live until this
 > wiring is done.
+>>>>>>> origin/main
 
 See [`SECURITY.md`](SECURITY.md) for roles, tokens, approvals and limitations.
 
@@ -96,8 +107,13 @@ enforce_event_injection(security, identity, body.type, path="/api/events")
 ```
 
 An intel officer may only raise `THREAT_DETECTED`; a maintenance officer only
+<<<<<<< HEAD
+`AIRCRAFT_UNSERVICEABLE`; planners and commanders may raise any event. Everyone
+else is denied.
+=======
 `AIRCRAFT_UNSERVICEABLE` and `BASE_CLOSED`; planners and commanders may raise
 any event. Everyone else is denied.
+>>>>>>> origin/main
 
 ## 4. Decisions and sim control are action-level
 
@@ -131,13 +147,25 @@ if outcome.apply_plan:
 | `ApprovalOutcome.denial` | Status |
 | :--- | :--- |
 | `NOT_COMMANDER` | `403` |
+<<<<<<< HEAD
+| `STEP_UP_REQUIRED` | `428` + RFC 7807 body |
+=======
 | `STEP_UP_REQUIRED` | `427` |
+>>>>>>> origin/main
 | `SEPARATION_OF_DUTIES` | `403` |
 | `ALREADY_DECIDED` | `409` |
 | `REASON_REQUIRED` | `422` |
 | `NOTHING_TO_REVOKE` | `409` |
 
+<<<<<<< HEAD
+A step-up denial raises `StepUpRequiredError`; `install_security_context`
+registers the handler that renders
+`{"type": "https://airops.dss/errors/step-up-required", "title": "Precondition Required", "status": 428, "detail": "...", "instance": "..."}`.
+Clients may branch on the `428` status or the body `type`. An accepted duplicate
+approval returns `None` and must not re-apply the plan.
+=======
 An accepted duplicate approval returns `None` and must not re-apply the plan.
+>>>>>>> origin/main
 
 ## 5. Operator resolution
 
@@ -225,7 +253,11 @@ Map `operator` to the resolved identity and never include passwords, PINs,
 password hashes or tokens in `details`.
 
 Suggested action names in the existing audit chain (contract-change candidate):
+<<<<<<< HEAD
+`LOGIN_SUCCESS`, `LOGIN_FAILURE`, `LOCKOUT`, `LOGOUT`,
+=======
 `LOGIN_SUCCESS`, `LOGIN_FAILURE`, `LOGIN_LOCKED`, `LOGOUT`,
+>>>>>>> origin/main
 `TOKEN_REFRESHED`, `ACCESS_DENIED`, `STEP_UP_SUCCESS`, `STEP_UP_FAILURE`,
 `APPROVAL_RECORDED`, `APPROVAL_REVOKED`, `ROLE_CHANGED`, `SPOOF_ATTEMPT`.
 
@@ -257,8 +289,14 @@ The frontend must supply the token by one of:
    subprotocol is awkward for the client); the server accepts, authenticates,
    then starts the stream.
 
+<<<<<<< HEAD
+A `?token=<jwt>` query parameter is rejected in secure mode. Access-log query
+strings are stripped defensively, but the token still must travel by
+subprotocol or first message.
+=======
 A `?token=<jwt>` query parameter still works for tooling and tests but is not
 part of the frontend contract (tokens can leak into logs).
+>>>>>>> origin/main
 
 Observer and auditor may only send `PING`; any other client message closes with
 4403. No snapshot is sent before authentication.
@@ -272,9 +310,15 @@ Observer and auditor may only send `PING`; any other client message closes with
 - the built-in `dev-only-change-me` value is rejected,
 - the secret must be at least 32 characters.
 
+<<<<<<< HEAD
+`app/config.py` now inherits `SecuritySettings`, so there is one source of
+truth for these fields. A test in `tests/security/test_settings.py` covers the
+parity and secret hardening.
+=======
 B8 should make `app/config.py` delegate to `SecuritySettings` (or remove its
 duplicate auth fields) so there is one source of truth. A test in
 `tests/security/test_settings.py` fails if the class defaults diverge.
+>>>>>>> origin/main
 
 ## 10. Frontend changes required
 
@@ -292,6 +336,19 @@ The frontend currently has no auth flow. These are the exact touch points:
      storage; support logout.
    - Explain that the demo accounts are fictional.
 3. **Token on WebSocket**
+<<<<<<< HEAD
+   - `frontend/src/services/wsClient.ts` must use the `bearer.<jwt>` subprotocol
+     or send the `AUTH` first message before expecting `SNAPSHOT` (not the query
+     string).
+   - Reconnect with backoff must re-authenticate; a 4401 close must not loop.
+4. **Step-up dialog**
+   - When a decision returns `428` (body `type`
+     `https://airops.dss/errors/step-up-required`), ask for the demo PIN and call
+     `POST /api/auth/step-up`, then retry the decision once.
+   - A wrong PIN from `/auth/step-up` is a `401`; keep the dialog open.
+   - Record `428` + the body `type` as the stable step-up signal in
+     `docs/API_CONTRACT.md`.
+=======
    - `frontend/src/services/wsClient.ts` must add the token to the URL or send
      the `AUTH` first message before expecting `SNAPSHOT`.
    - Reconnect with backoff must re-authenticate; a 4401 close must not loop.
@@ -300,6 +357,7 @@ The frontend currently has no auth flow. These are the exact touch points:
      `POST /api/auth/step-up`, then retry the decision once.
    - A wrong PIN from `/auth/step-up` is a `401`; keep the dialog open.
    - Record `427` as the stable step-up signal in `docs/API_CONTRACT.md`.
+>>>>>>> origin/main
 5. **Two-person approvals**
    - Display `approvalsRequired` and the `approvals` list.
    - After the first commander approval, show "awaiting second approver" rather
@@ -325,11 +383,21 @@ The frontend currently has no auth flow. These are the exact touch points:
 Raise `contract-change` issues for:
 
 - auth endpoints and `TokenResponse` / `UserView` shapes;
+<<<<<<< HEAD
+- `401` / `403` / `409` / `422` / `423` / `428` error semantics and
+  `WWW-Authenticate` / `Retry-After` headers;
+- WebSocket `AUTH` first message, subprotocol authentication and query-token
+  rejection;
+- optional `Recommendation.approvalsRequired` and `Recommendation.approvals`;
+- step-up-required error code (`428`) and RFC 7807 body `type`
+  (`https://airops.dss/errors/step-up-required`);
+=======
 - `401` / `403` / `409` / `422` / `423` / `427` error semantics and
   `WWW-Authenticate` / `Retry-After` headers;
 - WebSocket `AUTH` first message, query token and subprotocol;
 - optional `Recommendation.approvalsRequired` and `Recommendation.approvals`;
 - step-up-required error code/type;
+>>>>>>> origin/main
 - security audit action strings;
 - `/api/auth/users` role-management endpoint.
 
@@ -346,7 +414,15 @@ From `backend/`:
 .\.venv\Scripts\python.exe -m app.security.matrix --check
 ```
 
+<<<<<<< HEAD
+Wiring tests live in `tests/security/test_route_permissions.py` (every
+operational route has a mapping) and `tests/security/test_secure_integration.py`
+(login -> inject -> recommendation -> two-person approval -> audit verification,
+token/role denials, spoof audit, revocation and secure WebSocket handshakes).
+
+=======
 After wiring, add integration tests that exercise the real routes end to end:
 login -> inject event -> recommendation -> approve (two-person) -> audit chain
 verification, plus a WebSocket handshake with a token and a `401` on the same
 route without one.
+>>>>>>> origin/main

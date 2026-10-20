@@ -87,7 +87,7 @@ class DemoRunner:
 
     # ------------------------------------------------------------------- run
 
-    def start(self, name: str) -> dict[str, Any]:
+    def start(self, name: str, *, operator: str | None = None) -> dict[str, Any]:
         if name not in _SCRIPT_NAMES:
             raise UnknownDemoError(name)
         with self._lock:
@@ -96,7 +96,7 @@ class DemoRunner:
             loop = self._loop
             if loop is None or not loop.is_running():
                 raise DemoBusyError("simulation loop is not running")
-            steps = self._steps(name)
+            steps = self._steps(name, operator=operator)
             self._running = True
             self._name = name
             self._idle.clear()
@@ -152,9 +152,9 @@ class DemoRunner:
 
     # --------------------------------------------------------------- scripts
 
-    def _steps(self, name: str) -> list[OpsEventRequest]:
+    def _steps(self, name: str, *, operator: str | None = None) -> list[OpsEventRequest]:
         if name == "sam-route-b":
-            return [self._sam_step()]
+            return [self._sam_step(operator=operator)]
         if name == "runway-closure-aog":
             return [
                 OpsEventRequest(
@@ -165,7 +165,7 @@ class DemoRunner:
                         "durationHours": 6,
                     },
                     description="Runway closed at BASE-B due to emergency cratering",
-                    operator="demo-commander",
+                    operator=operator or "demo-commander",
                 ),
                 OpsEventRequest(
                     type="AIRCRAFT_UNSERVICEABLE",
@@ -174,12 +174,12 @@ class DemoRunner:
                         "reason": "Hydraulic failure on emergency diversion approach (AOG)",
                     },
                     description="Strike airframe AC-07 declared AOG at Sector Alpha",
-                    operator="demo-commander",
+                    operator=operator or "demo-commander",
                 ),
             ]
         raise UnknownDemoError(name)
 
-    def _sam_step(self) -> OpsEventRequest:
+    def _sam_step(self, *, operator: str | None = None) -> OpsEventRequest:
         position = self._route_b_interior_waypoint()
         return OpsEventRequest(
             type="THREAT_DETECTED",
@@ -190,7 +190,7 @@ class DemoRunner:
                 "confidence": 0.9,
             },
             description="SAM site detected on Route B near Contested Hub Oscar",
-            operator="demo-commander",
+            operator=operator or "demo-commander",
         )
 
     def _route_b_interior_waypoint(self) -> LatLng:

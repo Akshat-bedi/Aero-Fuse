@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from datetime import timedelta
 from typing import Any, cast
 
 from app.runtime import SimRuntime
@@ -40,6 +41,22 @@ def test_ticks_do_not_stale_a_pending_recommendation(app_client: LiveApp) -> Non
     recommendation = _recommendation(client, runtime)
     runtime.engine.tick(120)
 
+    current = client.get(f"/api/recommendations/{recommendation['id']}").json()
+    assert current["status"] == "pending"
+
+
+def test_three_sim_hours_at_20x_do_not_stale(app_client: LiveApp) -> None:
+    client, runtime = app_client
+    recommendation = _recommendation(client, runtime)
+    runtime.staleness.ttl = timedelta(hours=24)
+    runtime.clock.set_speed(20)
+    version_before = runtime.store.version
+
+    for _ in range(3 * 60 * 3):
+        runtime.broadcast_tick()
+
+    assert runtime.clock.now() == "2026-10-17T15:00:00.000Z"
+    assert runtime.store.version == version_before
     current = client.get(f"/api/recommendations/{recommendation['id']}").json()
     assert current["status"] == "pending"
 

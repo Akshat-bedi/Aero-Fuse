@@ -11,6 +11,7 @@ from app.domain.base import (
 )
 from app.domain.decision import (
     AircraftSwapModification,
+    ApprovalRecord,
     AssignmentModification,
     Change,
     CrewSwapModification,
@@ -105,6 +106,7 @@ __all__ = [
     "AirspaceType",
     "AlertSeverity",
     "AlertType",
+    "ApprovalRecord",
     "AssignmentModification",
     "AuditEntry",
     "AuditVerification",

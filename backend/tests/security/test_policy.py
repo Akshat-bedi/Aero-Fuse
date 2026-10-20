@@ -133,8 +133,13 @@ def test_identity_has_uses_the_authorization_rule() -> None:
     [
         (Role.INTEL_OFFICER, EventType.THREAT_DETECTED, True),
         (Role.INTEL_OFFICER, EventType.AIRCRAFT_UNSERVICEABLE, False),
+<<<<<<< HEAD
+(Role.MAINTENANCE_OFFICER, EventType.AIRCRAFT_UNSERVICEABLE, True),
+(Role.MAINTENANCE_OFFICER, EventType.BASE_CLOSED, False),
+=======
         (Role.MAINTENANCE_OFFICER, EventType.AIRCRAFT_UNSERVICEABLE, True),
         (Role.MAINTENANCE_OFFICER, EventType.BASE_CLOSED, True),
+>>>>>>> origin/main
         (Role.MAINTENANCE_OFFICER, EventType.THREAT_DETECTED, False),
         (Role.OPS_PLANNER, EventType.WEATHER_DEGRADED, True),
         (Role.COMMANDER, EventType.NEW_PRIORITY_MISSION, True),

@@ -22,8 +22,10 @@ from app.api.ws import ConnectionManager
 from app.audit import AuditLog
 from app.config import Settings
 from app.domain import (
+    ApprovalRecord,
     AuditEntry,
     ClockTickPayload,
+    ModificationsRequest,
     OpsEvent,
     OpsEventRequest,
     PositionTickItem,
@@ -35,6 +37,14 @@ from app.retask.decisions import DecisionService
 from app.retask.demos import DemoRunner
 from app.retask.pipeline import RetaskPipeline
 from app.retask.staleness import StalenessTracker
+from app.security.approvals import (
+    ApprovalState,
+    approval_fields,
+    classify_high_impact,
+    initial_state,
+    required_approvals,
+)
+from app.security.deps import SecurityContext
 from app.sim.clock import SimClock
 from app.sim.engine import SimEngine
 from app.state.seed import load_seed
@@ -44,8 +54,14 @@ from app.state.store import StateChange, StateStore
 class SimRuntime:
     """Owns the live simulation and its outbound streams."""
 
-    def __init__(self, settings: Settings) -> None:
+    def __init__(
+        self,
+        settings: Settings,
+        *,
+        security: SecurityContext | None = None,
+    ) -> None:
         self.settings = settings
+        self.security = security
         snapshot = load_seed(settings.seed_path)
         self.store = StateStore(snapshot)
         self.clock = SimClock(
@@ -60,9 +76,69 @@ class SimRuntime:
         self.retask = RetaskPipeline(self)
         self.demos = DemoRunner(self)
         self.decisions = DecisionService(self)
+        self.approval_states: dict[str, ApprovalState] = {}
+        self.approval_high_impact: dict[str, bool] = {}
+        self.approval_modifiers: dict[str, str] = {}
+        self.staged_modifications: dict[str, ModificationsRequest] = {}
         self.decision_epoch = 0
         self._unsubscribe = self.store.subscribe(self._on_store_change)
         self._tasks: list[asyncio.Task[None]] = []
+
+    # ------------------------------------------------------------- approvals
+
+    @property
+    def approval_flow_enabled(self) -> bool:
+        """True when the two-person/step-up approval flow is active."""
+        return self.security is not None and self.security.auth_enabled
+
+    def register_recommendation(
+        self, recommendation: Recommendation, *, no_feasible_plan: bool = False
+    ) -> None:
+        """Attach the B8b approval state when authentication is enabled."""
+        if not self.approval_flow_enabled or self.security is None:
+            return
+        priorities = {mission.id: int(mission.priority) for mission in self.store.missions.values()}
+        assessment = classify_high_impact(
+            recommendation,
+            priorities,
+            settings=self.security.settings,
+            no_feasible_plan=no_feasible_plan,
+        )
+        required = required_approvals(
+            high_impact=assessment.high_impact,
+            approver_is_modifier=False,
+            settings=self.security.settings,
+        )
+        state = initial_state(required)
+        self.approval_states[recommendation.id] = state
+        self.approval_high_impact[recommendation.id] = assessment.high_impact
+        self.sync_approval_fields(recommendation, state)
+
+    def sync_approval_fields(self, recommendation: Recommendation, state: ApprovalState) -> None:
+        fields = approval_fields(state)
+        recommendation.approvals_required = fields.approvals_required
+        recommendation.approvals = [
+            ApprovalRecord(
+                operator=item.operator,
+                role=item.role.value,
+                timestamp=item.timestamp,
+            )
+            for item in fields.approvals or []
+        ]
+
+    def forget_approval(self, recommendation: Recommendation, *, clear_fields: bool = True) -> None:
+        """Drop internal approval state (stale, expired or decided).
+
+        ``clear_fields`` also removes the optional wire fields; decided
+        recommendations keep them so the approval record remains visible.
+        """
+        self.approval_states.pop(recommendation.id, None)
+        self.approval_high_impact.pop(recommendation.id, None)
+        self.approval_modifiers.pop(recommendation.id, None)
+        self.staged_modifications.pop(recommendation.id, None)
+        if clear_fields:
+            recommendation.approvals_required = None
+            recommendation.approvals = None
 
     # ------------------------------------------------------------- lifecycle
 
@@ -152,8 +228,11 @@ class SimRuntime:
     def broadcast_heartbeat(self) -> None:
         self.ws.broadcast(self.frame("HEARTBEAT", {}, self.store.version))
 
-    def control(self, action: str, speed: int | None) -> dict[str, Any]:
+    def control(
+        self, action: str, speed: int | None, *, operator: str | None = None
+    ) -> dict[str, Any]:
         """Apply ``/sim/control``; reset reloads the seed and re-broadcasts it."""
+        actor = operator or "demo-commander"
         if action == "pause":
             self.clock.pause()
         elif action == "resume":
@@ -169,8 +248,12 @@ class SimRuntime:
             self.store.reset(snapshot)
             self.clock.reset(snapshot.sim.time)
             self.engine.reset()
+            self.approval_states.clear()
+            self.approval_high_impact.clear()
+            self.approval_modifiers.clear()
+            self.staged_modifications.clear()
         self.append_audit_sync(
-            operator="demo-commander",
+            operator=actor,
             action="SIM_CONTROL",
             target_id="SIM",
             details=(
@@ -192,7 +275,7 @@ class SimRuntime:
 
     # ---------------------------------------------------------------- events
 
-    def inject_event(self, request: OpsEventRequest) -> OpsEvent:
+    def inject_event(self, request: OpsEventRequest, *, operator: str | None = None) -> OpsEvent:
         """Register an event with a sim-clock timestamp and apply its effect.
 
         The store notification (raised inside ``apply_event``) broadcasts
@@ -201,18 +284,19 @@ class SimRuntime:
         response is not blocked by analysis. Raises ``UnknownEntityError`` for
         unknown referenced ids.
         """
+        actor = operator if operator is not None else request.operator
         event = OpsEvent(
             id=self.store.next_event_id(),
             timestamp=self.clock.now(),
             type=request.type,
             payload=request.payload,
             severity=request.severity,
-            operator=request.operator,
+            operator=actor,
             description=request.description,
         )
         self.store.apply_event(event)
         self.append_audit_sync(
-            operator=request.operator or "demo-operator",
+            operator=actor or "demo-operator",
             action="INJECT_EVENT",
             target_id=event.id,
             details=(
